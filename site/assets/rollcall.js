@@ -4,12 +4,12 @@
    Vanilla, no framework, no network. Anything that moves is gated twice: the
    <head> script only adds .motion when the system has no reduced-motion
    request, and motionOn() checks again before anything starts. Without
-   motion the register is already complete: every tick drawn, every hand up,
-   every word in the DOM from the first paint. The roll call only changes
-   opacity and strokes, so screen readers always get the full text.
+   motion the register is already filled in: every stamp down, every hand
+   up, every word in the DOM from the first paint. The roll call only hides
+   and shows stamps, so screen readers always get the whole register.
 
-   Sections: 1. setup  2. hero  3. the roll  4. reveals and chart
-             5. terminal  6. tabs  7. copy buttons  8. say "here" (shh)
+   Sections: 1. setup  2. title page  3. the roll  4. reveals and chart
+             5. tabs   6. copy buttons  7. say "here" (shh)
    ========================================================================== */
 (function () {
   "use strict";
@@ -41,9 +41,7 @@
         }
       });
     }, { threshold: threshold, rootMargin: "0px 0px -10% 0px" });
-    els.forEach(function (el) {
-      io.observe(el);
-    });
+    els.forEach(function (el) { io.observe(el); });
   }
 
   // Timers we may need to cancel if someone turns reduced motion on mid-roll.
@@ -57,14 +55,10 @@
     timers = [];
     root.classList.remove("motion");
     $all(".roll-waiting").forEach(function (el) { el.classList.remove("roll-waiting"); });
-    $all(".desk").forEach(function (d) { d.classList.remove("is-called"); d.classList.add("is-present"); });
-    $all(".term.is-typing").forEach(function (t) { t.classList.remove("is-typing"); });
-    $all("[data-type]").forEach(function (el) {
-      if (el.dataset.full) { el.textContent = el.dataset.full; }
-    });
+    $all(".roll tr.is-called").forEach(function (tr) { tr.classList.remove("is-called"); });
+    $all(".reveal, .flow, .feed, [data-chart], .classlist li").forEach(function (el) { el.classList.add("is-in"); });
     $all("[data-count]").forEach(function (el) { el.textContent = el.dataset.count; });
-    var caller = document.querySelector("[data-caller]");
-    if (caller) { caller.textContent = "everyone. All present."; }
+    if (callerEl) { callerEl.textContent = "everyone. All present."; }
   }
 
   if (reduce && reduce.addEventListener) {
@@ -73,45 +67,54 @@
     });
   }
 
-  /* ---------------------------------------------------------------- 2. hero */
+  /* ---------------------------------------------------------- 2. title page */
 
-  // Clicking the mark opens the book again: the register rows re-run.
-  var heroArt = document.querySelector(".hero__art");
-  var heroIcon = document.querySelector(".hero__icon");
-  if (heroArt && heroIcon) {
-    heroIcon.addEventListener("click", function () {
+  // Pressing the bookplate takes today's sample roll again.
+  var sheet = document.querySelector(".sheet");
+  var bookplate = document.querySelector(".bookplate");
+  if (sheet && bookplate) {
+    bookplate.addEventListener("click", function () {
       if (!motionOn()) {
-        say("The register is already filled in. Everyone's here.");
+        say("The roll is already taken. Everyone answered.");
         return;
       }
-      heroArt.classList.add("is-replay");
-      void heroArt.offsetWidth; // restart the CSS animations
-      heroArt.classList.remove("is-replay");
+      sheet.classList.add("is-replay");
+      void sheet.offsetWidth; // restart the CSS animations
+      sheet.classList.remove("is-replay");
+      say("Settle down, class. Taking the roll again.");
     });
   }
 
   /* ----------------------------------------------------------- 3. the roll */
 
-  var classroom = document.querySelector("[data-roll]");
-  var caller = document.querySelector("[data-caller]");
+  var register = document.querySelector("[data-roll]");
+  var callerEl = document.querySelector("[data-caller]");
   var replayBtn = document.querySelector("[data-replay]");
-  var desks = classroom ? $all(".desk", classroom) : [];
+  var seats = register ? $all("tbody[data-seat]", register) : [];
+  var pupils = register ? $all("tbody[data-seat] tr:not(.seat__label)", register) : [];
   var queue = [];
   var calling = false;
   var talliesDone = false;
 
   function setCaller(text) {
-    if (!caller) { return; }
-    caller.textContent = text;
-    caller.classList.remove("is-new");
-    void caller.offsetWidth;
-    caller.classList.add("is-new");
+    if (!callerEl) { return; }
+    callerEl.textContent = text;
+    callerEl.classList.remove("is-new");
+    void callerEl.offsetWidth;
+    callerEl.classList.add("is-new");
+  }
+
+  function answerFor(tr) {
+    if (tr.classList.contains("is-back")) { return "present! (from the back row)"; }
+    if (tr.classList.contains("is-mumble")) { return "inaudible (no version in the tag)"; }
+    if (tr.querySelector(".stamp--late")) { return "present (a little late)"; }
+    return "present";
   }
 
   function callNext() {
     if (!queue.length) {
       calling = false;
-      if (desks.every(function (d) { return d.classList.contains("is-present"); })) {
+      if (pupils.every(function (tr) { return tr.classList.contains("is-done"); })) {
         later(function () {
           setCaller("everyone. All present.");
           countTallies();
@@ -120,24 +123,22 @@
       return;
     }
     calling = true;
-    var desk = queue.shift();
-    var name = desk.querySelector(".desk__name").textContent;
-    var back = desk.classList.contains("desk--back");
-    desk.classList.add("is-called");
+    var tr = queue.shift();
+    var name = tr.querySelector("th[scope=row]").textContent;
+    var slow = tr.classList.contains("is-back") || tr.classList.contains("is-mumble");
+    tr.classList.add("is-called");
     setCaller(name + "…");
     later(function () {
-      desk.classList.add("is-present");
-      setCaller(name + ": " + (back ? "present! (from the back)" : "present"));
-    }, back ? 380 : 220);
-    later(function () {
-      desk.classList.remove("is-called");
-    }, back ? 900 : 520);
-    later(callNext, back ? 700 : 330);
+      tr.classList.add("is-done");
+      setCaller(name + ": " + answerFor(tr));
+    }, slow ? 420 : 240);
+    later(function () { tr.classList.remove("is-called"); }, slow ? 1000 : 600);
+    later(callNext, slow ? 760 : 380);
   }
 
-  function enqueueRow(row) {
-    $all(".desk", row).forEach(function (d) {
-      if (!d.classList.contains("is-present") && queue.indexOf(d) === -1) { queue.push(d); }
+  function enqueueSeat(seat) {
+    $all("tr:not(.seat__label)", seat).forEach(function (tr) {
+      if (!tr.classList.contains("is-done") && queue.indexOf(tr) === -1) { queue.push(tr); }
     });
     if (!calling) { callNext(); }
   }
@@ -145,7 +146,7 @@
   function countTallies() {
     if (talliesDone) { return; }
     talliesDone = true;
-    $all("[data-count]", classroom).forEach(function (el) {
+    $all("[data-count]", register).forEach(function (el) {
       var target = parseInt(el.dataset.count, 10);
       var start = performance.now();
       var dur = 700;
@@ -165,76 +166,43 @@
     queue = [];
     calling = false;
     talliesDone = false;
-    classroom.classList.add("roll-waiting");
-    desks.forEach(function (d) { d.classList.remove("is-present", "is-called"); });
-    $all("[data-count]", classroom).forEach(function (el) { el.textContent = "0"; });
+    register.classList.add("roll-waiting");
+    pupils.forEach(function (tr) { tr.classList.remove("is-done", "is-called"); });
+    $all("[data-count]", register).forEach(function (el) { el.textContent = "0"; });
     setCaller("the roll");
   }
 
-  if (classroom && motionOn()) {
+  if (register && motionOn()) {
     startRoll();
-    // Each row is called when it scrolls into view, front row first; a row
-    // that arrives early waits its turn in the queue.
-    onceVisible($all(".row", classroom), 0.45, enqueueRow);
+    // Each row of seats is called when it scrolls into view, front row
+    // first; a row that arrives early waits its turn.
+    onceVisible(seats, 0.3, enqueueSeat);
 
     if (replayBtn) {
       replayBtn.addEventListener("click", function () {
         timers.forEach(window.clearTimeout);
         timers = [];
         startRoll();
-        later(function () {
-          $all(".row", classroom).forEach(enqueueRow);
-        }, 250);
+        later(function () { seats.forEach(enqueueSeat); }, 250);
       });
     }
   }
 
   /* ---------------------------------------------- 4. reveals and the chart */
 
+  var listItems = $all(".classlist li");
   if (motionOn()) {
-    onceVisible($all(".reveal, .flow"), 0.2, function (el) { el.classList.add("is-in"); });
-    onceVisible($all(".pupil"), 0.3, function (el) {
-      var i = $all(".pupil").indexOf(el) % 4;
-      later(function () { el.classList.add("is-in"); }, i * 70);
+    onceVisible($all(".reveal, .flow, .feed, [data-chart]"), 0.2, function (el) { el.classList.add("is-in"); });
+    onceVisible(listItems, 0.4, function (el) {
+      var i = listItems.indexOf(el) % 2;
+      later(function () { el.classList.add("is-in"); }, i * 120);
     });
   } else {
-    $all(".reveal, .flow, .pupil").forEach(function (el) { el.classList.add("is-in"); });
+    $all(".reveal, .flow, .feed, [data-chart]").forEach(function (el) { el.classList.add("is-in"); });
+    listItems.forEach(function (el) { el.classList.add("is-in"); });
   }
 
-  /* ------------------------------------------------------------ 5. terminal */
-
-  function typeTerm(term) {
-    var lines = $all(".term__body > span", term);
-    var t = 0;
-    lines.forEach(function (line) {
-      var typed = line.querySelector("[data-type]");
-      if (typed) {
-        var full = typed.textContent;
-        typed.dataset.full = full;
-        typed.textContent = "";
-        // The command line itself is visible; only its letters arrive.
-        for (var c = 1; c <= full.length; c++) {
-          (function (n) {
-            later(function () { typed.textContent = full.slice(0, n); }, t + n * 38);
-          })(c);
-        }
-        t += full.length * 38 + 260;
-      } else {
-        (function (el, at) {
-          later(function () { el.classList.add("is-shown"); }, at);
-        })(line, t);
-        t += 55;
-      }
-    });
-    later(function () { term.classList.remove("is-typing"); }, t + 100);
-  }
-
-  if (motionOn()) {
-    $all("[data-term]").forEach(function (term) { term.classList.add("is-typing"); });
-    onceVisible($all("[data-term]"), 0.35, typeTerm);
-  }
-
-  /* ---------------------------------------------------------------- 6. tabs */
+  /* ---------------------------------------------------------------- 5. tabs */
 
   var tabs = $all('[role="tab"]');
   function selectTab(tab, focus) {
@@ -262,7 +230,7 @@
     selectTab(tabs[1], false);
   }
 
-  /* -------------------------------------------------------- 7. copy buttons */
+  /* -------------------------------------------------------- 6. copy buttons */
 
   function copyText(text) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -281,13 +249,13 @@
     });
   }
 
-  $all(".copy-btn").forEach(function (btn) {
+  $all(".copy").forEach(function (btn) {
     btn.addEventListener("click", function () {
       var text = btn.dataset.copy;
       if (!text && btn.dataset.copyFrom) {
         text = document.querySelector(btn.dataset.copyFrom).textContent;
       }
-      var label = btn.querySelector(".copy-btn__label");
+      var label = btn.querySelector(".copy__label");
       copyText(text).then(function () {
         btn.classList.add("is-copied");
         label.textContent = "Present!";
@@ -302,7 +270,7 @@
     });
   });
 
-  /* -------------------------------------------------- 8. say "here" (shh) */
+  /* -------------------------------------------------- 7. say "here" (shh) */
 
   var toast = document.querySelector(".toast");
   var toastTimer = 0;

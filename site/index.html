@@ -5,21 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ROLLCALL — Every app answers present.</title>
 <meta name="description" content="ROLLCALL is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.">
-<meta name="theme-color" content="#0c5449">
+<meta name="theme-color" content="#f7f2e6">
 <link rel="icon" href="brand/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
 <link rel="apple-touch-icon" href="brand/rollcall-avatar-256.png">
+<link rel="preload" href="assets/fonts/libre-caslon-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <!--
   WayneUI 2.0.8, copied from its documented static path
-  (wayne-ui/apps/site/public/v2, the same copy WELD's page ships) so this page
-  works offline and never reaches for a CDN.
+  (wayne-ui/apps/site/public/v2) so this page works offline and never reaches
+  for a CDN. It is the base: tokens, Lato, skip link, sr-only and the a11y
+  floor. rollcall.css then dresses it as a roll book.
 -->
 <link rel="stylesheet" href="assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="assets/rollcall.css">
 <script>
   /* Call the roll out loud only for people who are happy with motion.
-     Everyone else gets the register already filled in: same page, every
-     tick already there, nothing moving. */
+     Everyone else gets the register already filled in and the ink dry. */
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
     document.documentElement.classList.add("motion");
   }
@@ -28,261 +29,226 @@
 <body>
 <a class="wsu-skip-link" href="#main">Skip to content</a>
 
-<header class="site-header">
-  <div class="wsu-container">
-    <a class="brand" href="#main">
-      <img src="brand/rollcall-avatar-256.png" width="32" height="32" alt="">
-      <span class="brand__name">ROLLCALL</span>
+<header class="masthead">
+  <div class="wrap masthead__row">
+    <a class="masthead__brand" href="#main">
+      <img src="brand/rollcall-avatar-256.png" width="28" height="28" alt="">
+      <span>ROLLCALL</span>
     </a>
-    <span class="brand__version">0.1</span>
+    <p class="masthead__meta">Register 0.1 <span aria-hidden="true">·</span> <span class="masthead__part">a part of WELD</span></p>
   </div>
 </header>
 
 <main id="main">
 
-  <!-- ================================================================ hero -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="wsu-container hero__grid">
+  <!-- ============================================================ title page -->
+  <section class="titlepage" aria-labelledby="hero-title">
+    <div class="wrap titlepage__grid">
 
-      <div class="hero__copy">
-        <p class="eyebrow">WELD's fleet scanner</p>
-        <h1 class="hero__title" id="hero-title">
-          <span class="wsu-sr-only">ROLLCALL</span>
-          <!-- Each letter stands up when its name is called. Screen readers
-               get the word whole from the line above. -->
-          <span class="hero__letters" aria-hidden="true"><span style="--i:0">R</span><span style="--i:1">O</span><span style="--i:2">L</span><span style="--i:3">L</span><span style="--i:4">C</span><span style="--i:5">A</span><span style="--i:6">L</span><span style="--i:7">L</span></span>
-        </h1>
-        <p class="hero__tagline">Every app answers <span class="quote">“present”</span>.</p>
-        <p class="hero__joke">The ones on PHP 7.4 answer from the back row.</p>
-        <p class="hero__blurb">For every app it reports the PHP image, the declared PHP floor, Laravel, the auth package and the PROCTOR result, then checks each one against CREED's <code>policy.json</code> by date. One snapshot a day gives you drift and an EOL burn-down.</p>
-        <div class="quickstart">
-          <code class="quickstart__code" id="quickstart-cmd"><span class="t-dim">$</span> <span>composer require waynestate/rollcall</span></code>
-          <button class="copy-btn" type="button" data-copy="composer require waynestate/rollcall">
-            <span class="copy-btn__label">Copy</span>
+      <div class="titlepage__copy">
+        <p class="typed">Fleet attendance, Wayne State University</p>
+        <div class="titlepage__head">
+          <button class="bookplate" type="button" aria-label="Call the sample roll again">
+            <img src="brand/rollcall-avatar-512.png" width="512" height="512" alt="">
           </button>
+          <h1 class="titlepage__title" id="hero-title">ROLLCALL</h1>
         </div>
-        <p class="hero__cta">
-          <a class="wsu-btn wsu-btn--accent wsu-btn--lg" href="#start-title">Quick start</a>
-          <a class="hero__link" href="#roll-title">Take the roll</a>
+        <p class="titlepage__tagline">Every app answers <mark class="hl">“present”</mark>.</p>
+        <p class="titlepage__joke">The ones on PHP 7.4 answer from the back row.</p>
+        <p class="titlepage__blurb">WELD's fleet scanner. For every app it writes down the PHP image, the declared PHP floor, Laravel, the auth package and the PROCTOR result, then checks each one against CREED's <code>policy.json</code> by date. One snapshot a day gives you drift and an EOL burn-down.</p>
+
+        <div class="slip">
+          <code class="slip__code"><span class="slip__dim" aria-hidden="true">$</span> composer require waynestate/rollcall</code>
+          <button class="copy" type="button" data-copy="composer require waynestate/rollcall"><span class="copy__label">Copy</span></button>
+        </div>
+
+        <p class="titlepage__cta">
+          <a class="stamp-btn" href="#start-title">Quick start</a>
+          <a class="ink-link" href="#roll-title">Take the roll</a>
         </p>
       </div>
 
-      <!-- The mark, then the register it opens into: lines on the left page,
-           ticks on the right, the same two ideas as the mark itself. -->
-      <figure class="hero__art">
-        <div class="register" aria-hidden="true">
-          <p class="register__head"><span>Fleet register</span><span class="register__sample">sample</span></p>
-          <ol class="register__rows">
-            <li style="--i:0"><span class="register__name">kiln-booking</span><span class="register__php">8.5</span><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></li>
-            <li style="--i:1"><span class="register__name">tuba-rental</span><span class="register__php">8.4</span><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></li>
-            <li style="--i:2"><span class="register__name">pigeon-post</span><span class="register__php">8.3</span><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></li>
-            <li style="--i:3"><span class="register__name">lunch-ledger</span><span class="register__php">8.3</span><svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6"/></svg></li>
-            <li style="--i:4" class="register__back"><span class="register__name">abacus-classic</span><span class="register__php">7.4</span><span class="hand hand--mini"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span></li>
-          </ol>
-          <p class="register__foot"><strong>5 present</strong> · 1 from the back row</p>
-        </div>
-        <button class="hero__icon" type="button" aria-label="Call the hero register again">
-          <img class="hero__mark" src="brand/rollcall-avatar-512.png" width="512" height="512" alt="">
-        </button>
-        <figcaption class="wsu-sr-only">The ROLLCALL mark, an open roll book, beside a sample register: four apps ticked present and one on PHP 7.4 raising a hand from the back row.</figcaption>
+      <!-- Today's sheet: the mark's two pages (lines on the left, ticks on the
+           right) become a register being taken, one name at a time. -->
+      <figure class="sheet" aria-labelledby="sheet-cap">
+        <figcaption class="sheet__cap" id="sheet-cap"><span>Today's roll</span> <span class="sheet__sample">sample data</span></figcaption>
+        <ol class="sheet__rows" data-sheet>
+          <li style="--i:0"><span class="sheet__no" aria-hidden="true">01</span><span class="sheet__name">kiln-booking</span><span class="sheet__php">PHP 8.5</span><span class="sheet__mark"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.8l5 5L20 6.2"/></svg><span class="wsu-sr-only">present</span></span></li>
+          <li style="--i:1"><span class="sheet__no" aria-hidden="true">02</span><span class="sheet__name">tuba-rental</span><span class="sheet__php">PHP 8.4</span><span class="sheet__mark"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.8l5 5L20 6.2"/></svg><span class="wsu-sr-only">present</span></span></li>
+          <li style="--i:2"><span class="sheet__no" aria-hidden="true">03</span><span class="sheet__name">pigeon-post</span><span class="sheet__php">PHP 8.3</span><span class="sheet__mark"><span class="stamp stamp--late stamp--sm">late</span></span></li>
+          <li style="--i:3"><span class="sheet__no" aria-hidden="true">04</span><span class="sheet__name">lunch-ledger</span><span class="sheet__php">PHP 8.3</span><span class="sheet__mark"><span class="stamp stamp--late stamp--sm">late</span></span></li>
+          <li style="--i:4" class="sheet__back"><span class="sheet__no" aria-hidden="true">05</span><span class="sheet__name">abacus-classic</span><span class="sheet__php">PHP 7.4</span><span class="sheet__mark"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><span class="stamp stamp--back stamp--sm">back row</span></span></li>
+        </ol>
+        <p class="sheet__total"><span>Answered</span> <span>5 of 5</span></p>
       </figure>
 
     </div>
   </section>
 
-  <!-- =========================================================== the roll -->
-  <section class="section section--roll" aria-labelledby="roll-title">
-    <div class="wsu-container">
-      <div class="section__head">
-        <p class="eyebrow">The magic trick is attendance</p>
-        <h2 id="roll-title">Take the roll</h2>
-        <p>Sixteen apps, seated by PHP version. Scroll and ROLLCALL calls each name; every one answers. The back row answers too, just with a hand in the air.</p>
+  <!-- ============================================================ § 1 the roll -->
+  <section class="chapter" aria-labelledby="roll-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 1</p>
+        <p class="kicker">The magic trick is attendance</p>
       </div>
+      <div class="chapter__body">
+        <h2 id="roll-title">Take the roll</h2>
+        <p class="lede">Seventeen apps, seated front to back by PHP version. Scroll, and ROLLCALL calls each name down the list. Everyone answers. The back row answers with a hand in the air.</p>
 
-      <div class="classroom" data-roll>
-        <div class="classroom__bar">
-          <p class="sample-tag">Sample data · fictional apps</p>
-          <p class="caller" aria-hidden="true"><span class="caller__label">Calling</span> <span class="caller__name" data-caller>the roll</span></p>
-          <button class="replay" type="button" data-replay>Call the roll again</button>
+        <div class="register" data-roll>
+          <div class="register__top">
+            <p class="sample">Sample data · fictional apps · policy as of 2026-10-28</p>
+            <button class="redo" type="button" data-replay>Call the roll again</button>
+          </div>
+          <p class="caller" aria-hidden="true"><span class="caller__label">Now calling</span> <span class="caller__name" data-caller>…</span></p>
+
+          <table class="roll">
+            <caption class="wsu-sr-only">Sample roll: seventeen fictional apps with their PHP image, Laravel version, auth package, PROCTOR result and the mark ROLLCALL gives them</caption>
+            <thead>
+              <tr><th scope="col" class="roll__no">No.</th><th scope="col">App</th><th scope="col">PHP image</th><th scope="col">Laravel</th><th scope="col">Auth</th><th scope="col">PROCTOR</th><th scope="col" class="roll__mark">Mark</th></tr>
+            </thead>
+            <tbody class="seat" data-seat>
+              <tr class="seat__label"><th scope="rowgroup" colspan="7">Front row <span>PHP 8.5 and 8.4, active</span></th></tr>
+              <tr><td class="roll__no">01</td><th scope="row">kiln-booking</th><td data-label="PHP">8.5</td><td data-label="Laravel">13</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">02</td><th scope="row">tuba-rental</th><td data-label="PHP">8.4</td><td data-label="Laravel">13</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">03</td><th scope="row">moth-catalog</th><td data-label="PHP">8.4</td><td data-label="Laravel">12</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">04</td><th scope="row">quad-weather</th><td data-label="PHP">8.4</td><td data-label="Laravel">13</td><td data-label="Auth">none</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">05</td><th scope="row">greenhouse-log</th><td data-label="PHP">8.4</td><td data-label="Laravel">12</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">06</td><th scope="row">sundial</th><td data-label="PHP">8.4</td><td data-label="Laravel">13</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+              <tr><td class="roll__no">07</td><th scope="row">otter-tracker</th><td data-label="PHP">8.4</td><td data-label="Laravel">12</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--present">present</span></td></tr>
+            </tbody>
+            <tbody class="seat" data-seat>
+              <tr class="seat__label"><th scope="rowgroup" colspan="7">Middle rows <span>PHP 8.3 and 8.2, security fixes only</span></th></tr>
+              <tr><td class="roll__no">08</td><th scope="row">pigeon-post</th><td data-label="PHP">8.3</td><td data-label="Laravel">12</td><td data-label="Auth">phpcas</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--late">late</span></td></tr>
+              <tr><td class="roll__no">09</td><th scope="row">lunch-ledger</th><td data-label="PHP">8.3</td><td data-label="Laravel">12</td><td data-label="Auth">sesame</td><td data-label="PROCTOR" class="is-off">fail</td><td class="roll__mark"><span class="stamp stamp--late">late</span></td></tr>
+              <tr><td class="roll__no">10</td><th scope="row">chess-club</th><td data-label="PHP">8.3</td><td data-label="Laravel" class="is-off">11, EOL</td><td data-label="Auth">phpcas</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--late">late</span></td></tr>
+              <tr><td class="roll__no">11</td><th scope="row">lost-mittens</th><td data-label="PHP">8.3</td><td data-label="Laravel">12</td><td data-label="Auth">none</td><td data-label="PROCTOR" class="is-off">none</td><td class="roll__mark"><span class="stamp stamp--late">late</span></td></tr>
+              <tr><td class="roll__no">12</td><th scope="row">fog-index</th><td data-label="PHP">8.2 <small>64 days left</small></td><td data-label="Laravel" class="is-off">11, EOL</td><td data-label="Auth">phpcas</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="stamp stamp--late">late</span></td></tr>
+            </tbody>
+            <tbody class="seat seat--back" data-seat>
+              <tr class="seat__label"><th scope="rowgroup" colspan="7">Back row <span>past end of life</span></th></tr>
+              <tr class="is-back"><td class="roll__no">13</td><th scope="row">abacus-classic</th><td data-label="PHP" class="is-off">7.4</td><td data-label="Laravel" class="is-off">8, EOL</td><td data-label="Auth">phpcas</td><td data-label="PROCTOR" class="is-off">none</td><td class="roll__mark"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><span class="stamp stamp--back">back row</span></td></tr>
+              <tr class="is-back"><td class="roll__no">14</td><th scope="row">punch-card-pal</th><td data-label="PHP" class="is-off">7.4</td><td data-label="Laravel">none</td><td data-label="Auth">none</td><td data-label="PROCTOR" class="is-off">none</td><td class="roll__mark"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><span class="stamp stamp--back">back row</span></td></tr>
+              <tr class="is-back"><td class="roll__no">15</td><th scope="row">dial-up-directory</th><td data-label="PHP" class="is-off">8.1</td><td data-label="Laravel" class="is-off">10, EOL</td><td data-label="Auth">phpcas</td><td data-label="PROCTOR" class="is-off">fail</td><td class="roll__mark"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><span class="stamp stamp--back">back row</span></td></tr>
+              <tr class="is-back"><td class="roll__no">16</td><th scope="row">floppy-archive</th><td data-label="PHP" class="is-off">8.0</td><td data-label="Laravel" class="is-off">9, EOL</td><td data-label="Auth">sesame</td><td data-label="PROCTOR">pass</td><td class="roll__mark"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><span class="stamp stamp--back">back row</span></td></tr>
+              <tr class="is-mumble"><td class="roll__no">17</td><th scope="row">ghost-kiosk</th><td data-label="PHP">legacy-base <small>no version in the tag</small></td><td data-label="Laravel">none</td><td data-label="Auth">none</td><td data-label="PROCTOR" class="is-off">none</td><td class="roll__mark"><span class="stamp stamp--mumble">inaudible</span></td></tr>
+            </tbody>
+          </table>
+
+          <dl class="totals">
+            <div><dt><span class="stamp stamp--present stamp--sm">present</span></dt><dd data-count="7">7</dd></div>
+            <div><dt><span class="stamp stamp--late stamp--sm">late</span></dt><dd data-count="5">5</dd></div>
+            <div><dt><span class="stamp stamp--back stamp--sm">back row</span></dt><dd data-count="4">4</dd></div>
+            <div><dt><span class="stamp stamp--mumble stamp--sm">inaudible</span></dt><dd data-count="1">1</dd></div>
+            <div class="totals__sum"><dt>Answered</dt><dd data-count="17">17</dd></div>
+          </dl>
+          <p class="register__note">Nobody is ever marked absent: a gap in one source becomes a note on that app, never a failed scan. The public report shows only totals like these; the per-app list is the internal view (<code>--internal</code>) and stays inside the project.</p>
         </div>
-
-        <p class="board" aria-hidden="true">Policy: CREED <code>policy.json</code>, as of 2026-10-28</p>
-
-        <div class="rows">
-          <section class="row" aria-labelledby="row-1">
-            <h3 class="row__label" id="row-1">Front row <span>PHP 8.5 and 8.4, active</span></h3>
-            <ol class="seats">
-              <li class="desk" data-state="active"><p class="desk__name">kiln-booking</p><p><span class="state state--active">PHP 8.5</span></p><p class="desk__facts">Laravel 13 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="active"><p class="desk__name">tuba-rental</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 13 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="active"><p class="desk__name">moth-catalog</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 12 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="active"><p class="desk__name">quad-weather</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 13 · no auth · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-            </ol>
-          </section>
-
-          <section class="row" aria-labelledby="row-2">
-            <h3 class="row__label" id="row-2">Second row <span>PHP 8.4 and 8.3</span></h3>
-            <ol class="seats">
-              <li class="desk" data-state="active"><p class="desk__name">greenhouse-log</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 12 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="active"><p class="desk__name">sundial</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 13 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="active"><p class="desk__name">otter-tracker</p><p><span class="state state--active">PHP 8.4</span></p><p class="desk__facts">Laravel 12 · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="security"><p class="desk__name">pigeon-post</p><p><span class="state state--security">PHP 8.3 · security only</span></p><p class="desk__facts">Laravel 12 · phpcas · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-            </ol>
-          </section>
-
-          <section class="row" aria-labelledby="row-3">
-            <h3 class="row__label" id="row-3">Third row <span>PHP 8.3 and 8.2, security only</span></h3>
-            <ol class="seats">
-              <li class="desk" data-state="security"><p class="desk__name">lunch-ledger</p><p><span class="state state--security">PHP 8.3 · security only</span></p><p class="desk__facts">Laravel 12 · sesame · PROCTOR fail</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="security"><p class="desk__name">chess-club</p><p><span class="state state--security">PHP 8.3 · security only</span></p><p class="desk__facts">Laravel 11 (EOL) · phpcas · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="security"><p class="desk__name">lost-mittens</p><p><span class="state state--security">PHP 8.3 · security only</span></p><p class="desk__facts">Laravel 12 · no auth · no PROCTOR report</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-              <li class="desk" data-state="security"><p class="desk__name">fog-index</p><p><span class="state state--security">PHP 8.2 · 64 days left</span></p><p class="desk__facts">Laravel 11 (EOL) · phpcas · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present</span></p></li>
-            </ol>
-          </section>
-
-          <section class="row row--back" aria-labelledby="row-4">
-            <h3 class="row__label" id="row-4">Back row <span>past end of life</span></h3>
-            <ol class="seats">
-              <li class="desk desk--back" data-state="eol"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><p class="desk__name">abacus-classic</p><p><span class="state state--eol">PHP 7.4 · EOL</span></p><p class="desk__facts">Laravel 8 (EOL) · phpcas · no PROCTOR report</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present <small>(from the back)</small></span></p></li>
-              <li class="desk desk--back" data-state="eol"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><p class="desk__name">punch-card-pal</p><p><span class="state state--eol">PHP 7.4 · EOL</span></p><p class="desk__facts">no Laravel · no auth · no PROCTOR report</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present <small>(from the back)</small></span></p></li>
-              <li class="desk desk--back" data-state="eol"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><p class="desk__name">dial-up-directory</p><p><span class="state state--eol">PHP 8.1 · EOL</span></p><p class="desk__facts">Laravel 10 (EOL) · phpcas · PROCTOR fail</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present <small>(from the back)</small></span></p></li>
-              <li class="desk desk--back" data-state="eol"><span class="hand" aria-hidden="true"><svg viewBox="0 0 32 40"><use href="#hand"/></svg></span><p class="desk__name">floppy-archive</p><p><span class="state state--eol">PHP 8.0 · EOL</span></p><p class="desk__facts">Laravel 9 (EOL) · sesame · PROCTOR pass</p><p class="desk__answer"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6"/></svg><span>present <small>(from the back)</small></span></p></li>
-            </ol>
-          </section>
-        </div>
-
-        <dl class="tally">
-          <div class="tally__item"><dt>Present</dt><dd data-count="16">16</dd></div>
-          <div class="tally__item tally__item--active"><dt>Active</dt><dd data-count="7">7</dd></div>
-          <div class="tally__item tally__item--security"><dt>Security only</dt><dd data-count="5">5</dd></div>
-          <div class="tally__item tally__item--eol"><dt>EOL</dt><dd data-count="4">4</dd></div>
-        </dl>
-        <p class="classroom__note">The public report shows counts like these and nothing else. The per-app list above is the internal view (<code>--internal</code>); in real life it stays inside the project.</p>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================= the answers -->
-  <section class="section" aria-labelledby="answers-title">
-    <div class="wsu-container">
-      <div class="section__head section__head--left">
-        <p class="eyebrow">Five answers per app</p>
-        <h2 id="answers-title">What “present” means</h2>
-        <p>Each answer is a version, and every version is checked against the dates in CREED's <code>policy.json</code>. State is never decided in code.</p>
+  <!-- ===================================================== § 2 what it means -->
+  <section class="chapter" aria-labelledby="answers-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 2</p>
+        <p class="kicker">Five answers per app</p>
       </div>
+      <div class="chapter__body">
+        <h2 id="answers-title">What “present” means</h2>
+        <p class="lede">Each answer is a version, and every version is checked against the dates in CREED's <code>policy.json</code>. State is never decided in code.</p>
 
-      <div class="ledger reveal">
-        <ol class="ledger__cols">
-          <li><p class="ledger__q">PHP image</p><p>The runtime the app really ships on, read from the app list's image tag.</p></li>
-          <li><p class="ledger__q">PHP floor</p><p>The lowest PHP the app's <code>composer.json</code> allows. <code>*</code> counts as no floor at all.</p></li>
-          <li><p class="ledger__q">Laravel</p><p>The installed version from <code>composer.lock</code>, never a guess.</p></li>
-          <li><p class="ledger__q">Auth package</p><p>Which sign-in package is installed: SESAME, a CAS client, or none.</p></li>
-          <li><p class="ledger__q">PROCTOR</p><p><code>pass</code>, <code>fail</code> or <code>none</code>, read from PROCTOR's JSON report. ROLLCALL never re-runs a rule.</p></li>
+        <ol class="columns reveal">
+          <li><h3>PHP image</h3><p>The runtime the app really ships on, read from the app list's image tag.</p></li>
+          <li><h3>PHP floor</h3><p>The lowest PHP its <code>composer.json</code> allows. <code>*</code> counts as no floor at all.</p></li>
+          <li><h3>Laravel</h3><p>The installed version from <code>composer.lock</code>, never a guess.</p></li>
+          <li><h3>Auth package</h3><p>Which sign-in package is installed: SESAME, a CAS client, or none.</p></li>
+          <li><h3>PROCTOR</h3><p><code>pass</code>, <code>fail</code> or <code>none</code>, from PROCTOR's JSON report. ROLLCALL never re-runs a rule.</p></li>
         </ol>
-        <div class="ledger__states">
-          <p class="ledger__states-title">Each version lands in one of four states</p>
-          <ul class="states">
-            <li><span class="state state--active">active</span> fully supported</li>
-            <li><span class="state state--security">security_only</span> fixes only, a date is coming</li>
-            <li><span class="state state--eol">eol</span> past its security date, or older than anything the policy lists</li>
-            <li><span class="state state--unknown">unknown</span> newer than the policy knows, or a tag nobody can parse</li>
+
+        <div class="key reveal">
+          <p class="key__title">Key to the marks</p>
+          <ul class="key__list">
+            <li><span class="stamp stamp--present">present</span> <span><code>active</code>: fully supported</span></li>
+            <li><span class="stamp stamp--late">late</span> <span><code>security_only</code>: fixes only, a date is coming</span></li>
+            <li><span class="stamp stamp--back">back row</span> <span><code>eol</code>: past its security date, or older than anything the policy lists</span></li>
+            <li><span class="stamp stamp--mumble">inaudible</span> <span><code>unknown</code>: newer than the policy knows, or a tag nobody can read</span></li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================ terminal -->
-  <section class="section section--term" aria-labelledby="report-title">
-    <div class="wsu-container report">
-      <div class="report__copy">
-        <p class="eyebrow">Real output</p>
-        <h2 id="report-title">The register, in your terminal</h2>
-        <p>This is ROLLCALL 0.1 run against its bundled fixtures: four demo apps, no network, no token. <code>scan</code> calls the roll and saves the day's snapshot; <code>report</code> reads it against the policy.</p>
-        <p>Every gap in a source becomes a note on that app, never a failed scan. A refused GitLab token stops the scan loudly instead of handing you a flattering partial answer.</p>
-        <p class="report__exit"><span class="report__code">exit 0</span> however the fleet looks. There is no exit 1: ROLLCALL takes attendance, it does not hand out detention.</p>
+  <!-- ======================================================= § 3 burn-down -->
+  <section class="chapter" aria-labelledby="burn-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 3</p>
+        <p class="kicker">Drift and the burn-down</p>
       </div>
-      <div class="term" data-term>
-        <p class="term__bar" aria-hidden="true">~/rollcall · fixtures</p>
-<pre class="term__body"><span class="term__cmd"><span class="t-dim">$ </span><span data-type>php bin/rollcall scan</span></span>
-<span class="term__out">Present: 4 apps. Snapshot 2026-10-28 saved.</span>
-<span class="term__cmd"><span class="t-dim">$ </span><span data-type>php bin/rollcall report</span></span>
-<span class="term__out"><span class="t-gold">ROLLCALL 0.1.0</span> | scan 2026-10-28 | public</span>
-<span class="term__out">Apps present: 4 (scan problems: 0)</span>
-<span class="term__out"> </span>
-<span class="term__out"><span class="t-gold">PHP image</span></span>
-<span class="term__out"><span class="t-dim">VERSION  APPS  STATE          DAYS TO EOL</span></span>
-<span class="term__out">8.1      1     <span class="t-eol">eol</span>            -301</span>
-<span class="term__out">8.3      1     <span class="t-warn">security_only</span>  429</span>
-<span class="term__out">8.4      1     <span class="t-ok">active</span>         795</span>
-<span class="term__out">unknown  1     unknown        -</span>
-<span class="term__out"> </span>
-<span class="term__out"><span class="t-gold">EOL burn-down</span></span>
-<span class="term__out"><span class="t-dim">DATE        APPS  EOL  SUPPORTED  UNKNOWN</span></span>
-<span class="term__out">2026-10-28  4     1    2          1</span>
-<span class="term__prompt" aria-hidden="true"><span class="t-dim">$</span> <span class="caret"></span></span></pre>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================================== burn-down -->
-  <section class="section" aria-labelledby="burn-title">
-    <div class="wsu-container burn">
-      <div class="section__head section__head--left">
-        <p class="eyebrow">Drift and the burn-down</p>
+      <div class="chapter__body">
         <h2 id="burn-title">Watch the back row empty</h2>
-        <p>One snapshot per scan day. Count the apps on an EOL image each day and you get a line that should only go one way.</p>
-      </div>
+        <p class="lede">One snapshot per scan day. Count the apps on an EOL image each day and you get a line that should only go one way.</p>
 
-      <div class="burn__grid">
-        <figure class="chart reveal" data-chart>
-          <figcaption class="chart__title">
-            <span>Apps on an EOL PHP image</span>
-            <span class="sample-tag sample-tag--ink">Sample data</span>
-          </figcaption>
-          <div class="chart__plot" aria-hidden="true">
-            <div class="chart__grid"><span data-v="20">20</span><span data-v="15">15</span><span data-v="10">10</span><span data-v="5">5</span><span data-v="0">0</span></div>
-            <div class="chart__bars">
-              <span class="bar" style="--v:19;--i:0"><b>19</b></span>
-              <span class="bar" style="--v:17;--i:1"><b>17</b></span>
-              <span class="bar" style="--v:17;--i:2"><b>17</b></span>
-              <span class="bar" style="--v:15;--i:3"><b>15</b></span>
-              <span class="bar" style="--v:13;--i:4"><b>13</b></span>
-              <span class="bar" style="--v:12;--i:5"><b>12</b></span>
-              <span class="bar" style="--v:10;--i:6"><b>10</b></span>
-              <span class="bar" style="--v:9;--i:7"><b>9</b></span>
-              <span class="bar" style="--v:7;--i:8"><b>7</b></span>
-              <span class="bar" style="--v:6;--i:9"><b>6</b></span>
-              <span class="bar" style="--v:5;--i:10"><b>5</b></span>
-              <span class="bar bar--now" style="--v:4;--i:11"><b>4</b></span>
-            </div>
-            <div class="chart__axis"><span>Aug 12</span><span>Sep 9</span><span>Oct 7</span><span>Oct 28</span></div>
-          </div>
-          <div class="wsu-sr-only"><table>
-            <caption>Sample data: apps on an EOL PHP image, one scan a week</caption>
-            <thead><tr><th scope="col">Scan day</th><th scope="col">EOL apps</th></tr></thead>
-            <tbody>
-              <tr><td>2026-08-12</td><td>19</td></tr><tr><td>2026-08-19</td><td>17</td></tr><tr><td>2026-08-26</td><td>17</td></tr>
-              <tr><td>2026-09-02</td><td>15</td></tr><tr><td>2026-09-09</td><td>13</td></tr><tr><td>2026-09-16</td><td>12</td></tr>
-              <tr><td>2026-09-23</td><td>10</td></tr><tr><td>2026-09-30</td><td>9</td></tr><tr><td>2026-10-07</td><td>7</td></tr>
-              <tr><td>2026-10-14</td><td>6</td></tr><tr><td>2026-10-21</td><td>5</td></tr><tr><td>2026-10-28</td><td>4</td></tr>
-            </tbody>
-          </table></div>
-          <p class="chart__foot">19 to 4 in eleven weeks. Grafana draws the same line from <code>/metrics</code> with the bundled dashboard.</p>
+        <figure class="chart" data-chart>
+          <figcaption class="chart__cap"><span>Apps on an EOL PHP image, one scan a week</span> <span class="sample">Sample data</span></figcaption>
+          <!-- Ruled by hand: the axes are pen strokes, the bars are hatched in
+               pencil, and a red-ink line runs over the top. Drawn on scroll. -->
+          <svg class="chart__svg" viewBox="0 0 640 280" role="img" aria-labelledby="chart-sum">
+            <title id="chart-sum">Apps on an EOL PHP image fell from 19 on August 12 to 4 on October 28 (sample data).</title>
+            <defs>
+              <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)">
+                <line x1="0" y1="0" x2="0" y2="7" class="chart__hatch"/>
+              </pattern>
+            </defs>
+            <g class="chart__grid">
+              <path d="M52 60 H620"/><path d="M52 120 H620"/><path d="M52 180 H620"/>
+            </g>
+            <g class="chart__ylabels">
+              <text x="42" y="64">15</text><text x="42" y="124">10</text><text x="42" y="184">5</text><text x="42" y="244">0</text>
+            </g>
+            <g class="chart__bars">
+              <rect x="64" y="12" width="32" height="228" style="--i:0"/>
+              <rect x="110" y="36" width="32" height="204" style="--i:1"/>
+              <rect x="156" y="36" width="32" height="204" style="--i:2"/>
+              <rect x="202" y="60" width="32" height="180" style="--i:3"/>
+              <rect x="248" y="84" width="32" height="156" style="--i:4"/>
+              <rect x="294" y="96" width="32" height="144" style="--i:5"/>
+              <rect x="340" y="120" width="32" height="120" style="--i:6"/>
+              <rect x="386" y="132" width="32" height="108" style="--i:7"/>
+              <rect x="432" y="156" width="32" height="84" style="--i:8"/>
+              <rect x="478" y="168" width="32" height="72" style="--i:9"/>
+              <rect x="524" y="180" width="32" height="60" style="--i:10"/>
+              <rect x="570" y="192" width="32" height="48" style="--i:11" class="is-now"/>
+            </g>
+            <path class="chart__axis" pathLength="1" d="M52 8 C51 90 53 170 52 241 C220 240 420 242 622 240"/>
+            <path class="chart__trend" pathLength="1" d="M80 10 L126 34 L172 35 L218 58 L264 82 L310 94 L356 118 L402 130 L448 154 L494 166 L540 178 L586 190"/>
+            <g class="chart__xlabels">
+              <text x="80" y="264">Aug 12</text><text x="264" y="264">Sep 9</text><text x="448" y="264">Oct 7</text><text x="586" y="264">Oct 28</text>
+            </g>
+            <g class="chart__notes">
+              <text x="104" y="16" class="chart__note">19</text>
+              <text x="604" y="168" class="chart__note chart__note--now">4 left</text>
+            </g>
+          </svg>
+          <p class="chart__foot">Grafana draws the same line from <code>/metrics</code> with the bundled dashboard, <code>grafana/rollcall-burn-down.json</code>.</p>
         </figure>
 
         <div class="drift reveal">
-          <h3 class="drift__title">Drift, counted per kind</h3>
+          <h3>Drift, counted per kind</h3>
           <ul class="drift__list">
-            <li><code>image_eol</code> runs on an EOL PHP image</li>
-            <li><code>image_unknown</code> an image tag nobody can read</li>
-            <li><code>image_below_floor</code> the image is older than the app allows</li>
-            <li><code>floor_allows_eol</code> <code>composer.json</code> still lets an EOL PHP in</li>
-            <li><code>floor_unbounded</code> no PHP floor declared at all</li>
-            <li><code>eol_past_grace</code> past the policy's grace days</li>
-            <li><code>laravel_eol</code> Laravel past its security date</li>
-            <li><code>proctor_missing</code> no PROCTOR report on file</li>
-            <li><code>proctor_failing</code> PROCTOR says fail</li>
-            <li><code>override_expired</code> a PROCTOR override ran out</li>
+            <li><code>image_eol</code><span>runs on an EOL PHP image</span></li>
+            <li><code>image_unknown</code><span>an image tag nobody can read</span></li>
+            <li><code>image_below_floor</code><span>the image is older than the app allows</span></li>
+            <li><code>floor_allows_eol</code><span>the PHP floor still lets an EOL version in</span></li>
+            <li><code>floor_unbounded</code><span>no PHP floor declared at all</span></li>
+            <li><code>eol_past_grace</code><span>past the policy's grace days</span></li>
+            <li><code>laravel_eol</code><span>Laravel past its security date</span></li>
+            <li><code>proctor_missing</code><span>no PROCTOR report on file</span></li>
+            <li><code>proctor_failing</code><span>PROCTOR says fail</span></li>
+            <li><code>override_expired</code><span>a PROCTOR override ran out</span></li>
           </ul>
           <p class="drift__foot"><code>rollcall drift</code> also compares the policy with a saved endoflife.date page. A difference is a flag for a person; the policy stays the source of truth.</p>
         </div>
@@ -290,147 +256,166 @@
     </div>
   </section>
 
-  <!-- ========================================================= quick start -->
-  <section class="section section--start" aria-labelledby="start-title">
-    <div class="wsu-container">
-      <div class="section__head">
-        <p class="eyebrow">From a checkout, with the bundled fixtures</p>
-        <h2 id="start-title">Quick start</h2>
-        <p>No network, no token. Install dependencies once with <code>composer install</code>, then call the roll. PHP 8.3 or newer.</p>
+  <!-- ===================================================== § 4 quick start -->
+  <section class="chapter" aria-labelledby="start-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 4</p>
+        <p class="kicker">From a checkout, with the bundled fixtures</p>
       </div>
+      <div class="chapter__body">
+        <h2 id="start-title">Quick start</h2>
+        <p class="lede">No network, no token. PHP 8.3 or newer. Install dependencies once with <code>composer install</code>, then call the roll.</p>
 
-      <div class="start">
-        <div class="tabs" role="tablist" aria-label="Your operating system">
-          <button class="tab" type="button" role="tab" id="tab-nix" aria-controls="panel-nix" aria-selected="true">Linux and macOS</button>
-          <button class="tab" type="button" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false" tabindex="-1">Windows</button>
-        </div>
-
-        <div class="panel" role="tabpanel" id="panel-nix" aria-labelledby="tab-nix" tabindex="0">
-          <p class="panel__shell">bash</p>
-<pre class="code" id="code-nix">export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
+        <div class="tabbed">
+          <div class="tabs" role="tablist" aria-label="Your operating system">
+            <button class="tab" type="button" role="tab" id="tab-nix" aria-controls="panel-nix" aria-selected="true">Linux and macOS</button>
+            <button class="tab" type="button" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false" tabindex="-1">Windows</button>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-nix" aria-labelledby="tab-nix" tabindex="0">
+            <p class="panel__shell">bash</p>
+<pre class="carbon" id="code-nix">export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
 export ROLLCALL_REPOS_DIR=tests/fixtures/repos
 export ROLLCALL_IMAGES_FILE=tests/fixtures/images.json
 export ROLLCALL_PROCTOR_DIR=tests/fixtures/proctor
 export ROLLCALL_STORE_DIR=var/snapshots
 php bin/rollcall scan
 php bin/rollcall report</pre>
-          <button class="copy-btn copy-btn--panel" type="button" data-copy-from="#code-nix"><span class="copy-btn__label">Copy</span></button>
-        </div>
-
-        <div class="panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0" hidden>
-          <p class="panel__shell">PowerShell, no bash or WSL needed</p>
-<pre class="code" id="code-win">$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
+            <button class="copy copy--panel" type="button" data-copy-from="#code-nix"><span class="copy__label">Copy</span></button>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0" hidden>
+            <p class="panel__shell">PowerShell, no bash or WSL needed</p>
+<pre class="carbon" id="code-win">$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
 $env:ROLLCALL_REPOS_DIR = "tests/fixtures/repos"
 $env:ROLLCALL_IMAGES_FILE = "tests/fixtures/images.json"
 $env:ROLLCALL_PROCTOR_DIR = "tests/fixtures/proctor"
 $env:ROLLCALL_STORE_DIR = "var/snapshots"
 php bin/rollcall scan
 php bin/rollcall report</pre>
-          <button class="copy-btn copy-btn--panel" type="button" data-copy-from="#code-win"><span class="copy-btn__label">Copy</span></button>
+            <button class="copy copy--panel" type="button" data-copy-from="#code-win"><span class="copy__label">Copy</span></button>
+          </div>
         </div>
-      </div>
 
-      <div class="cmds">
-        <article class="cmd reveal">
-          <h3><code>rollcall scan</code></h3>
-          <p>Calls the roll once and stores <code>&lt;date&gt;.json</code>. Scan twice in a day and that day's snapshot is replaced.</p>
-        </article>
-        <article class="cmd reveal">
-          <h3><code>rollcall report</code></h3>
-          <p><code>--format=text|json|prometheus</code>. <code>--internal</code> adds the per-app list; keep that inside the project.</p>
-        </article>
-        <article class="cmd reveal">
-          <h3><code>rollcall drift</code></h3>
-          <p><code>--feed=&lt;file&gt;</code>: a saved endoflife.date page. ROLLCALL never fetches it itself.</p>
-        </article>
-        <article class="cmd cmd--laravel reveal">
-          <h3>In Laravel</h3>
-          <p>The package registers itself. Publish the config, then schedule the scan.</p>
-<pre class="code code--small">php artisan vendor:publish --tag=rollcall-config
-php artisan rollcall:scan</pre>
-        </article>
+        <div class="feed">
+        <div class="printout">
+          <p class="printout__head">What comes back <span>real output, ROLLCALL 0.1, bundled fixtures (four demo apps)</span></p>
+<pre class="printout__body">Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
+
+ROLLCALL 0.1.0 | scan 2026-10-28 | as of 2026-10-28 | public
+Apps present: 4 (scan problems: 0)
+
+PHP image
+VERSION  APPS  STATE          SECURITY UNTIL  DAYS TO EOL
+8.1      1     eol            2025-12-31      -301
+8.3      1     security_only  2027-12-31      429
+8.4      1     active         2028-12-31      795
+unknown  1     unknown        -               -
+
+EOL burn-down (state on each scan day)
+DATE        APPS  EOL  SUPPORTED  UNKNOWN
+2026-10-28  4     1    2          1</pre>
+          <p class="printout__foot"><strong>exit 0</strong>, however the fleet looks. There is no exit 1: ROLLCALL takes attendance, it does not hand out detention.</p>
+        </div>
+        </div>
+
+        <dl class="commands reveal">
+          <div><dt><code>rollcall scan</code></dt><dd>Calls the roll once and stores <code>&lt;date&gt;.json</code>. Scan twice in a day and that day's snapshot is replaced.</dd></div>
+          <div><dt><code>rollcall report</code></dt><dd><code>--format=text|json|prometheus</code>. <code>--internal</code> adds the per-app list; keep that inside the project.</dd></div>
+          <div><dt><code>rollcall drift</code></dt><dd><code>--feed=&lt;file&gt;</code>, a saved endoflife.date page. ROLLCALL never fetches it itself.</dd></div>
+          <div><dt>In Laravel</dt><dd>The package registers itself. Publish the config with <code>php artisan vendor:publish --tag=rollcall-config</code>, then schedule <code>php artisan rollcall:scan</code>.</dd></div>
+        </dl>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================= house rules -->
-  <section class="section" aria-labelledby="rules-title">
-    <div class="wsu-container">
-      <div class="section__head section__head--left">
-        <p class="eyebrow">Classroom rules</p>
+  <!-- ===================================================== § 5 house rules -->
+  <section class="chapter" aria-labelledby="rules-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 5</p>
+        <p class="kicker">Classroom rules</p>
+      </div>
+      <div class="chapter__body">
         <h2 id="rules-title">For noticing who is missing, not for shaming them</h2>
+        <ol class="rules">
+          <li class="reveal"><h3>It enforces nothing.</h3><p>No issues opened, no comments, no deploys. It exits <code>0</code> whatever it finds.</p></li>
+          <li class="reveal"><h3>Totals, not names.</h3><p>The public report is counts and progress only: no app names, no owners, no ranking.</p></li>
+          <li class="reveal"><h3>Read-only everywhere.</h3><p><code>GET</code> and <code>HEAD</code> only, and a test fails if a write verb shows up in <code>src/</code>. The one thing it writes is its own snapshot folder.</p></li>
+          <li class="reveal"><h3>Metrics stay off until you turn them on.</h3><p>Then <code>/metrics</code> wants a bearer token or an allowed address. With neither set, nobody gets in.</p></li>
+        </ol>
       </div>
-      <ul class="rules">
-        <li class="rule reveal"><p class="rule__num">1</p><h3>It enforces nothing</h3><p>No issues opened, no comments, no deploys. It exits <code>0</code> whatever it finds.</p></li>
-        <li class="rule reveal"><p class="rule__num">2</p><h3>Counts, not names</h3><p>The public report is counts and progress only: no app names, no owners, no ranking.</p></li>
-        <li class="rule reveal"><p class="rule__num">3</p><h3>Read-only everywhere</h3><p><code>GET</code> and <code>HEAD</code> only, and a test fails if a write verb shows up. The one thing it writes is its own snapshot folder.</p></li>
-        <li class="rule reveal"><p class="rule__num">4</p><h3>Metrics stay off</h3><p>Until you turn them on. Then <code>/metrics</code> wants a bearer token or an allowed address; with neither, nobody gets in.</p></li>
-      </ul>
     </div>
   </section>
 
-  <!-- ================================================== where answers come -->
-  <section class="section section--flow" aria-labelledby="flow-title">
-    <div class="wsu-container">
-      <div class="section__head">
+  <!-- =================================================== § 6 where it comes from -->
+  <section class="chapter" aria-labelledby="flow-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 6</p>
+        <p class="kicker">Sources in, one register out</p>
+      </div>
+      <div class="chapter__body">
         <h2 id="flow-title">Where the answers come from</h2>
-        <p>Three sources and one policy go in; one snapshot a day comes out. Each source has a fixture adapter, so nothing here needs a live host to try.</p>
-      </div>
-      <div class="flow reveal">
-        <ul class="flow__col flow__col--in">
-          <li class="node"><span class="node__k">Repositories</span><span class="node__v"><code>composer.json</code> and <code>.lock</code>, from GitLab or a folder</span></li>
-          <li class="node"><span class="node__k">App list</span><span class="node__v">the PHP image each app runs</span></li>
-          <li class="node node--part"><img src="assets/marks/proctor.png" width="40" height="40" alt=""><span><span class="node__k">PROCTOR</span><span class="node__v">one JSON report per app</span></span></li>
-          <li class="node node--part"><img src="assets/marks/creed.png" width="40" height="40" alt=""><span><span class="node__k">CREED</span><span class="node__v"><code>policy.json</code>, the dates</span></span></li>
-        </ul>
-        <span class="flow__wire" aria-hidden="true"><span></span></span>
-        <div class="flow__col flow__col--mid">
-          <div class="node node--hub"><img src="brand/rollcall-avatar-256.png" width="72" height="72" alt=""><span class="node__k">ROLLCALL</span><span class="node__v">scan, snapshot, compare</span></div>
+        <p class="lede">Three sources and one policy go in; one snapshot a day comes out. Each source has a fixture adapter, so nothing here needs a live host to try.</p>
+        <div class="flow reveal">
+          <ul class="flow__col">
+            <li class="card"><span class="card__k">Repositories</span><span class="card__v"><code>composer.json</code> and <code>.lock</code>, from GitLab or a folder</span></li>
+            <li class="card"><span class="card__k">App list</span><span class="card__v">the PHP image each app runs</span></li>
+            <li class="card card--part"><img src="assets/marks/proctor.png" width="36" height="36" alt=""><span><span class="card__k">PROCTOR</span><span class="card__v">one JSON report per app</span></span></li>
+            <li class="card card--part"><img src="assets/marks/creed.png" width="36" height="36" alt=""><span><span class="card__k">CREED</span><span class="card__v"><code>policy.json</code>, the dates</span></span></li>
+          </ul>
+          <span class="flow__wire" aria-hidden="true"></span>
+          <div class="flow__hub card"><img src="brand/rollcall-avatar-256.png" width="64" height="64" alt=""><span class="card__k">ROLLCALL</span><span class="card__v">scan, snapshot, compare</span></div>
+          <span class="flow__wire" aria-hidden="true"></span>
+          <ul class="flow__col">
+            <li class="card"><span class="card__k">Terminal</span><span class="card__v"><code>text</code> and <code>json</code> reports</span></li>
+            <li class="card"><span class="card__k">/metrics</span><span class="card__v">Prometheus text, off by default</span></li>
+            <li class="card"><span class="card__k">Grafana</span><span class="card__v">the bundled burn-down dashboard</span></li>
+            <li class="card"><span class="card__k">Laravel page</span><span class="card__v">a WayneUI dashboard of totals</span></li>
+          </ul>
         </div>
-        <span class="flow__wire" aria-hidden="true"><span></span></span>
-        <ul class="flow__col flow__col--out">
-          <li class="node"><span class="node__k">Terminal</span><span class="node__v"><code>text</code> and <code>json</code> reports</span></li>
-          <li class="node"><span class="node__k">/metrics</span><span class="node__v">Prometheus text, off by default</span></li>
-          <li class="node"><span class="node__k">Grafana</span><span class="node__v">the bundled burn-down dashboard</span></li>
-          <li class="node"><span class="node__k">Laravel page</span><span class="node__v">a WayneUI dashboard of counts</span></li>
-        </ul>
       </div>
     </div>
   </section>
 
-  <!-- ========================================================== class list -->
-  <section class="section section--class" aria-labelledby="class-title">
-    <div class="wsu-container">
-      <div class="section__head">
-        <p class="eyebrow">ROLLCALL's place in WELD</p>
-        <h2 id="class-title">The class list</h2>
-        <p>WELD is Wayne State's application stack. Every part answers present here too.</p>
+  <!-- ===================================================== § 7 class list -->
+  <section class="chapter" aria-labelledby="class-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 7</p>
+        <p class="kicker">ROLLCALL's place in WELD</p>
       </div>
-      <ol class="classlist">
-        <li class="pupil"><span class="pupil__mark pupil__mark--tile"><img src="assets/marks/wayneui.svg" width="40" height="40" alt=""></span><span class="pupil__name">WayneUI</span><span class="pupil__line">the interface; the dashboard wears its classes</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/creed.png" width="256" height="256" alt=""></span><span class="pupil__name">CREED</span><span class="pupil__line">writes the dates ROLLCALL reads</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/proctor.png" width="256" height="256" alt=""></span><span class="pupil__name">PROCTOR</span><span class="pupil__line">checks one app; ROLLCALL collects the results</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/preflight.png" width="256" height="256" alt=""></span><span class="pupil__name">PREFLIGHT</span><span class="pupil__line">CI templates, where PROCTOR reports are born</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/sesame.png" width="256" height="256" alt=""></span><span class="pupil__name">SESAME</span><span class="pupil__line">the auth package ROLLCALL hopes to count</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/helmet.png" width="256" height="256" alt=""></span><span class="pupil__name">HELMET</span><span class="pupil__line">baseline runtime, with its own <code>/metrics</code></span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/pinstripe.png" width="256" height="256" alt=""></span><span class="pupil__name">Pinstripe</span><span class="pupil__line">the Pint and PHPStan rules this repo wears</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/sourdough.png" width="256" height="256" alt=""></span><span class="pupil__name">Sourdough</span><span class="pupil__line">starters that begin in the front row</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/weld.png" width="256" height="256" alt=""></span><span class="pupil__name">WELD</span><span class="pupil__line">the whole stack, joined in one app</span></li>
-        <li class="pupil pupil--self"><span class="pupil__mark"><img src="brand/rollcall-avatar-256.png" width="256" height="256" alt=""></span><span class="pupil__name">ROLLCALL <span class="chip">you are here</span></span><span class="pupil__line">the fleet census and EOL burn-down</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/booster.png" width="256" height="256" alt=""></span><span class="pupil__name">BOOSTER</span><span class="pupil__line">moves the back row forward</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/squire.png" width="256" height="256" alt=""></span><span class="pupil__name">SQUIRE</span><span class="pupil__line">carries the release to Citadel</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="pupil__name">DRAWBRIDGE</span><span class="pupil__line">the Citadel sign-in gateway</span></li>
-        <li class="pupil"><span class="pupil__mark"><img src="assets/marks/advisor.png" width="256" height="256" alt=""></span><span class="pupil__name">ADVISOR</span><span class="pupil__line">ask what applies to your app</span></li>
-      </ol>
+      <div class="chapter__body">
+        <h2 id="class-title">The class list</h2>
+        <p class="lede">WELD is Wayne State's application stack. Every part answers present here too.</p>
+        <ol class="classlist">
+          <li><span class="classlist__mark classlist__mark--tile"><img src="assets/marks/wayneui.svg" width="24" height="24" alt=""></span><span class="classlist__name">WayneUI</span><span class="classlist__line">the interface; the dashboard wears its classes</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/creed.png" width="256" height="256" alt=""></span><span class="classlist__name">CREED</span><span class="classlist__line">writes the dates ROLLCALL reads</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/proctor.png" width="256" height="256" alt=""></span><span class="classlist__name">PROCTOR</span><span class="classlist__line">checks one app; ROLLCALL collects the results</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/preflight.png" width="256" height="256" alt=""></span><span class="classlist__name">PREFLIGHT</span><span class="classlist__line">CI templates, where PROCTOR reports are born</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/sesame.png" width="256" height="256" alt=""></span><span class="classlist__name">SESAME</span><span class="classlist__line">the auth package ROLLCALL hopes to count</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/helmet.png" width="256" height="256" alt=""></span><span class="classlist__name">HELMET</span><span class="classlist__line">baseline runtime, with its own <code>/metrics</code></span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/pinstripe.png" width="256" height="256" alt=""></span><span class="classlist__name">Pinstripe</span><span class="classlist__line">the Pint and PHPStan rules this repo wears</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/sourdough.png" width="256" height="256" alt=""></span><span class="classlist__name">Sourdough</span><span class="classlist__line">starters that begin in the front row</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/weld.png" width="256" height="256" alt=""></span><span class="classlist__name">WELD</span><span class="classlist__line">the whole stack, joined in one app</span></li>
+          <li class="is-self"><span class="classlist__mark"><img src="brand/rollcall-avatar-256.png" width="256" height="256" alt=""></span><span class="classlist__name"><mark class="hl">ROLLCALL</mark></span><span class="classlist__line">you are here: the fleet census and EOL burn-down</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/booster.png" width="256" height="256" alt=""></span><span class="classlist__name">BOOSTER</span><span class="classlist__line">moves the back row forward</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/squire.png" width="256" height="256" alt=""></span><span class="classlist__name">SQUIRE</span><span class="classlist__line">carries the release to Citadel</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="classlist__name">DRAWBRIDGE</span><span class="classlist__line">the Citadel sign-in gateway</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/advisor.png" width="256" height="256" alt=""></span><span class="classlist__name">ADVISOR</span><span class="classlist__line">ask what applies to your app</span></li>
+        </ol>
+      </div>
     </div>
   </section>
 
 </main>
 
-<footer class="site-footer">
-  <div class="wsu-container">
-    <p class="site-footer__joke">Attendance taken. Nobody was sent to the principal.</p>
-    <p class="site-footer__org">Wayne State University · Enterprise Applications · MIT licence</p>
+<!-- The back cover: green cloth, gold foil. -->
+<footer class="cover">
+  <div class="wrap cover__inner">
+    <p class="cover__title">ROLLCALL</p>
+    <p class="cover__joke">Attendance taken. Nobody was sent to the principal.</p>
+    <p class="cover__org">Wayne State University · Enterprise Applications · MIT licence</p>
   </div>
 </footer>
 
