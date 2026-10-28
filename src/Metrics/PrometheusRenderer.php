@@ -7,6 +7,7 @@ namespace Waynestate\Rollcall\Metrics;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
 use Prometheus\Storage\InMemory;
+use Waynestate\Rollcall\Lifecycle\Support;
 
 /**
  * The fleet census as Prometheus text, for a Grafana burn-down.
@@ -105,6 +106,12 @@ final class PrometheusRenderer
 
     private static function state(mixed $value): string
     {
+        // A version newer than every line in CREED's policy is treated as
+        // current, so it lands in the active bucket, matching the report.
+        if ($value === "newer than CREED's policy; treated as current") {
+            return Support::Active->value;
+        }
+
         return in_array($value, ['active', 'security_only', 'eol', 'unknown'], true) ? (string) $value : 'unknown';
     }
 

@@ -6,10 +6,10 @@ namespace Waynestate\Rollcall\Tests;
 
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Metrics\PrometheusRenderer;
 use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
-use Waynestate\Rollcall\Policy\Policy;
 use Waynestate\Rollcall\Report\JsonRenderer;
 use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\Report\TextRenderer;
@@ -49,6 +49,18 @@ final class ReportTest extends TestCase
 
         $this->assertSame(['apereo/phpcas' => 1, 'none' => 2, 'waynestate/sesame' => 1], $report['auth_package']);
         $this->assertSame(['pass' => 1, 'fail' => 1, 'none' => 2], $report['proctor']);
+    }
+
+    public function test_a_version_ahead_of_the_policy_is_shown_as_treated_as_current(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [new AppFacts('g/future', phpImage: '9.0')]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY), true);
+
+        $images = array_column($report['php_image'], null, 'version');
+        $this->assertSame('newer than CREED\'s policy; treated as current', $images['9.0']['state']);
+        $this->assertSame(['active' => 1, 'security_only' => 0, 'eol' => 0, 'unknown' => 0], $report['image_states'], 'the count still uses the state bucket');
+        $apps = array_column($report['apps'], null, 'id');
+        $this->assertSame('newer than CREED\'s policy; treated as current', $apps['g/future']['image_state']);
     }
 
     public function test_drift_is_counted_per_kind_and_every_kind_is_listed(): void
@@ -182,5 +194,19 @@ final class ReportTest extends TestCase
         $this->assertStringContainsString('rollcall_auth_package_apps{package="other"} 3', $text);
         $this->assertStringContainsString('rollcall_php_image_apps{version="unknown",state="unknown"} 1', $text);
         $this->assertStringNotContainsString('evil', $text);
+    }
+
+    public function test_prometheus_reports_a_version_ahead_of_the_policy_as_active(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [
+            new AppFacts('g/future', phpImage: '9.0'),
+            new AppFacts('g/gap', phpImage: '8.0'),
+        ]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY));
+
+        $text = (new PrometheusRenderer())->render($report);
+
+        $this->assertStringContainsString('rollcall_php_image_apps{version="9.0",state="active"} 1', $text);
+        $this->assertStringContainsString('rollcall_php_image_apps{version="8.0",state="unknown"} 1', $text);
     }
 }

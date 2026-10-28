@@ -54,6 +54,7 @@
         "lint": "pint --test",
         "fix": "pint",
         "analyse": "phpstan analyse --memory-limit=1G",
+        "creed-copy:check": "@php tools/creed-copy-check.php",
         "ci": [
             "@composer validate --strict",
             "phpunit",
@@ -63,7 +64,8 @@
         ]
     },
     "scripts-descriptions": {
-        "ci": "Run every CI check: manifest, tests, style, static analysis, audit"
+        "ci": "Run every CI check: manifest, tests, style, static analysis, audit",
+        "creed-copy:check": "Prove the generated CREED copy in src/Creed has not drifted (needs CREED_PATH set to a CREED checkout)"
     },
     "config": {
         "sort-packages": true,

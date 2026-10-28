@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Lifecycle;
 
-use Waynestate\Rollcall\Policy\Policy;
+use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\RollcallException;
 
 /**
