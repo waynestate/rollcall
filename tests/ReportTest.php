@@ -6,10 +6,10 @@ namespace Waynestate\Rollcall\Tests;
 
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Metrics\PrometheusRenderer;
 use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
-use Waynestate\Rollcall\Policy\Policy;
 use Waynestate\Rollcall\Report\JsonRenderer;
 use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\Report\TextRenderer;

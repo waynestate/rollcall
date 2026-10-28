@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall;
 
+use InvalidArgumentException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Clock\ClockInterface;
+use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Waynestate\Rollcall\Clock\SystemClock;
+use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Metrics\MetricsGuard;
 use Waynestate\Rollcall\Parse\ComposerReader;
-use Waynestate\Rollcall\Policy\Policy;
 use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\Scan\Scanner;
 use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
@@ -38,7 +40,14 @@ final class Factory
             throw new RollcallException('No policy file. Set ROLLCALL_POLICY_FILE to CREED\'s policy.json.');
         }
 
-        return Policy::fromFile($this->config->policyFile);
+        // The generated CREED fromFile() docblock omits the RuntimeException its loadFile() can
+        // throw when the file exists but cannot be read. Both exception types must become a
+        // RollcallException so a bad policy file keeps the CLI's exit code 2.
+        try {
+            return Policy::fromFile($this->config->policyFile);
+        } catch (InvalidArgumentException|RuntimeException $e) { // @phpstan-ignore catch.neverThrown (see comment above the try)
+            throw new RollcallException(sprintf('Policy file "%s" is missing or unreadable. Set ROLLCALL_POLICY_FILE.', $this->config->policyFile));
+        }
     }
 
     public function store(): SnapshotStore

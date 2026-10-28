@@ -41,6 +41,12 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan`.
 
+CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
+made by CREED's `bin/export.php` until CREED is on Packagist. Refresh it from a CREED checkout with
+`php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed`, and prove the copy has not
+drifted with `composer creed-copy:check` (it reads the checkout from `CREED_PATH`). A hand edit to `src/Creed/`
+fails that check.
+
 Data comes in through three interfaces, each with a fixture adapter, so nothing here needs a live host to try:
 
 | Source | Interface | 0.1 adapters |
@@ -125,8 +131,8 @@ does not gate anything.
   the internal view each upgraded app carries the day it landed.
 - **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day.
 
-State is never decided in code: it is derived from the dates in `policy.json`. A version older than anything the
-policy lists counts as EOL; a version newer than the policy knows is `unknown`.
+State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
+policy does not list is `unknown`.
 
 ## Configuration
 

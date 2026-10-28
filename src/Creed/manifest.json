@@ -1,0 +1,17 @@
+{
+    "schema_version": 1,
+    "source": "creed",
+    "creed_version": "0.1.0-60-g3b82955",
+    "namespace": "Waynestate\\Rollcall\\Creed",
+    "files": {
+        "Policy.php": {
+            "sha256": "37bfd13dd1b6fa4cd161b41dd528de77702939ddea97e5deb595c9354b44e0f6"
+        },
+        "State.php": {
+            "sha256": "6193e1fbfdffa4c8b1aabdf7d6c5e34058370669c715810bb9c2daf9b01828c7"
+        },
+        "policy.json": {
+            "sha256": "712b2f72f1b60b9cbfa288a02b0f1791f3d9dd4967e8b069e68f774ec42ada94"
+        }
+    }
+}

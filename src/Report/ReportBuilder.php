@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Report;
 
 use DateTimeImmutable;
+use Waynestate\Rollcall\Creed\Policy;
+use Waynestate\Rollcall\Lifecycle\Support;
 use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
-use Waynestate\Rollcall\Policy\Policy;
-use Waynestate\Rollcall\Policy\State;
 
 /**
  * Turns snapshots and the policy into a report.
@@ -58,7 +58,7 @@ final class ReportBuilder
             foreach ($flags as $flag) {
                 $drift[$flag]++;
             }
-            $imageState = $this->policy->stateOf('php', $app->phpImage, $today);
+            $imageState = $this->state('php', $app->phpImage, $today);
             $states[$imageState->value]++;
             $proctor[$app->proctorResult ?? 'none']++;
             $authKey = $app->authPackage ?? 'none';
@@ -70,9 +70,9 @@ final class ReportBuilder
                     'php_image' => $app->phpImage,
                     'image_state' => $imageState->value,
                     'php_floor' => $app->phpFloor,
-                    'floor_state' => $this->policy->stateOf('php', $app->phpFloor, $today)->value,
+                    'floor_state' => $this->state('php', $app->phpFloor, $today)->value,
                     'laravel' => $app->laravel,
-                    'laravel_state' => $this->policy->stateOf('laravel', $app->laravelMajor(), $today)->value,
+                    'laravel_state' => $this->state('laravel', $app->laravelMajor(), $today)->value,
                     'auth_package' => $app->authPackage,
                     'auth_version' => $app->authVersion,
                     'proctor' => $app->proctorResult,
@@ -118,10 +118,10 @@ final class ReportBuilder
     public function flagsFor(AppFacts $app, DateTimeImmutable $today): array
     {
         $flags = [];
-        $image = $this->policy->stateOf('php', $app->phpImage, $today);
+        $image = $this->state('php', $app->phpImage, $today);
         if ($app->phpImage === null) {
             $flags[] = 'image_unknown';
-        } elseif ($image === State::Eol) {
+        } elseif ($image === Support::Eol) {
             $flags[] = 'image_eol';
             if ($this->policy->isPastGrace('php', $app->phpImage, $today)) {
                 $flags[] = 'eol_past_grace';
@@ -130,14 +130,14 @@ final class ReportBuilder
         if ($app->phpFloor === null) {
             $flags[] = 'floor_unbounded';
         } else {
-            if ($this->policy->stateOf('php', $app->phpFloor, $today) === State::Eol) {
+            if ($this->state('php', $app->phpFloor, $today) === Support::Eol) {
                 $flags[] = 'floor_allows_eol';
             }
             if ($app->phpImage !== null && version_compare($app->phpImage, $app->phpFloor, '<')) {
                 $flags[] = 'image_below_floor';
             }
         }
-        if ($this->policy->stateOf('laravel', $app->laravelMajor(), $today) === State::Eol) {
+        if ($this->state('laravel', $app->laravelMajor(), $today) === Support::Eol) {
             $flags[] = 'laravel_eol';
         }
         if ($app->proctorResult === null) {
@@ -155,10 +155,16 @@ final class ReportBuilder
         return array_values(array_unique($flags));
     }
 
+    /** The report state for a version: CREED's answer, in ROLLCALL's words. */
+    private function state(string $component, ?string $version, DateTimeImmutable $day): Support
+    {
+        return Support::fromTryStateOf($this->policy->tryStateOf($component, $version, $day));
+    }
+
     /** @return array<string, int> */
     private function emptyStates(): array
     {
-        return [State::Active->value => 0, State::SecurityOnly->value => 0, State::Eol->value => 0, State::Unknown->value => 0];
+        return [Support::Active->value => 0, Support::SecurityOnly->value => 0, Support::Eol->value => 0, Support::Unknown->value => 0];
     }
 
     /**
@@ -188,7 +194,7 @@ final class ReportBuilder
             $rows[] = [
                 'version' => $version,
                 'apps' => $apps,
-                'state' => $this->policy->stateOf($component, $known ? $version : null, $today)->value,
+                'state' => $this->state($component, $known ? $version : null, $today)->value,
                 'security_until' => $until?->format('Y-m-d'),
                 'days_to_eol' => $known ? $this->policy->daysToEol($component, $version, $today) : null,
             ];
@@ -237,8 +243,8 @@ final class ReportBuilder
             unset($was[$app->id]);
             if ($old->phpImage !== null && $app->phpImage !== null && $old->phpImage !== $app->phpImage) {
                 $moved++;
-                $wasState = $this->policy->stateOf('php', $old->phpImage, $previous->date);
-                if ($wasState === State::Eol && $this->policy->stateOf('php', $app->phpImage, $today)->isSupported()) {
+                $wasState = $this->state('php', $old->phpImage, $previous->date);
+                if ($wasState === Support::Eol && $this->state('php', $app->phpImage, $today)->isSupported()) {
                     $upgraded++;
                 }
             }
@@ -267,9 +273,9 @@ final class ReportBuilder
             $supported = 0;
             $unknown = 0;
             foreach ($snapshot->apps as $app) {
-                $state = $this->policy->stateOf('php', $app->phpImage, $snapshot->date);
+                $state = $this->state('php', $app->phpImage, $snapshot->date);
                 match (true) {
-                    $state === State::Eol => $eol++,
+                    $state === Support::Eol => $eol++,
                     $state->isSupported() => $supported++,
                     default => $unknown++,
                 };
@@ -292,8 +298,8 @@ final class ReportBuilder
         $lastState = [];
         foreach ($history as $snapshot) {
             foreach ($snapshot->apps as $app) {
-                $state = $this->policy->stateOf('php', $app->phpImage, $snapshot->date);
-                if (($lastState[$app->id] ?? null) === State::Eol && $state->isSupported() && ! isset($dates[$app->id])) {
+                $state = $this->state('php', $app->phpImage, $snapshot->date);
+                if (($lastState[$app->id] ?? null) === Support::Eol && $state->isSupported() && ! isset($dates[$app->id])) {
                     $dates[$app->id] = $snapshot->date->format('Y-m-d');
                 }
                 $lastState[$app->id] = $state;

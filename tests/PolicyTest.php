@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Tests;
 
 use DateTimeImmutable;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Waynestate\Rollcall\Policy\Policy;
-use Waynestate\Rollcall\Policy\State;
+use Waynestate\Rollcall\Config;
+use Waynestate\Rollcall\Creed\Policy;
+use Waynestate\Rollcall\Factory;
+use Waynestate\Rollcall\Lifecycle\Support;
 use Waynestate\Rollcall\RollcallException;
 
 final class PolicyTest extends TestCase
@@ -23,32 +26,32 @@ final class PolicyTest extends TestCase
         return new DateTimeImmutable($date);
     }
 
-    /** @return iterable<string, array{string, string, string, State}> */
+    /** @return iterable<string, array{string, string, string, Support}> */
     public static function states(): iterable
     {
-        yield 'php 8.4 is active on its last active day' => ['php', '8.4', '2026-12-31', State::Active];
-        yield 'php 8.4 turns security-only the day after' => ['php', '8.4', '2027-01-01', State::SecurityOnly];
-        yield 'php 8.2 is security-only now' => ['php', '8.2', '2026-10-28', State::SecurityOnly];
-        yield 'php 8.2 is still supported on its last day' => ['php', '8.2', '2026-12-31', State::SecurityOnly];
-        yield 'php 8.2 is EOL the day after' => ['php', '8.2', '2027-01-01', State::Eol];
-        yield 'php 8.1 has only a security date and is EOL after it' => ['php', '8.1', '2026-10-28', State::Eol];
-        yield 'php 7.4 is older than anything listed, so EOL' => ['php', '7.4', '2026-10-28', State::Eol];
-        yield 'php 9.0 is newer than the policy, so unknown' => ['php', '9.0', '2026-10-28', State::Unknown];
-        yield 'laravel 10 is EOL' => ['laravel', '10', '2026-10-28', State::Eol];
-        yield 'laravel 9 is older than listed, so EOL' => ['laravel', '9', '2026-10-28', State::Eol];
-        yield 'laravel 12 is security-only' => ['laravel', '12', '2026-10-28', State::SecurityOnly];
-        yield 'an unlisted component is unknown' => ['cobol', '1', '2026-10-28', State::Unknown];
+        yield 'php 8.4 is active on its last active day' => ['php', '8.4', '2026-12-31', Support::Active];
+        yield 'php 8.4 turns security-only the day after' => ['php', '8.4', '2027-01-01', Support::SecurityOnly];
+        yield 'php 8.2 is security-only now' => ['php', '8.2', '2026-10-28', Support::SecurityOnly];
+        yield 'php 8.2 is still supported on its last day' => ['php', '8.2', '2026-12-31', Support::SecurityOnly];
+        yield 'php 8.2 is EOL the day after' => ['php', '8.2', '2027-01-01', Support::Eol];
+        yield 'php 8.1 has only a security date and is EOL after it' => ['php', '8.1', '2026-10-28', Support::Eol];
+        yield 'php 7.4 is older than anything listed, so unknown' => ['php', '7.4', '2026-10-28', Support::Unknown];
+        yield 'php 9.0 is newer than the policy, so unknown' => ['php', '9.0', '2026-10-28', Support::Unknown];
+        yield 'laravel 10 is EOL' => ['laravel', '10', '2026-10-28', Support::Eol];
+        yield 'laravel 9 is older than listed, so unknown' => ['laravel', '9', '2026-10-28', Support::Unknown];
+        yield 'laravel 12 is security-only' => ['laravel', '12', '2026-10-28', Support::SecurityOnly];
+        yield 'an unlisted component is unknown' => ['cobol', '1', '2026-10-28', Support::Unknown];
     }
 
     #[DataProvider('states')]
-    public function test_state_is_derived_from_the_dates(string $component, string $version, string $today, State $expected): void
+    public function test_state_is_derived_from_the_dates(string $component, string $version, string $today, Support $expected): void
     {
-        $this->assertSame($expected, $this->policy()->stateOf($component, $version, self::day($today)));
+        $this->assertSame($expected, Support::fromTryStateOf($this->policy()->tryStateOf($component, $version, self::day($today))));
     }
 
     public function test_a_missing_version_is_unknown(): void
     {
-        $this->assertSame(State::Unknown, $this->policy()->stateOf('php', null, self::day('2026-10-28')));
+        $this->assertSame(Support::Unknown, Support::fromTryStateOf($this->policy()->tryStateOf('php', null, self::day('2026-10-28'))));
     }
 
     public function test_days_to_eol_counts_to_the_security_date_and_goes_negative(): void
@@ -62,33 +65,40 @@ final class PolicyTest extends TestCase
     public function test_grace_comes_from_the_policy_rules(): void
     {
         $policy = $this->policy();
-        $this->assertSame(90, $policy->eolGraceDays);
+        $this->assertSame(90, $policy->rules()['eol_grace_days']);
         $this->assertTrue($policy->isPastGrace('php', '8.1', self::day('2026-10-28')));
         $this->assertFalse($policy->isPastGrace('php', '8.2', self::day('2027-02-01')));
         $this->assertTrue($policy->isPastGrace('php', '8.2', self::day('2027-04-02')));
     }
 
-    /** @return iterable<string, array{string}> */
-    public static function badPolicies(): iterable
+    public function test_a_policy_without_a_schema_version_is_refused(): void
     {
-        yield 'not json' => ['{ nope'];
-        yield 'wrong schema version' => ['{"schema_version": 2, "components": {"php": {"versions": {}}}}'];
-        yield 'no components' => ['{"schema_version": 1, "components": {}}'];
-        yield 'component without versions' => ['{"schema_version": 1, "components": {"php": {}}}'];
-        yield 'bad date' => ['{"schema_version": 1, "components": {"php": {"versions": {"8.4": {"security_until": "soon"}}}}}'];
-        yield 'bad grace' => ['{"schema_version": 1, "components": {"php": {"versions": {}}}, "rules": {"eol_grace_days": -1}}'];
+        $this->expectException(InvalidArgumentException::class);
+        Policy::fromArray(['components' => ['php' => ['versions' => []]]]);
     }
 
-    #[DataProvider('badPolicies')]
-    public function test_a_bad_policy_is_refused(string $json): void
+    public function test_a_missing_file_is_refused(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Policy::fromFile(__DIR__ . '/fixtures/nope.json');
+    }
+
+    public function test_a_file_that_is_not_json_is_refused(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'rollcall-policy-');
+        file_put_contents($file, '{ nope');
+        try {
+            $this->expectException(InvalidArgumentException::class);
+            Policy::fromFile($file);
+        } finally {
+            unlink($file);
+        }
+    }
+
+    public function test_the_factory_names_the_setting_when_the_file_is_missing(): void
     {
         $this->expectException(RollcallException::class);
-        Policy::fromJson($json);
-    }
-
-    public function test_a_missing_file_names_the_setting(): void
-    {
         $this->expectExceptionMessage('ROLLCALL_POLICY_FILE');
-        Policy::fromFile(__DIR__ . '/fixtures/nope.json');
+        (new Factory(new Config(policyFile: __DIR__ . '/fixtures/nope.json')))->policy();
     }
 }

@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Waynestate\Rollcall\Config;
 use Waynestate\Rollcall\Console\Application;
+use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Lifecycle\EndOfLifeDrift;
-use Waynestate\Rollcall\Policy\Policy;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Tests\Support\Fleet;
 
