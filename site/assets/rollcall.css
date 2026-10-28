@@ -328,14 +328,14 @@ code {
   position: relative;
   --icon: clamp(104px, 12vw, 160px);
   margin: 0;
-  padding: calc(var(--icon) * 0.4) 0 0 calc(var(--icon) * 0.3);
+  padding: calc(var(--icon) * 0.5) 0 0 calc(var(--icon) * 0.42);
   min-width: 0;
 }
 
 .register {
   position: relative;
   margin: 0;
-  padding: calc(var(--icon) * 0.6 + 0.6rem) 1.5rem 1.4rem 4.2rem;
+  padding: calc(var(--icon) * 0.5 + 0.3rem) 1.5rem 1.1rem 4.2rem;
   color: var(--rc-ink);
   border-radius: 14px;
   background-color: var(--rc-paper);
@@ -353,7 +353,7 @@ code {
   position: absolute;
   top: 1.1rem;
   right: 1.5rem;
-  left: calc(var(--icon) * 0.7 + 0.75rem);
+  left: calc(var(--icon) * 0.58 + 0.75rem);
   margin: 0;
   font-family: var(--wsu-font-family-mono);
   font-size: 0.75rem;
@@ -405,6 +405,19 @@ code {
 
 .register__back {
   color: var(--rc-maroon);
+}
+
+.register__foot {
+  margin: 0.6rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 2px solid var(--rc-ink);
+  font-family: var(--wsu-font-family-mono);
+  font-size: 0.75rem;
+  color: var(--rc-muted);
+}
+
+.register__foot strong {
+  color: var(--rc-green);
 }
 
 .register__back .register__php {
@@ -803,6 +816,7 @@ html:not(.motion) .replay {
 
 .report__copy h2 {
   margin: 0 0 1rem;
+  color: var(--rc-cream);
   font-size: clamp(2rem, 4.2vw, 3rem);
   font-weight: var(--wsu-font-weight-black);
   line-height: 1.05;
@@ -826,6 +840,7 @@ html:not(.motion) .replay {
 }
 
 .report__code {
+  margin-right: 0.2rem;
   font-family: var(--wsu-font-family-mono);
   font-weight: var(--wsu-font-weight-bold);
   color: var(--rc-gold);
@@ -860,7 +875,7 @@ html:not(.motion) .replay {
 }
 
 .term__body > span {
-  display: block;
+  display: inline;
 }
 
 .caret {
@@ -877,7 +892,7 @@ html:not(.motion) .replay {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
   gap: 1.5rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .chart {
@@ -901,7 +916,7 @@ html:not(.motion) .replay {
   position: relative;
   display: grid;
   grid-template-columns: 2rem minmax(0, 1fr);
-  grid-template-rows: 15rem auto;
+  grid-template-rows: clamp(13rem, 30vw, 22rem) auto;
 }
 
 .chart__grid {
@@ -1087,6 +1102,8 @@ html:not(.motion) .replay {
 
 .panel__shell {
   margin: 0 0 0.6rem;
+  padding-right: 6rem;
+  line-height: 2rem;
   font-family: var(--wsu-font-family-mono);
   font-size: 0.75rem;
   color: var(--rc-muted);
@@ -1107,14 +1124,17 @@ html:not(.motion) .replay {
 
 .code--small {
   margin-top: 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-size: 0.75rem;
 }
 
 .copy-btn--panel {
   position: absolute;
-  top: 0.85rem;
+  top: 1.25rem;
   right: 1.25rem;
-  padding: 0.3rem 0.85rem;
+  height: 2rem;
+  padding: 0 0.95rem;
   border-radius: 999px;
   font-size: 0.75rem;
 }
@@ -1483,10 +1503,6 @@ html:not(.motion) .replay {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .hero__art {
-    padding: 2.75rem 0 0 1.5rem;
-  }
-
   .register {
     padding-left: 3.2rem;
     padding-right: 1rem;
@@ -1578,6 +1594,10 @@ html:not(.motion) .replay {
   .motion .register__rows .tick path {
     animation: draw 0.4s var(--rc-ease-out) both;
     animation-delay: calc(1.25s + var(--i) * 0.32s);
+  }
+
+  .motion .register__foot {
+    animation: rise 0.5s var(--rc-ease-out) 3.1s both;
   }
 
   .motion .register__back .hand {
