@@ -1,6 +1,10 @@
 {
     "name": "waynestate/rollcall",
     "description": "WELD's fleet scanner: every app answers present with its PHP image, Laravel and auth-package versions and its PROCTOR result, checked against CREED's policy.",
+    "homepage": "https://rollcall.apps.wayne.edu/",
+    "support": {
+        "source": "https://github.com/waynestate/rollcall"
+    },
     "type": "library",
     "license": "MIT",
     "authors": [
