@@ -51,6 +51,18 @@ final class ReportTest extends TestCase
         $this->assertSame(['pass' => 1, 'fail' => 1, 'none' => 2], $report['proctor']);
     }
 
+    public function test_a_version_ahead_of_the_policy_is_shown_as_treated_as_current(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [new AppFacts('g/future', phpImage: '9.0')]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY), true);
+
+        $images = array_column($report['php_image'], null, 'version');
+        $this->assertSame('newer than CREED\'s policy; treated as current', $images['9.0']['state']);
+        $this->assertSame(['active' => 1, 'security_only' => 0, 'eol' => 0, 'unknown' => 0], $report['image_states'], 'the count still uses the state bucket');
+        $apps = array_column($report['apps'], null, 'id');
+        $this->assertSame('newer than CREED\'s policy; treated as current', $apps['g/future']['image_state']);
+    }
+
     public function test_drift_is_counted_per_kind_and_every_kind_is_listed(): void
     {
         $drift = $this->report()['drift'];

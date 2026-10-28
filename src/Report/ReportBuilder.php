@@ -68,11 +68,11 @@ final class ReportBuilder
                 $perApp[] = [
                     'id' => $app->id,
                     'php_image' => $app->phpImage,
-                    'image_state' => $imageState->value,
+                    'image_state' => $this->stateLabel('php', $app->phpImage, $today),
                     'php_floor' => $app->phpFloor,
-                    'floor_state' => $this->state('php', $app->phpFloor, $today)->value,
+                    'floor_state' => $this->stateLabel('php', $app->phpFloor, $today),
                     'laravel' => $app->laravel,
-                    'laravel_state' => $this->state('laravel', $app->laravelMajor(), $today)->value,
+                    'laravel_state' => $this->stateLabel('laravel', $app->laravelMajor(), $today),
                     'auth_package' => $app->authPackage,
                     'auth_version' => $app->authVersion,
                     'proctor' => $app->proctorResult,
@@ -161,6 +161,22 @@ final class ReportBuilder
         return Support::fromTryStateOf($this->policy->tryStateOf($component, $version, $day));
     }
 
+    /**
+     * The state a version shows in the report.
+     *
+     * A version the policy does not list but that sorts above every listed
+     * line is newer than the policy; CREED treats it as current, and the
+     * report says so instead of a bare "active".
+     */
+    private function stateLabel(string $component, ?string $version, DateTimeImmutable $day): string
+    {
+        if ($version !== null && $this->policy->hasComponent($component) && $this->policy->isAheadOfPolicy($component, $version)) {
+            return 'newer than CREED\'s policy; treated as current';
+        }
+
+        return $this->state($component, $version, $day)->value;
+    }
+
     /** @return array<string, int> */
     private function emptyStates(): array
     {
@@ -194,7 +210,7 @@ final class ReportBuilder
             $rows[] = [
                 'version' => $version,
                 'apps' => $apps,
-                'state' => $this->state($component, $known ? $version : null, $today)->value,
+                'state' => $this->stateLabel($component, $known ? $version : null, $today),
                 'security_until' => $until?->format('Y-m-d'),
                 'days_to_eol' => $known ? $this->policy->daysToEol($component, $version, $today) : null,
             ];
