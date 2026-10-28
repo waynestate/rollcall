@@ -14,3 +14,6 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 - Optional Prometheus metrics, off by default, with a token or allowlist guard, plus a Grafana dashboard.
 - Raw-PHP front controller (`/metrics`, `/report.json`) and a Laravel adapter (dashboard, `rollcall:scan`).
 - `composer ci` (manifest, PHPUnit, Pint, PHPStan, audit) on GitLab and GitHub.
+- Snapshot retention: `ROLLCALL_RETENTION_DAYS` (default 90; 0 keeps everything), `rollcall scan --prune[=DAYS]`,
+  and `rollcall prune [--days=N] [--dry-run]` (plus `php artisan rollcall:prune`). Pruning never deletes the newest
+  snapshot, so the dashboard always has data.

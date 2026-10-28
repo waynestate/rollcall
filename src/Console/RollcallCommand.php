@@ -37,6 +37,23 @@ abstract class RollcallCommand extends Command
     /** Runs the command body; subclasses throw RollcallException for expected failures. */
     abstract protected function handle(InputInterface $input, OutputInterface $output, Factory $factory, Config $config, ClockInterface $clock): int;
 
+    /**
+     * The retention window in days: the option's value if one was given, else
+     * the config's. A value must be a whole number of days; 0 keeps everything.
+     */
+    protected function retentionDays(InputInterface $input, Config $config, string $option): int
+    {
+        $value = $input->getOption($option);
+        if ($value === null || $value === false) {
+            return $config->retentionDays;
+        }
+        if (! is_string($value) || preg_match('/^\d+$/', $value) !== 1) {
+            throw new RollcallException(sprintf('Retention days must be a whole number of days (0 keeps everything), not "%s".', $value));
+        }
+
+        return (int) $value;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $errors = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;

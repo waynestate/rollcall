@@ -7,7 +7,7 @@ namespace Waynestate\Rollcall\Console;
 use Symfony\Component\Console\Application as BaseApplication;
 use Waynestate\Rollcall\Report\ReportBuilder;
 
-/** `rollcall scan | report | drift`. Present! */
+/** `rollcall scan | report | drift | prune`. Present! */
 final class Application extends BaseApplication
 {
     /** @param  array<string, string|false|null>  $env */
@@ -17,5 +17,6 @@ final class Application extends BaseApplication
         $this->add(new ScanCommand($env));
         $this->add(new ReportCommand($env));
         $this->add(new DriftCommand($env));
+        $this->add(new PruneCommand($env));
     }
 }

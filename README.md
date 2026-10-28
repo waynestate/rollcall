@@ -20,7 +20,8 @@ Front page: [`site/index.html`](site/index.html) (static, no build step; see `si
 ROLLCALL is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
 against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
 version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
-per scan, so it can show drift and an EOL burn-down over time.
+per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
+(default 90 days; the newest snapshot always stays).
 
 ROLLCALL enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
 The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
@@ -51,9 +52,9 @@ WELD is Wayne State's application stack. ROLLCALL is the roll book for the whole
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
-- `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan`.
+- `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
 CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
 made by CREED's `bin/export.php` until CREED is on Packagist. Refresh it from a CREED checkout with
@@ -115,20 +116,26 @@ runs.
 ## Commands
 
 ```
-rollcall scan   [--today=YYYY-MM-DD]
+rollcall scan   [--today=YYYY-MM-DD] [--prune[=DAYS]]
 rollcall report [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
 rollcall drift  --feed=<file> [--component=php] [--today=YYYY-MM-DD]
+rollcall prune  [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 ```
 
 - `scan` calls the roll once and stores `<ROLLCALL_STORE_DIR>/<date>.json`. Scanning twice in a day replaces that
   day's snapshot. A gap in one source (a missing report, a bad image tag) becomes a note on that app, not a failed
   scan. A refused GitLab token stops the scan loudly instead of producing a flattering partial answer.
+  `--prune[=DAYS]` deletes snapshots older than that many days after saving (default: `ROLLCALL_RETENTION_DAYS`,
+  90; 0 keeps everything).
 - `report` prints the latest snapshot against the policy as of today. `text` is a terminal table, `json` is the
   machine-readable form, `prometheus` is the metrics text (refused unless `ROLLCALL_METRICS_ENABLED=true`).
   `--internal` adds the per-app list; keep that output inside the project.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
   policy stays the source of truth. ROLLCALL does not fetch that page itself.
+- `prune` deletes snapshots older than `--days` (default: `ROLLCALL_RETENTION_DAYS`, 90; 0 keeps everything). The
+  newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
+  `--dry-run` lists what would go without deleting anything.
 
 Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: ROLLCALL
 does not gate anything.
@@ -164,6 +171,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package | the built-in list |
+| `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
 | `ROLLCALL_METRICS_ENABLED` | Turn metrics on (`CLI report --format=prometheus` and `/metrics`) | `false` |
 | `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
 | `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |

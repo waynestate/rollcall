@@ -31,6 +31,7 @@ final class Config
         private readonly string $metricsToken = '',
         public readonly array $metricsAllow = [],
         public readonly bool $publicReportEnabled = false,
+        public readonly int $retentionDays = 90,
     ) {}
 
     /** @param  array<string, string|false|null>  $env */
@@ -59,12 +60,26 @@ final class Config
             metricsToken: $get('ROLLCALL_METRICS_TOKEN') ?? '',
             metricsAllow: $list($get('ROLLCALL_METRICS_ALLOW')),
             publicReportEnabled: self::truthy($get('ROLLCALL_PUBLIC_REPORT_ENABLED')),
+            retentionDays: self::days($get('ROLLCALL_RETENTION_DAYS'), 90),
         );
     }
 
     private static function truthy(?string $value): bool
     {
         return in_array(strtolower($value ?? ''), ['1', 'true', 'yes', 'on'], true);
+    }
+
+    /** A whole number of days; 0 keeps every snapshot forever. */
+    private static function days(?string $value, int $default): int
+    {
+        if ($value === null) {
+            return $default;
+        }
+        if (preg_match('/^\d+$/', $value) !== 1) {
+            throw new RollcallException('ROLLCALL_RETENTION_DAYS must be a whole number of days (0 keeps everything).');
+        }
+
+        return (int) $value;
     }
 
     public function gitlabToken(): string

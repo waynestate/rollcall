@@ -18,6 +18,7 @@ return [
     'images_file' => env('ROLLCALL_IMAGES_FILE'),
     'proctor_dir' => env('ROLLCALL_PROCTOR_DIR'),
     'auth_packages' => env('ROLLCALL_AUTH_PACKAGES'),
+    'retention_days' => env('ROLLCALL_RETENTION_DAYS', 90),
 
     // Off by default, in Prometheus format, like the rest of the stack. On, /metrics needs the bearer token or an allowlisted address.
     'metrics_enabled' => env('ROLLCALL_METRICS_ENABLED', false),

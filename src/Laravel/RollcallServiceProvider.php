@@ -44,6 +44,7 @@ class RollcallServiceProvider extends ServiceProvider
                 'ROLLCALL_IMAGES_FILE' => $str('images_file'),
                 'ROLLCALL_PROCTOR_DIR' => $str('proctor_dir'),
                 'ROLLCALL_AUTH_PACKAGES' => $str('auth_packages'),
+                'ROLLCALL_RETENTION_DAYS' => $str('retention_days'),
                 'ROLLCALL_METRICS_ENABLED' => ($c['metrics_enabled'] ?? false) ? 'true' : null,
                 'ROLLCALL_METRICS_TOKEN' => $str('metrics_token'),
                 'ROLLCALL_METRICS_ALLOW' => $str('metrics_allow'),
@@ -59,7 +60,7 @@ class RollcallServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'rollcall');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ScanCommand::class]);
+            $this->commands([ScanCommand::class, PruneCommand::class]);
         }
 
         $this->registerRoutes();

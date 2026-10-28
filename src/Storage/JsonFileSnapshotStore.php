@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Storage;
 
+use DateTimeImmutable;
 use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\RollcallException;
 
@@ -60,5 +61,34 @@ final class JsonFileSnapshotStore implements SnapshotStore
         $all = $this->all();
 
         return $all === [] ? null : $all[array_key_last($all)];
+    }
+
+    public function prune(int $days, DateTimeImmutable $now, bool $dryRun = false): array
+    {
+        if ($days <= 0) {
+            return [];
+        }
+        $all = $this->all();
+        if ($all === []) {
+            return [];
+        }
+        $newest = $all[array_key_last($all)]->date->format('Y-m-d');
+        $cutoff = $now->modify(sprintf('-%d days', $days));
+        $gone = [];
+        foreach ($all as $snapshot) {
+            $date = $snapshot->date->format('Y-m-d');
+            if ($date === $newest || $snapshot->date >= $cutoff) {
+                continue;
+            }
+            $gone[] = $date;
+            if (! $dryRun) {
+                $file = $this->directory . '/' . $date . '.json';
+                if (! @unlink($file)) {
+                    throw new RollcallException(sprintf('Could not delete the snapshot "%s".', $date));
+                }
+            }
+        }
+
+        return $gone;
     }
 }
