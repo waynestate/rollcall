@@ -19,7 +19,7 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | 11 | Should ROLLCALL fetch endoflife.date itself? | Project owner | Automatic drift flags | No. `rollcall drift` reads a saved page, so no unattended outbound call exists |
 | 12 | Who confirms an app's owner, and where is that recorded? | Project owner | "Owner unknown" tracking | Not built; the report carries no owner field at all |
 | 13 | Does the dashboard need WayneUI's `app-shell` (public or internal template)? | WayneUI maintainer | Matching WayneUI exactly and the a11y gate | The Laravel page is plain HTML with WayneUI class names (`wsu-table`, `wsu-stat`, skip link) and links `ROLLCALL_WAYNEUI_CSS`. Swap to `<x-wsu::app-shell>` once WayneUI installs as a Composer dependency |
-| 14 | A Prometheus server for `/metrics` (D-024) and whether `grafana.example.edu` imports the bundled dashboard as is | Grafana owner | Live burn-down | Dashboard JSON and endpoint are built and tested; nothing depends on a server |
+| 14 | A Prometheus server for `/metrics` (D-024) and whether the Grafana instance imports the bundled dashboard as is | Grafana owner | Live burn-down | Dashboard JSON and endpoint are built and tested; nothing depends on a server |
 | 15 | Does the snapshot-per-day cadence suit the burn-down, and who schedules `rollcall scan`? | Project owner | Burn-down resolution | One snapshot per day; scheduling is the deployer's (cron, a Laravel schedule or a CI schedule) |
 
 ## Missing configuration
@@ -36,7 +36,7 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | `ROLLCALL_STORE_DIR` | A writable, persistent directory on the host. Needed on OpenShift, Coolify or Docker as a mounted volume | `var/snapshots` |
 | `ROLLCALL_WAYNEUI_CSS` | WayneUI's built stylesheet URL | empty |
 | Deploy host and hostname `rollcall.apps.wayne.edu` | Citadel/platform team | none; no deploy is built |
-| A git.wayne.edu instance runner | Platform owner | none; CI runs on GitLab and GitHub |
+| A git.wayne.edu instance runner | Platform owner | none; CI runs on the GitLab runners and GitHub |
 
 ## Not built yet
 

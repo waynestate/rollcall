@@ -1,6 +1,6 @@
 # ROLLCALL
 
-[![GitLab pipeline](https://gitlab.example/enterprise-apps/rollcall/badges/main/pipeline.svg)](https://gitlab.example/enterprise-apps/rollcall/-/pipelines) [![GitHub CI](https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/rollcall/actions/workflows/ci.yml)
+[![GitHub CI](https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/rollcall/actions/workflows/ci.yml)
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
@@ -163,7 +163,7 @@ Off by default (ADR-0011). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serv
 snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
 `ROLLCALL_METRICS_ALLOW`; with neither set, nobody gets in. Labels are version numbers, state names, drift kinds and
 public package names: no app names or personal data. The dashboard JSON is in `grafana/rollcall-burn-down.json`; import
-it into Grafana (for example `grafana.example.edu`) once a Prometheus server scrapes the endpoint. Run `rollcall scan`
+it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`
 on a schedule so the series moves.
 
 ## Laravel
