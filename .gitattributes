@@ -5,3 +5,5 @@
 /tests export-ignore
 *.sh text eol=lf
 /.github export-ignore
+/docs/readme export-ignore
+/scripts/readme-art export-ignore

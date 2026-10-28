@@ -1,6 +1,15 @@
+<div align="center">
+  <a href="site/index.html"><img src="docs/readme/hero.jpg" width="100%" alt="ROLLCALL's front page: the headline 'Every app answers present.' beside a sheet of ruled register paper listing sample apps, each marked present, late or back row, over the green roll-book mark."></a>
+</div>
+
 # ROLLCALL
 
-[![GitHub CI](https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg)](https://github.com/waynestate/rollcall/actions/workflows/ci.yml)
+<p>
+  <img src="docs/readme/badges/php.svg" alt="php ^8.3">
+  <img src="docs/readme/badges/license.svg" alt="licence MIT">
+  <img src="docs/readme/badges/exit-codes.svg" alt="exit codes 0 ok, 2 error">
+  <a href="https://github.com/waynestate/rollcall/actions/workflows/ci.yml"><img src="https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg" alt="GitHub CI"></a>
+</p>
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
@@ -16,6 +25,11 @@ per scan, so it can show drift and an EOL burn-down over time.
 ROLLCALL enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
 The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
 (Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
+
+<div align="center">
+  <img src="docs/readme/register.svg" width="100%" alt="A page of ROLLCALL's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">
+  <br><sub>One page of the roll book, called name by name. Sample data: the apps are fictional, and a real scan's per-app list stays internal.</sub>
+</div>
 
 ## Where it sits in WELD
 
@@ -200,9 +214,50 @@ check can run beside the code it protects.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.
 
+<details>
+<summary>Watch the back row empty (the burn-down, sample data)</summary>
+
+<br>
+
+<img src="docs/readme/burn-down.jpg" width="100%" alt="ROLLCALL's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.">
+
+<sub>The same line Grafana draws from <code>/metrics</code>. Made-up apps, real arithmetic.</sub>
+
+</details>
+
+<details>
+<summary>The brand board (the cover of the book)</summary>
+
+<br>
+
+<img src="docs/readme/board.jpg" width="100%" alt="ROLLCALL's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.">
+
+</details>
+
 ## Contributing
 
 This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
 first; Wayne State developers open issues and merge requests on the internal project.
 
 Licence: MIT, Copyright Wayne State University.
+
+<div align="center"><b>The whole class</b><br><sub>WayneUI and the stack. Everyone is here today; the ones in the back row know who they are.</sub></div>
+
+<div align="center">
+  <a href="https://github.com/waynestate/wayne-ui" title="WayneUI"><img src="docs/readme/cast/wayneui.png" width="40" alt="WayneUI"></a>
+  <a href="https://github.com/waynestate/creed" title="CREED"><img src="docs/readme/cast/creed.png" width="40" alt="CREED"></a>
+  <a href="https://github.com/waynestate/proctor" title="PROCTOR"><img src="docs/readme/cast/proctor.png" width="40" alt="PROCTOR"></a>
+  <a href="https://github.com/waynestate/sesame" title="SESAME"><img src="docs/readme/cast/sesame.png" width="40" alt="SESAME"></a>
+  <a href="https://github.com/waynestate/helmet" title="HELMET"><img src="docs/readme/cast/helmet.png" width="40" alt="HELMET"></a>
+  <a href="https://github.com/waynestate/sourdough" title="Sourdough"><img src="docs/readme/cast/sourdough.png" width="40" alt="Sourdough"></a>
+  <a href="https://github.com/waynestate/squire" title="SQUIRE"><img src="docs/readme/cast/squire.png" width="40" alt="SQUIRE"></a>
+  <a href="https://github.com/waynestate/preflight" title="PREFLIGHT"><img src="docs/readme/cast/preflight.png" width="40" alt="PREFLIGHT"></a>
+  <a href="https://github.com/waynestate/pinstripe" title="Pinstripe"><img src="docs/readme/cast/pinstripe.png" width="40" alt="Pinstripe"></a>
+  <a href="https://github.com/waynestate/booster" title="BOOSTER"><img src="docs/readme/cast/booster.png" width="40" alt="BOOSTER"></a>
+  <a href="https://github.com/waynestate/rollcall" title="ROLLCALL"><img src="docs/readme/cast/rollcall.png" width="40" alt="ROLLCALL"></a>
+  <a href="https://github.com/waynestate/drawbridge" title="DRAWBRIDGE"><img src="docs/readme/cast/drawbridge.png" width="40" alt="DRAWBRIDGE"></a>
+  <a href="https://github.com/waynestate/advisor" title="ADVISOR"><img src="docs/readme/cast/advisor.png" width="40" alt="ADVISOR"></a>
+  <a href="https://github.com/waynestate/weld" title="WELD"><img src="docs/readme/cast/weld.png" width="40" alt="WELD"></a>
+</div>
+
+<div align="center"><sub>Images are regenerated from the front page by <a href="scripts/readme-art/README.md"><code>scripts/readme-art</code></a>. Present.</sub></div>
