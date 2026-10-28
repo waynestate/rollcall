@@ -1,6 +1,6 @@
 # ROLLCALL best practices
 
-Drawn from `design/best-practices/rollcall.md` (the long guide, with sources). This is the short list for people who
+Drawn from the stack's long guide (with sources). This is the short list for people who
 change ROLLCALL, tagged by how the repository holds each rule at 0.1.
 
 Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), **Documented** (written down only),

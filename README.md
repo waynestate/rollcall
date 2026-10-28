@@ -159,7 +159,7 @@ id has not changed, follows `Link` pagination only to the configured host, and w
 
 ## Metrics
 
-Off by default (ADR-0011). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves Prometheus text built from the latest
+Off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves Prometheus text built from the latest
 snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
 `ROLLCALL_METRICS_ALLOW`; with neither set, nobody gets in. Labels are version numbers, state names, drift kinds and
 public package names: no app names or personal data. The dashboard JSON is in `grafana/rollcall-burn-down.json`; import
