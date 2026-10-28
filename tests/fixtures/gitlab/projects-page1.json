@@ -1,0 +1,4 @@
+[
+    {"id": 101, "name": "ledger", "path_with_namespace": "demo/ledger", "default_branch": "main"},
+    {"id": 102, "name": "atlas", "path_with_namespace": "demo/sub/atlas", "default_branch": "develop"}
+]

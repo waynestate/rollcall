@@ -1,0 +1,8 @@
+{
+    "apps": [
+        {"project": "demo/ledger", "image": "php:8.4-apache"},
+        {"project": "demo/atlas", "image": "php-8.1"},
+        {"project": "demo/relic", "image": "legacy-base"},
+        {"project": "demo/broken", "image": "php:8.3-apache"}
+    ]
+}

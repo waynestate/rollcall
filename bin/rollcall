@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+
+use Waynestate\Rollcall\Console\Application;
+
+// Found in a Composer install (vendor/waynestate/rollcall/bin) or in a checkout.
+$autoload = null;
+foreach ([__DIR__.'/../vendor/autoload.php', __DIR__.'/../../../autoload.php'] as $candidate) {
+    if (is_file($candidate)) {
+        $autoload = $candidate;
+        break;
+    }
+}
+if ($autoload === null) {
+    fwrite(STDERR, "vendor/autoload.php not found. Run `composer install` first.\n");
+    exit(2);
+}
+
+require $autoload;
+
+exit((new Application(array_merge($_ENV, getenv())))->run());

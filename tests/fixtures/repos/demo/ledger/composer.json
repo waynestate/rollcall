@@ -1,0 +1,8 @@
+{
+    "name": "demo/ledger",
+    "require": {
+        "php": "^8.4",
+        "laravel/framework": "^12.0",
+        "waynestate/sesame": "^0.1"
+    }
+}

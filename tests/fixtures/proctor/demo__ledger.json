@@ -1,0 +1,10 @@
+{
+    "tool": "proctor",
+    "version": "0.1.0",
+    "path": ".",
+    "today": "2026-10-28",
+    "result": "pass",
+    "exit": 0,
+    "findings": [],
+    "overrides": []
+}

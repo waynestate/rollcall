@@ -1,0 +1,14 @@
+{
+    "tool": "proctor",
+    "version": "0.1.0",
+    "path": ".",
+    "today": "2026-10-28",
+    "result": "fail",
+    "exit": 1,
+    "findings": [
+        {"check_id": "php_floor", "status": "fail", "message": "composer.json allows EOL PHP 8.1", "path": "composer.json", "line": null}
+    ],
+    "overrides": [
+        {"check": "php_floor", "reason": "Upgrade scheduled", "expires": "2026-06-30", "approved_by": null, "expired": true}
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "packages": [
+        {"name": "laravel/framework", "version": "v10.48.2"},
+        {"name": "apereo/phpcas", "version": "1.6.1"}
+    ]
+}

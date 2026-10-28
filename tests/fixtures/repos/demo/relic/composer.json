@@ -1,0 +1,6 @@
+{
+    "name": "demo/relic",
+    "require": {
+        "php": "*"
+    }
+}

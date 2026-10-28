@@ -1,0 +1,11 @@
+{
+    "schema_version": "1.2.0",
+    "result": {
+        "name": "php",
+        "releases": [
+            {"name": "8.4", "eoasFrom": "2026-12-31", "eolFrom": "2028-12-31", "isEol": false},
+            {"name": "8.3", "eoasFrom": "2025-12-31", "eolFrom": "2027-11-30", "isEol": false},
+            {"name": "9.9", "eoasFrom": "2030-01-01", "eolFrom": "2032-01-01", "isEol": false}
+        ]
+    }
+}

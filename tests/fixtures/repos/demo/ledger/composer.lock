@@ -1,0 +1,10 @@
+{
+    "packages": [
+        {"name": "laravel/framework", "version": "v12.3.1"},
+        {"name": "waynestate/sesame", "version": "v0.1.0"},
+        {"name": "symfony/console", "version": "v7.3.0"}
+    ],
+    "packages-dev": [
+        {"name": "apereo/phpcas", "version": "1.6.1"}
+    ]
+}
