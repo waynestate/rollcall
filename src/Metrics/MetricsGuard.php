@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Metrics;
 
 /**
- * Decides whether a /metrics request may be answered (ADR-0011). It fails
+ * Decides whether a /metrics request may be answered. It fails
  * closed: with no token and no allowlist configured, nobody is let in.
  *
  * A request passes with the right bearer token or from an allowlisted

@@ -19,7 +19,7 @@ use Waynestate\Rollcall\Http\Endpoint;
  * no rules: every number comes from the core's report builder.
  *
  * Routes are off until turned on, and /metrics is off until
- * ROLLCALL_METRICS_ENABLED is true (ADR-0011).
+ * ROLLCALL_METRICS_ENABLED is true, in Prometheus format, like the rest of the stack.
  */
 class RollcallServiceProvider extends ServiceProvider
 {

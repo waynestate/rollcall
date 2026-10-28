@@ -9,7 +9,7 @@ use Prometheus\RenderTextFormat;
 use Prometheus\Storage\InMemory;
 
 /**
- * The fleet census as Prometheus text (ADR-0011), for a Grafana burn-down.
+ * The fleet census as Prometheus text, for a Grafana burn-down.
  *
  * Built from the public report only, so no app id, owner or other personal
  * data can reach a label. Labels are version numbers, state names, drift

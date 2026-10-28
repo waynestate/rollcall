@@ -19,7 +19,7 @@ return [
     'proctor_dir' => env('ROLLCALL_PROCTOR_DIR'),
     'auth_packages' => env('ROLLCALL_AUTH_PACKAGES'),
 
-    // Off by default (ADR-0011). On, /metrics needs the bearer token or an allowlisted address.
+    // Off by default, in Prometheus format, like the rest of the stack. On, /metrics needs the bearer token or an allowlisted address.
     'metrics_enabled' => env('ROLLCALL_METRICS_ENABLED', false),
     'metrics_token' => env('ROLLCALL_METRICS_TOKEN'),
     'metrics_allow' => env('ROLLCALL_METRICS_ALLOW'),

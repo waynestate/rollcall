@@ -6,7 +6,7 @@ namespace Waynestate\Rollcall\Policy;
 
 /**
  * Where a version stands on a given day. ROLLCALL never decides this itself;
- * the dates in CREED's policy.json do (ADR-0003).
+ * the dates in CREED's policy.json do, the stack's version policy.
  */
 enum State: string
 {
