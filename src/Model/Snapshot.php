@@ -8,8 +8,8 @@ use DateTimeImmutable;
 use Waynestate\Rollcall\RollcallException;
 
 /**
- * One scan: the date it ran and every app's facts. Snapshots are append-only
- * history for the burn-down.
+ * One scan: the date it ran and every app's facts. Snapshots are history for
+ * the burn-down; `rollcall prune` drops old ones but always keeps the newest.
  */
 final class Snapshot
 {
