@@ -195,4 +195,18 @@ final class ReportTest extends TestCase
         $this->assertStringContainsString('rollcall_php_image_apps{version="unknown",state="unknown"} 1', $text);
         $this->assertStringNotContainsString('evil', $text);
     }
+
+    public function test_prometheus_reports_a_version_ahead_of_the_policy_as_active(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [
+            new AppFacts('g/future', phpImage: '9.0'),
+            new AppFacts('g/gap', phpImage: '8.0'),
+        ]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY));
+
+        $text = (new PrometheusRenderer())->render($report);
+
+        $this->assertStringContainsString('rollcall_php_image_apps{version="9.0",state="active"} 1', $text);
+        $this->assertStringContainsString('rollcall_php_image_apps{version="8.0",state="unknown"} 1', $text);
+    }
 }
