@@ -226,7 +226,11 @@ check can run beside the code it protects.
 - Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only `GET` and `HEAD`, and a test
   fails if a write verb appears in `src/`.
 - The GitLab token comes from the environment, is sent only to the configured `https` host, and is hidden from debug
-  output and error messages. Use a `read_api` token with an expiry and a named rotation owner.
+  output and error messages. Use a `read_api` token with an expiry and a named rotation owner. When the source is
+  GitLab, `scan` reads the token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days
+  before it expires, or when it has already expired. The note names the date; rotating the token stays the owner's
+  job, never ROLLCALL's. The check is advisory: a refused, unreachable or unparseable answer prints nothing and
+  never fails the scan, and the token value never appears in output.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.

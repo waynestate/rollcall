@@ -4,6 +4,13 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Added
+
+- Token-expiry warning in `scan`: the GitLab source reads the calling token's own record
+  (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days before it expires, or when it has already
+  expired. The check is advisory: a refused, unreachable or unparseable answer prints nothing and never fails the
+  scan, and the token value never appears in output. Rotating the token stays the owner's job.
+
 ### Changed
 
 - Include Pinstripe's raw PHPStan preset (`waynestate/pinstripe:^0.1` dev dependency) instead of carrying a hand
