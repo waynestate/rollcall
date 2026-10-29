@@ -53,7 +53,7 @@ WELD is Wayne State's application stack. ROLLCALL is the roll book for the whole
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -117,10 +117,11 @@ runs.
 ## Commands
 
 ```
-rollcall scan   [--today=YYYY-MM-DD] [--prune[=DAYS]]
-rollcall report [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
-rollcall drift  --feed=<file> [--component=php] [--today=YYYY-MM-DD]
-rollcall prune  [--days=N] [--dry-run] [--today=YYYY-MM-DD]
+rollcall scan       [--today=YYYY-MM-DD] [--prune[=DAYS]]
+rollcall report     [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
+rollcall drift      --feed=<file> [--component=php] [--today=YYYY-MM-DD]
+rollcall advisories --feed=<file> [--today=YYYY-MM-DD]
+rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 ```
 
 - `scan` calls the roll once and stores `<ROLLCALL_STORE_DIR>/<date>.json`. Scanning twice in a day replaces that
@@ -134,6 +135,14 @@ rollcall prune  [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
   policy stays the source of truth. ROLLCALL does not fetch that page itself.
+- `advisories` checks each app's locked `laravel/framework` and auth-package versions against a saved Packagist
+  security-advisories response (for example
+  `https://packagist.org/api/security-advisories/?packages[]=laravel/framework` saved to a file). One line per
+  package and version, sorted by package then version: the status (`affected`, `clear` or `no data`), the count and
+  the advisory ids, and how many apps hold that pair. A package with no advisory data prints `no data`, never
+  `safe`: an absent row proves nothing about the package, and a version nobody can parse says `no data` too.
+  ROLLCALL does not fetch that page itself; a person saves it and `--feed` points at the file. Output is package
+  names and counts only: no app ids.
 - `prune` deletes snapshots older than `--days` (default: `ROLLCALL_RETENTION_DAYS`, 90; 0 keeps everything). The
   newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
   `--dry-run` lists what would go without deleting anything.

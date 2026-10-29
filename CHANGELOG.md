@@ -4,6 +4,13 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Added
+
+- `rollcall advisories --feed=<file>`: checks each app's locked `laravel/framework` and auth-package versions
+  against a saved Packagist security-advisories response, one line per package and version (status, count, advisory
+  ids, app count). A package with no advisory data prints `no data`, never `safe`; an unparseable version or range
+  also says `no data`. ROLLCALL does not fetch the feed itself, and the output carries no app ids.
+
 ## [0.1.1] - 2026-10-29
 
 ### Added

@@ -21,6 +21,7 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | 13 | Does the dashboard need WayneUI's `app-shell` (public or internal template)? | WayneUI maintainer | Matching WayneUI exactly and the a11y gate | The Laravel page is plain HTML with WayneUI class names (`wsu-table`, `wsu-stat`, skip link) and links `ROLLCALL_WAYNEUI_CSS`. Swap to `<x-wsu::app-shell>` once WayneUI installs as a Composer dependency |
 | 14 | Who runs a Prometheus server for `/metrics`, and whether the Grafana instance imports the bundled dashboard as is | Grafana owner | Live burn-down | Dashboard JSON and endpoint are built and tested; nothing depends on a server |
 | 15 | Does the snapshot-per-day cadence suit the burn-down, and who schedules `rollcall scan`? | Project owner | Burn-down resolution | One snapshot per day; scheduling is the deployer's (cron, a Laravel schedule or a CI schedule) |
+| 16 | Should ROLLCALL fetch Packagist's security advisories itself? | Project owner | Automatic advisory flags | No. `rollcall advisories` reads a saved response, so no unattended outbound call exists (the same default as question 11) |
 
 ## Missing configuration
 
@@ -45,8 +46,8 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | Citadel read-only adapter and the forced-upgrade date | No access path yet (question 2); `ImageSource` is ready for it |
 | PROCTOR reports from CI artifacts | Storage not decided (question 1); the reader and interface exist |
 | Host census importer for apps not in GitLab | Needs the Citadel export format (question 2) |
-| Packagist advisories lookup with "no data" for absent packages | Needs a live-host decision; no call is made in 0.1 |
 | endoflife.date client | Only the saved-file drift check is built (question 11) |
+| Live Packagist advisories fetch | The saved-file lookup is built (`rollcall advisories`); fetching it itself waits on question 16 |
 | Override storage owned by ROLLCALL | 0.1 shows the overrides PROCTOR reports, with reason and expiry; ROLLCALL keeps none of its own |
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |

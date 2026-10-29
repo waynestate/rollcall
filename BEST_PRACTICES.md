@@ -31,7 +31,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Read the PROCTOR report; do not re-run a rule | Enforced | `ProctorReportReader` validates PROCTOR's JSON shape |
 | Show every override with reason and expiry; an expired one stays, marked expired | Checked | Internal report and page; tested |
 | Show the date next to every state | Enforced | `security_until` and `days_to_eol` in each table |
-| A package with no advisory data says "no data", not "safe" | Not yet | The Packagist advisories lookup is not built |
+| A package with no advisory data says "no data", not "safe" | Enforced | `PackageAdvisories` answers `no data` for an absent package, a missing version or an unparseable range, and `clear` (never "safe") when the feed lists none that apply; tested |
 
 ## Show progress without blame
 
@@ -52,5 +52,5 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 
 ## Not yet
 
-Citadel read-only adapter, the upgrade-record reader, ownership verification, the Packagist advisories lookup, the
-CycloneDX bill of materials, the front page and the a11y gate run. See `OPEN_QUESTIONS.md`, "Not built yet".
+Citadel read-only adapter, the upgrade-record reader, ownership verification, the live Packagist advisories fetch,
+the CycloneDX bill of materials, the front page and the a11y gate run. See `OPEN_QUESTIONS.md`, "Not built yet".
