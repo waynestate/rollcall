@@ -1,5 +1,5 @@
 /* ============================================================================
-   ROLLCALL front page: taking the roll.
+   Rollcall front page: taking the roll.
 
    Vanilla, no framework, no network. Anything that moves is gated twice: the
    <head> script only adds .motion when the system has no reduced-motion

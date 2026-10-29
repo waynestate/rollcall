@@ -7,8 +7,8 @@
      points them at a local stack server in dev; content: auto, production or dev. -->
 <meta name="stack-env" content="auto">
 <script src="assets/stack-env.js" defer></script>
-<title>ROLLCALL: Every app answers present.</title>
-<meta name="description" content="ROLLCALL is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.">
+<title>Rollcall: Every app answers present.</title>
+<meta name="description" content="Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.">
 <meta name="theme-color" content="#f7f2e6">
 <link rel="icon" href="brand/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
@@ -98,7 +98,7 @@
       </div>
       <div class="chapter__body">
         <h2 id="roll-title">Take the roll</h2>
-        <p class="lede">Seventeen apps, seated front to back by PHP version. Scroll, and ROLLCALL calls each name down the list. Everyone answers. The back row answers with a hand in the air.</p>
+        <p class="lede">Seventeen apps, seated front to back by PHP version. Scroll, and Rollcall calls each name down the list. Everyone answers. The back row answers with a hand in the air.</p>
 
         <div class="register" data-roll>
           <div class="register__top">
@@ -108,7 +108,7 @@
           <p class="caller" aria-hidden="true"><span class="caller__label">Now calling</span> <span class="caller__name" data-caller>…</span></p>
 
           <table class="roll">
-            <caption class="wsu-sr-only">Sample roll: seventeen fictional apps with their PHP image, Laravel version, auth package, PROCTOR result and the mark ROLLCALL gives them</caption>
+            <caption class="wsu-sr-only">Sample roll: seventeen fictional apps with their PHP image, Laravel version, auth package, PROCTOR result and the mark Rollcall gives them</caption>
             <thead>
               <tr><th scope="col" class="roll__no">No.</th><th scope="col">App</th><th scope="col">PHP image</th><th scope="col">Laravel</th><th scope="col">Auth</th><th scope="col">PROCTOR</th><th scope="col" class="roll__mark">Mark</th></tr>
             </thead>
@@ -169,7 +169,7 @@
           <li><h3>PHP floor</h3><p>The lowest PHP its <code>composer.json</code> allows. <code>*</code> counts as no floor at all.</p></li>
           <li><h3>Laravel</h3><p>The installed version from <code>composer.lock</code>, never a guess.</p></li>
           <li><h3>Auth package</h3><p>Which sign-in package is installed: SESAME, a CAS client, or none.</p></li>
-          <li><h3>PROCTOR</h3><p><code>pass</code>, <code>fail</code> or <code>none</code>, from PROCTOR's JSON report. ROLLCALL never re-runs a rule.</p></li>
+          <li><h3>PROCTOR</h3><p><code>pass</code>, <code>fail</code> or <code>none</code>, from PROCTOR's JSON report. Rollcall never re-runs a rule.</p></li>
         </ol>
 
         <div class="key reveal">
@@ -302,10 +302,10 @@ php bin/rollcall report</pre>
 
         <div class="feed">
         <div class="printout">
-          <p class="printout__head">What comes back <span>real output, ROLLCALL 0.1, bundled fixtures (four demo apps)</span></p>
+          <p class="printout__head">What comes back <span>real output, Rollcall 0.1, bundled fixtures (four demo apps)</span></p>
 <pre class="printout__body">Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
 
-ROLLCALL 0.1.0 | scan 2026-10-28 | as of 2026-10-28 | public
+ROLLCALL 0.1.4 | scan 2026-10-28 | as of 2026-10-28 | public
 Apps present: 4 (scan problems: 0)
 
 PHP image
@@ -318,14 +318,14 @@ unknown  1     unknown        -               -
 EOL burn-down (state on each scan day)
 DATE        APPS  EOL  SUPPORTED  UNKNOWN
 2026-10-28  4     1    2          1</pre>
-          <p class="printout__foot"><strong>exit 0</strong>, however the fleet looks. There is no exit 1: ROLLCALL takes attendance, it does not hand out detention.</p>
+          <p class="printout__foot"><strong>exit 0</strong>, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.</p>
         </div>
         </div>
 
         <dl class="commands reveal">
           <div><dt><code>rollcall scan</code></dt><dd>Calls the roll once and stores <code>&lt;date&gt;.json</code>. Scan twice in a day and that day's snapshot is replaced.</dd></div>
           <div><dt><code>rollcall report</code></dt><dd><code>--format=text|json|prometheus</code>. <code>--internal</code> adds the per-app list; keep that inside the project.</dd></div>
-          <div><dt><code>rollcall drift</code></dt><dd><code>--feed=&lt;file&gt;</code>, a saved endoflife.date page. ROLLCALL never fetches it itself.</dd></div>
+          <div><dt><code>rollcall drift</code></dt><dd><code>--feed=&lt;file&gt;</code>, a saved endoflife.date page. Rollcall never fetches it itself.</dd></div>
           <div><dt>In Laravel</dt><dd>The package registers itself. Publish the config with <code>php artisan vendor:publish --tag=rollcall-config</code>, then schedule <code>php artisan rollcall:scan</code>.</dd></div>
         </dl>
       </div>
@@ -369,7 +369,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
             <li class="card card--part"><img src="assets/marks/creed.png" width="36" height="36" alt=""><span><span class="card__k"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="card__v"><code>policy.json</code>, the dates</span></span></li>
           </ul>
           <span class="flow__wire" aria-hidden="true"></span>
-          <div class="flow__hub card"><img src="brand/rollcall-avatar-256.png" width="64" height="64" alt=""><span class="card__k">ROLLCALL</span><span class="card__v">scan, snapshot, compare</span></div>
+          <div class="flow__hub card"><img src="brand/rollcall-avatar-256.png" width="64" height="64" alt=""><span class="card__k">Rollcall</span><span class="card__v">scan, snapshot, compare</span></div>
           <span class="flow__wire" aria-hidden="true"></span>
           <ul class="flow__col">
             <li class="card"><span class="card__k">Terminal</span><span class="card__v"><code>text</code> and <code>json</code> reports</span></li>
@@ -387,25 +387,25 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
         <p class="folio" aria-hidden="true">§ 7</p>
-        <p class="kicker">ROLLCALL's place in WELD</p>
+        <p class="kicker">Rollcall's place in WELD</p>
       </div>
       <div class="chapter__body">
         <h2 id="class-title">The class list</h2>
         <p class="lede">WELD is Wayne State's application stack. Every part answers present here too.</p>
         <ol class="classlist">
           <li><span class="classlist__mark classlist__mark--tile"><img src="assets/marks/wayneui.svg" width="24" height="24" alt=""></span><span class="classlist__name"><a class="part-link" href="https://wayneui.apps.wayne.edu/">WayneUI</a></span><span class="classlist__line">the interface; the dashboard wears its classes</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/creed.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="classlist__line">writes the dates ROLLCALL reads</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/proctor.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://proctor.apps.wayne.edu/">PROCTOR</a></span><span class="classlist__line">checks one app; ROLLCALL collects the results</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/preflight.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://preflight.apps.wayne.edu/">PREFLIGHT</a></span><span class="classlist__line">CI templates, where PROCTOR reports are born</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/sesame.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://sesame.apps.wayne.edu/">SESAME</a></span><span class="classlist__line">the auth package ROLLCALL hopes to count</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/creed.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="classlist__line">writes the dates Rollcall reads</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/proctor.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://proctor.apps.wayne.edu/">PROCTOR</a></span><span class="classlist__line">checks one app; Rollcall collects the results</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/preflight.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://preflight.apps.wayne.edu/">Preflight</a></span><span class="classlist__line">CI templates, where PROCTOR reports are born</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/sesame.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://sesame.apps.wayne.edu/">SESAME</a></span><span class="classlist__line">the auth package Rollcall hopes to count</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/helmet.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://helmet.apps.wayne.edu/">HELMET</a></span><span class="classlist__line">baseline runtime, with its own <code>/metrics</code></span></li>
           <li><span class="classlist__mark"><img src="assets/marks/pinstripe.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://pinstripe.apps.wayne.edu/">Pinstripe</a></span><span class="classlist__line">the Pint and PHPStan rules this repo wears</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/sourdough.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://sourdough.apps.wayne.edu/">Sourdough</a></span><span class="classlist__line">starters that begin in the front row</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/weld.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://weld.apps.wayne.edu/">WELD</a></span><span class="classlist__line">the whole stack, joined in one app</span></li>
-          <li class="is-self"><span class="classlist__mark"><img src="brand/rollcall-avatar-256.png" width="256" height="256" alt=""></span><span class="classlist__name"><mark class="hl">ROLLCALL</mark></span><span class="classlist__line">you are here: the fleet census and EOL burn-down</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/booster.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://booster.apps.wayne.edu/">BOOSTER</a></span><span class="classlist__line">moves the back row forward</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/squire.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://squire.apps.wayne.edu/">SQUIRE</a></span><span class="classlist__line">carries the release to Citadel</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://drawbridge.apps.wayne.edu/">DRAWBRIDGE</a></span><span class="classlist__line">the Citadel sign-in gateway</span></li>
+          <li class="is-self"><span class="classlist__mark"><img src="brand/rollcall-avatar-256.png" width="256" height="256" alt=""></span><span class="classlist__name"><mark class="hl">Rollcall</mark></span><span class="classlist__line">you are here: the fleet census and EOL burn-down</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/booster.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://booster.apps.wayne.edu/">Booster</a></span><span class="classlist__line">moves the back row forward</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/squire.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://squire.apps.wayne.edu/">Squire</a></span><span class="classlist__line">carries the release to Citadel</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://drawbridge.apps.wayne.edu/">Drawbridge</a></span><span class="classlist__line">the Citadel sign-in gateway</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/advisor.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://advisor.apps.wayne.edu/">ADVISOR</a></span><span class="classlist__line">ask what applies to your app</span></li>
         </ol>
       </div>
