@@ -5,6 +5,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Fixed: stale capability claims in the site and README.
+- Added: agent-ready site (prompt blocks, Markdown twins, llms.txt), from Squire's kit.
 
 ## [0.1.5] - 2026-10-29
 

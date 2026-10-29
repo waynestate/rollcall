@@ -21,8 +21,8 @@
      1. fonts, tokens, paper    6. § 2 columns, key     11. back cover, toast
      2. shared pieces           7. § 3 chart, drift     12. responsive
      3. masthead                8. § 4 quick start      13. motion (only .motion)
-     4. title page and sheet    9. § 5 rules, § 6 flow
-     5. § 1 the register       10. § 7 class list
+     4. title page and sheet    9. § 6 rules, § 7 flow
+     5. § 1 the register       10. § 8 class list         14. agent-ready kit (§ 5)
    ========================================================================== */
 
 /* ----------------------------------------------- 1. fonts, tokens, paper */
@@ -1943,4 +1943,315 @@ ol.classlist > li img,
 li.card--part img { transition: transform 160ms ease, filter 160ms ease; }
 ol.classlist > li:has(.part-link:hover) img,
 li.card--part:has(.part-link:hover) img { transform: translateY(-2px); }
+}
+
+/* ------------------------------------- 14. agent-ready kit (§ 5 and the cover note)
+
+   Squire's agent-ready.css lays out the prompt blocks and the page menu; this
+   maps its tokens onto the roll book. The prompts are notes left on the desk
+   for the substitute: a fresh sheet with the red margin rule, the prompt typed
+   on the paper's own ruling, a stamped Copy button, and the commands chalked on
+   the green board. Nothing here moves unless .motion says it may.            */
+
+:root {
+  --ar-bg: var(--paper-3);
+  --ar-ink: var(--ink);
+  --ar-muted: var(--muted);
+  --ar-rule: var(--rule-strong);
+  --ar-accent: var(--green);
+  --ar-on-accent: var(--paper-3);
+  --ar-focus: var(--ink-blue);
+  --ar-code-bg: var(--paper);
+  --ar-code-ink: var(--ink);
+  --ar-term-bg: var(--green);
+  --ar-term-ink: var(--paper-3);
+  --ar-display: var(--f-display);
+  --ar-mono: var(--f-type);
+  --ar-radius: 4px;
+  --ar-shadow: 0 1px 2px rgba(28, 37, 65, 0.16), 0 18px 34px -26px rgba(28, 37, 65, 0.55);
+}
+
+.subnotes {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 2rem;
+}
+
+/* A fresh sheet: the red margin rule down its left, like the sample sheet. */
+.subnote {
+  --note-margin: clamp(1.4rem, 2.6vw, 2.2rem);
+  padding-left: calc(var(--note-margin) + clamp(0.8rem, 2vw, 1.2rem));
+  border: 0;
+  background-color: var(--paper-3);
+  background-image: linear-gradient(to right, transparent var(--note-margin), var(--red-rule) var(--note-margin), var(--red-rule) calc(var(--note-margin) + 1.5px), transparent calc(var(--note-margin) + 1.5px));
+}
+
+.ar-prompt--lead.subnote {
+  transform: rotate(-0.35deg);
+}
+
+/* Stamped across the corner of the first note, half on the sheet. */
+.subnote__stamp {
+  position: absolute;
+  top: -0.85rem;
+  right: clamp(0.75rem, 3vw, 2rem);
+  font-size: 0.875rem;
+  background: var(--paper-3);
+  transform: rotate(-7deg);
+}
+
+.ar-prompt__glyph {
+  color: var(--ink-blue);
+  background: var(--paper);
+  border: 1.5px dashed var(--rule-strong);
+  font-family: var(--f-type);
+  font-weight: 700;
+}
+
+.ar-prompt__kicker {
+  font-family: var(--f-type);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--red);
+}
+
+.ar-prompt__title {
+  font-weight: 400;
+  font-size: clamp(1.45rem, 2.4vw, 1.85rem);
+}
+
+/* Typed on the ruling: one blue rule under every line, scrolling with it. */
+.ar-prompt__text {
+  padding: 0.8em 1.1em;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  border: 1.5px dashed var(--rule-strong);
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.75em - 1px), rgba(36, 66, 126, 0.16) calc(1.75em - 1px), rgba(36, 66, 126, 0.16) 1.75em);
+  background-position: 0 0.8em;
+  background-attachment: local;
+}
+
+.ar-prompt.is-collapsed .ar-prompt__text {
+  max-height: calc(var(--ar-preview-lines, 10) * 1.75em + 0.8em);
+}
+
+.ar-prompt__more {
+  font-weight: 700;
+  color: var(--ink-blue);
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+/* Buttons are stamped, the same as the rest of the book. */
+.ar-btn {
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--paper-3);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.ar-btn:hover {
+  background: var(--hl);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.ar-btn--primary {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper-3);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.ar-btn--primary:hover {
+  background: #0a463d;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.ar-run__label {
+  font-family: var(--f-type);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink-blue);
+}
+
+.ar-chip {
+  font-family: var(--f-type);
+  font-weight: 700;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 3px;
+}
+
+.ar-chip:hover {
+  border-color: var(--ink);
+  background: var(--paper);
+}
+
+/* The chosen tool gets the highlighter. */
+.ar-chip[aria-expanded="true"] {
+  border-color: var(--ink);
+  background: var(--hl);
+  box-shadow: none;
+}
+
+.ar-status {
+  font-family: var(--f-type);
+  color: var(--green);
+}
+
+/* The board: chalk on green cloth, gold for the chosen shell. */
+.ar-cmd {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.12);
+}
+
+.ar-cmd__title b {
+  font-family: var(--f-type);
+}
+
+.ar-cmd .ar-btn {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: transparent;
+  box-shadow: none;
+}
+
+.ar-cmd .ar-btn:hover {
+  background: rgba(255, 204, 51, 0.14);
+}
+
+.ar-cmd .ar-seg {
+  border-color: rgba(255, 252, 243, 0.6);
+}
+
+.ar-cmd .ar-seg__btn[aria-pressed="true"] {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.ar-cmd :focus-visible {
+  outline-color: var(--gold);
+}
+
+.ar-cmd .ar-status {
+  color: var(--paper-3);
+}
+
+.subnotes__title {
+  margin: 0.75rem 0 0;
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-blue);
+}
+
+/* Full width, one under the other: typed prose reads badly in narrow
+   columns. A shorter preview keeps the pile from towering. */
+.subnotes__paths {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.subnotes__paths .ar-prompt {
+  --ar-preview-lines: 6;
+}
+
+.subnotes__paths .ar-prompt__title {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+}
+
+.subnotes__fine {
+  max-width: 46rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* The note clipped inside the cover, under the title page's buttons. */
+.cover-note {
+  max-width: 34rem;
+  margin-top: 1.5rem;
+  padding-top: 0.6rem;
+  border-top: 1.5px dashed var(--rule-strong);
+  gap: 0 1.1rem;
+}
+
+.cover-note .ar-page__label {
+  font-family: var(--f-type);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--red);
+}
+
+.cover-note .ar-page__list {
+  gap: 0 1.1rem;
+}
+
+.cover-note .ar-page__link,
+.cover-note .ar-page__btn {
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink-blue);
+  text-decoration-color: var(--red);
+  text-underline-offset: 5px;
+}
+
+.cover-note .ar-status {
+  flex-basis: 100%;
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 440px) {
+  .ar-prompt--lead.subnote {
+    transform: none;
+  }
+
+  .subnote__stamp {
+    font-size: 0.75rem;
+  }
+
+  /* A phone needs the width for the typing more than it needs the glyph. */
+  .subnote .ar-prompt__glyph {
+    display: none;
+  }
+
+  .subnote {
+    --note-margin: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion .ar-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--ink);
+  }
+
+  .motion .ar-btn--primary:active {
+    transform: translate(4px, 4px);
+  }
+}
+
+@media print {
+  .ar-prompt__actions,
+  .ar-cmd,
+  .ar-prompt__more,
+  .cover-note {
+    display: none;
+  }
+
+  .ar-prompt.is-collapsed .ar-prompt__text {
+    max-height: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }

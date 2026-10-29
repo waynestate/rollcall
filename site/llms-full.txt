@@ -1,0 +1,627 @@
+# Rollcall: everything in one file
+
+> Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+
+The README and the Markdown twin of every page, joined. The index is https://rollcall.apps.wayne.edu/llms.txt. Written by Squire's agent-ready kit; do not edit.
+
+---
+
+## README
+
+Source: https://github.com/waynestate/rollcall/blob/HEAD/README.md
+
+## Rollcall
+
+Checks: `composer ci` (the same command runs on GitLab and GitHub).
+
+> Every app answers "present". The ones on PHP 7.4 answer from the back row.
+
+Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/HEAD/site/index.html) (static, no build step; see `site/README.md`).
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+
+Rollcall is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
+against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
+version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
+per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
+(default 90 days; the newest snapshot always stays).
+
+Rollcall enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
+The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
+(Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
+
+### Where it sits in WELD
+
+WELD is Wayne State's application stack. Rollcall is the roll book for the whole party:
+
+| Part | Job |
+|---|---|
+| WayneUI (project 0) | The interface layer: tokens, components, four consumer paths |
+| CREED | The standards and `policy.json`, the dates Rollcall reads |
+| PROCTOR | Measures one app against the policy; Rollcall reads its JSON report and never re-runs a rule |
+| Preflight | CI templates |
+| SESAME | Protocol-neutral auth; Rollcall reports which auth package each app uses |
+| HELMET | Baseline runtime and its own optional `/metrics` |
+| Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
+| Sourdough | Starters |
+| Rollcall | The fleet census and EOL burn-down |
+
+### How it is built
+
+A framework-free core (`src/`) plus thin entry points that hold no rules:
+
+- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
+- `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
+
+CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
+made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of
+`waynestate/creed`; until Rollcall switches, the copy stays. Refresh it from a CREED checkout with
+`php /bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed`, and prove the copy has not
+drifted with `composer creed-copy:check` (it reads the checkout from `CREED_PATH`). A hand edit to `src/Creed/`
+fails that check.
+
+Data comes in through three interfaces, each with a fixture adapter, so nothing here needs a live host to try:
+
+| Source | Interface | 0.1 adapters |
+|---|---|---|
+| Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
+| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
+
+Everything is read-only toward every source. The only thing Rollcall writes is its own snapshot directory.
+
+### Install
+
+```
+composer require waynestate/rollcall
+```
+
+Rollcall 0.1.5 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+
+### Quick start
+
+From a checkout, with the bundled fixtures (no network, no token). Install dependencies once with
+`composer install` (or the Docker line under "Run the checks").
+
+Linux and macOS (bash):
+
+```
+export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
+export ROLLCALL_REPOS_DIR=tests/fixtures/repos
+export ROLLCALL_IMAGES_FILE=tests/fixtures/images.json
+export ROLLCALL_PROCTOR_DIR=tests/fixtures/proctor
+export ROLLCALL_STORE_DIR=var/snapshots
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+Windows (PowerShell, no bash or WSL needed):
+
+```
+$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
+$env:ROLLCALL_REPOS_DIR = "tests/fixtures/repos"
+$env:ROLLCALL_IMAGES_FILE = "tests/fixtures/images.json"
+$env:ROLLCALL_PROCTOR_DIR = "tests/fixtures/proctor"
+$env:ROLLCALL_STORE_DIR = "var/snapshots"
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+`policy.json` is CREED's file; the copy under `tests/fixtures/` is a snapshot for tests. Use the released one in real
+runs.
+
+### Commands
+
+```
+rollcall scan       [--today=YYYY-MM-DD] [--prune[=DAYS]]
+rollcall report     [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
+rollcall drift      --feed=<file> [--component=php] [--today=YYYY-MM-DD]
+rollcall advisories --feed=<file> [--today=YYYY-MM-DD]
+rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
+```
+
+- `scan` calls the roll once and stores `/.json`. Scanning twice in a day replaces that
+  day's snapshot. A gap in one source (a missing report, a bad image tag) becomes a note on that app, not a failed
+  scan. A refused GitLab token stops the scan loudly instead of producing a flattering partial answer.
+  `--prune[=DAYS]` deletes snapshots older than that many days after saving (default: `ROLLCALL_RETENTION_DAYS`,
+  90; 0 keeps everything).
+- `report` prints the latest snapshot against the policy as of today. `text` is a terminal table, `json` is the
+  machine-readable form, `prometheus` is the metrics text (refused unless `ROLLCALL_METRICS_ENABLED=true`).
+  `--internal` adds the per-app list; keep that output inside the project.
+- `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
+  `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
+   policy stays the source of truth. Rollcall does not fetch that page itself.
+- `advisories` checks each app's locked `laravel/framework` and auth-package versions against a saved Packagist
+  security-advisories response (for example
+  `https://packagist.org/api/security-advisories/?packages[]=laravel/framework` saved to a file). One line per
+  package and version, sorted by package then version: the status (`affected`, `clear` or `no data`), the count and
+  the advisory ids, and how many apps hold that pair. A package with no advisory data prints `no data`, never
+  `safe`: an absent row proves nothing about the package, and a version nobody can parse says `no data` too.
+     Rollcall does not fetch that page itself; a person saves it and `--feed` points at the file. Output is package
+  names and counts only: no app ids.
+- `prune` deletes snapshots older than `--days` (default: `ROLLCALL_RETENTION_DAYS`, 90; 0 keeps everything). The
+  newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
+  `--dry-run` lists what would go without deleting anything.
+
+Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: Rollcall
+does not gate anything.
+
+### What the report says
+
+- **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`,
+  `eol`, `unknown`), the date security support ends and the days left (negative once past).
+- **Auth package and PROCTOR**: apps per auth package, and per PROCTOR result (`pass`, `fail`, `none`).
+- **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`,
+  `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`,
+  `proctor_failing`, `override_expired`.
+- **Progress**: apps that moved since the previous scan and apps that went from an EOL image to a supported one. In
+  the internal view each upgraded app carries the day it landed.
+- **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day.
+
+State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
+policy does not list is `unknown`.
+
+### Configuration
+
+Every setting is an environment variable. `.env.example` holds placeholders; never commit a real token.
+
+| Variable | Meaning | Default |
+|---|---|---|
+| `ROLLCALL_POLICY_FILE` | Path to CREED's `policy.json` | none (required for `report`, `drift`) |
+| `ROLLCALL_STORE_DIR` | Snapshot directory, the only place Rollcall writes | `var/snapshots` |
+| `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
+| `ROLLCALL_REPOS_DIR` | Fixture repositories as `//composer.{json,lock}` | none |
+| `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
+| `ROLLCALL_GITLAB_TOKEN` | A `read_api` token on a group or service account (never `api`). Never logged, never printed | none |
+| `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included | none |
+| `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
+| `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
+| `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package | the built-in list |
+| `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
+| `ROLLCALL_METRICS_ENABLED` | Turn metrics on (`CLI report --format=prometheus` and `/metrics`) | `false` |
+| `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
+| `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |
+| `ROLLCALL_PUBLIC_REPORT_ENABLED` | Serve `GET /report.json` (public counts only) | `false` |
+| `ROLLCALL_DASHBOARD_ENABLED` | Laravel: serve the dashboard page | `false` |
+| `ROLLCALL_DASHBOARD_PATH` | Laravel: dashboard URL path | `rollcall` |
+| `ROLLCALL_INTERNAL_ENABLED` | Laravel: serve the per-app page at `/apps` (needs your sign-in middleware) | `false` |
+| `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
+
+Scanning GitLab (once a person gives you a token and a group): set `ROLLCALL_SOURCE=gitlab` and the three GitLab
+variables. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob
+id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
+
+### WSU values (Playbook)
+
+`ROLLCALL_GITLAB_URL` is a Wayne State value, so it may come from Playbook (`waynestate/playbook`) when the
+environment has none. The environment always wins; Playbook only fills what the environment leaves out. The GitLab
+token never comes through Playbook and stays an environment variable.
+
+| Setting | Value |
+|---|---|
+| `ROLLCALL_GITLAB_URL` | The `https://` base URL of the GitLab instance |
+
+Playbook is private and lives on git.wayne.edu. Getting it into your app:
+
+Composer: add the repository to your `composer.json`, then require the package. Composer authenticates to
+git.wayne.edu with the token in `auth.json`.
+
+```json
+{
+    "repositories": [
+        {"type": "vcs", "url": "https://git.wayne.edu/enterprise-apps/playbook.git"}
+    ]
+}
+```
+
+```
+composer require waynestate/playbook
+```
+
+curl (Linux, macOS):
+
+```
+curl --fail -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main" -o .env.playbook
+```
+
+PowerShell (Windows):
+
+```
+Invoke-WebRequest -Headers @{ 'PRIVATE-TOKEN' = $env:GITLAB_TOKEN } -Uri "https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main" -OutFile .env.playbook
+```
+
+Clone:
+
+```
+git clone https://git.wayne.edu/enterprise-apps/playbook.git
+```
+
+The token is your own: `read_api` for curl, `read_repository` for clone and Composer.
+
+Playbook is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.
+
+### Metrics
+
+Off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves Prometheus text built from the latest
+snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
+`ROLLCALL_METRICS_ALLOW`; with neither set, nobody gets in. Labels are version numbers, state names, drift kinds and
+public package names: no app names or personal data. The dashboard JSON is in `grafana/rollcall-burn-down.json`; import
+it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`
+on a schedule so the series moves.
+
+### Laravel
+
+The package registers itself (`extra.laravel.providers`). Publish the config with
+`php artisan vendor:publish --tag=rollcall-config`, set the variables above, and schedule `rollcall:scan`. The
+dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it
+runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such
+middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
+The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
+on a separate app or leave metrics off.
+
+### Run the checks
+
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/HEAD/MAINTAINING.md).
+
+`composer ci` is the contract: manifest, tests, Pint, PHPStan and `composer audit`. PHP is not needed on the host:
+
+```
+docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+```
+
+(On Windows PowerShell `${PWD}` works as written; in Git Bash use `$(pwd -W)` and set `MSYS_NO_PATHCONV=1`.)
+
+The GitLab pipeline (`.gitlab-ci.yml`) and the GitHub workflow (`.github/workflows/ci.yml`) both wrap `composer ci`,
+on PHP 8.3, 8.4 and 8.5. git.wayne.edu has no runners yet; an instance runner there is strongly recommended so this
+check can run beside the code it protects.
+
+### Security notes
+
+- Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only `GET` and `HEAD`, and a test
+  fails if a write verb appears in `src/`.
+- The GitLab token comes from the environment, is sent only to the configured `https` host, and is hidden from debug
+  output and error messages. Use a `read_api` token with an expiry and a named rotation owner. When the source is
+  GitLab, `scan` reads the token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days
+  before it expires, or when it has already expired. The note names the date; rotating the token stays the owner's
+     job, never Rollcall's. The check is advisory: a refused, unreachable or unparseable answer prints nothing and
+  never fails the scan, and the token value never appears in output.
+- Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
+- PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
+  strips control characters.
+
+### Contributing
+
+This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
+first; Wayne State developers open issues and merge requests on the internal project.
+
+Licence: MIT, Copyright Wayne State University.
+
+---
+
+Source: https://rollcall.apps.wayne.edu/
+
+Fleet attendance, Wayne State University
+
+## ROLLCALL
+
+Every app answers “present”.
+
+The ones on PHP 7.4 answer from the back row.
+
+WELD's fleet scanner. For every app it writes down the PHP image, the declared PHP floor, Laravel, the auth package and the PROCTOR result, then checks each one against CREED's `policy.json` by date. One snapshot a day gives you drift and an EOL burn-down.
+
+`$ composer require waynestate/rollcall`
+
+[Quick start](https://rollcall.apps.wayne.edu/#start-title) [Take the roll](https://rollcall.apps.wayne.edu/#roll-title)
+
+Today's roll sample data
+
+1. kiln-bookingPHP 8.5present
+2. tuba-rentalPHP 8.4present
+3. pigeon-postPHP 8.3late
+4. lunch-ledgerPHP 8.3late
+5. abacus-classicPHP 7.4back row
+
+Answered 5 of 5
+
+The magic trick is attendance
+
+### Take the roll
+
+Seventeen apps, seated front to back by PHP version. Scroll, and Rollcall calls each name down the list. Everyone answers. The back row answers with a hand in the air.
+
+Sample data · fictional apps · policy as of 2026-10-28
+
+**Sample roll: seventeen fictional apps with their PHP image, Laravel version, auth package, PROCTOR result and the mark Rollcall gives them**
+
+| No. | App | PHP image | Laravel | Auth | PROCTOR | Mark |
+| --- | --- | --- | --- | --- | --- | --- |
+| Front row PHP 8.5 and 8.4, active |  |  |  |  |  |  |
+| 01 | kiln-booking | 8.5 | 13 | sesame | pass | present |
+| 02 | tuba-rental | 8.4 | 13 | sesame | pass | present |
+| 03 | moth-catalog | 8.4 | 12 | sesame | pass | present |
+| 04 | quad-weather | 8.4 | 13 | none | pass | present |
+| 05 | greenhouse-log | 8.4 | 12 | sesame | pass | present |
+| 06 | sundial | 8.4 | 13 | sesame | pass | present |
+| 07 | otter-tracker | 8.4 | 12 | sesame | pass | present |
+| Middle rows PHP 8.3 and 8.2, security fixes only |  |  |  |  |  |  |
+| 08 | pigeon-post | 8.3 | 12 | phpcas | pass | late |
+| 09 | lunch-ledger | 8.3 | 12 | sesame | fail | late |
+| 10 | chess-club | 8.3 | 11, EOL | phpcas | pass | late |
+| 11 | lost-mittens | 8.3 | 12 | none | none | late |
+| 12 | fog-index | 8.2 64 days left | 11, EOL | phpcas | pass | late |
+| Back row past end of life |  |  |  |  |  |  |
+| 13 | abacus-classic | 7.4 | 8, EOL | phpcas | none | back row |
+| 14 | punch-card-pal | 7.4 | none | none | none | back row |
+| 15 | dial-up-directory | 8.1 | 10, EOL | phpcas | fail | back row |
+| 16 | floppy-archive | 8.0 | 9, EOL | sesame | pass | back row |
+| 17 | ghost-kiosk | legacy-base no version in the tag | none | none | none | inaudible |
+
+- **present**: 7
+- **late**: 5
+- **back row**: 4
+- **inaudible**: 1
+- **Answered**: 17
+
+Nobody is ever marked absent: a gap in one source becomes a note on that app, never a failed scan. The public report shows only totals like these; the per-app list is the internal view (`--internal`) and stays inside the project.
+
+Five answers per app
+
+### What “present” means
+
+Each answer is a version, and every version is checked against the dates in CREED's `policy.json`. State is never decided in code.
+
+1. ### PHP image
+   The runtime the app really ships on, read from the app list's image tag.
+2. ### PHP floor
+   The lowest PHP its `composer.json` allows. `*` counts as no floor at all.
+3. ### Laravel
+   The installed version from `composer.lock`, never a guess.
+4. ### Auth package
+   Which sign-in package is installed: SESAME, a CAS client, or none.
+5. ### PROCTOR
+   `pass`, `fail` or `none`, from PROCTOR's JSON report. Rollcall never re-runs a rule.
+
+Key to the marks
+
+- present `active`: fully supported
+- late `security_only`: fixes only, a date is coming
+- back row `eol`: past its security date, or older than anything the policy lists
+- inaudible `unknown`: newer than the policy knows, or a tag nobody can read
+
+Drift and the burn-down
+
+### Watch the back row empty
+
+One snapshot per scan day. Count the apps on an EOL image each day and you get a line that should only go one way.
+
+Apps on an EOL PHP image, one scan a week Sample data
+
+Grafana draws the same line from `/metrics` with the bundled dashboard, `grafana/rollcall-burn-down.json`.
+
+#### Drift, counted per kind
+
+- `image_eol`runs on an EOL PHP image
+- `image_unknown`an image tag nobody can read
+- `image_below_floor`the image is older than the app allows
+- `floor_allows_eol`the PHP floor still lets an EOL version in
+- `floor_unbounded`no PHP floor declared at all
+- `eol_past_grace`past the policy's grace days
+- `laravel_eol`Laravel past its security date
+- `proctor_missing`no PROCTOR report on file
+- `proctor_failing`PROCTOR says fail
+- `override_expired`a PROCTOR override ran out
+
+`rollcall drift` also compares the policy with a saved endoflife.date page. A difference is a flag for a person; the policy stays the source of truth.
+
+From a checkout, with the bundled fixtures
+
+### Quick start
+
+No network, no token. PHP 8.3 or newer. Install dependencies once with `composer install`, then call the roll.
+
+**Linux and macOS**
+
+bash
+
+```
+export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
+export ROLLCALL_REPOS_DIR=tests/fixtures/repos
+export ROLLCALL_IMAGES_FILE=tests/fixtures/images.json
+export ROLLCALL_PROCTOR_DIR=tests/fixtures/proctor
+export ROLLCALL_STORE_DIR=var/snapshots
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+**Windows**
+
+PowerShell, no bash or WSL needed
+
+```
+$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
+$env:ROLLCALL_REPOS_DIR = "tests/fixtures/repos"
+$env:ROLLCALL_IMAGES_FILE = "tests/fixtures/images.json"
+$env:ROLLCALL_PROCTOR_DIR = "tests/fixtures/proctor"
+$env:ROLLCALL_STORE_DIR = "var/snapshots"
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+What comes back real output, Rollcall 0.1, bundled fixtures (four demo apps)
+
+```
+Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
+
+ROLLCALL 0.1.5 | scan 2026-10-28 | as of 2026-10-28 | public
+Apps present: 4 (scan problems: 0)
+
+PHP image
+VERSION  APPS  STATE          SECURITY UNTIL  DAYS TO EOL
+8.1      1     eol            2025-12-31      -301
+8.3      1     security_only  2027-12-31      429
+8.4      1     active         2028-12-31      795
+unknown  1     unknown        -               -
+
+EOL burn-down (state on each scan day)
+DATE        APPS  EOL  SUPPORTED  UNKNOWN
+2026-10-28  4     1    2          1
+```
+
+**exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
+
+- **`rollcall scan`**: Calls the roll once and stores `<date>.json`. Scan twice in a day and that day's snapshot is replaced.
+- **`rollcall report`**: `--format=text|json|prometheus`. `--internal` adds the per-app list; keep that inside the project.
+- **`rollcall drift`**: `--feed=<file>`, a saved endoflife.date page. Rollcall never fetches it itself.
+- **In Laravel**: The package registers itself. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, then schedule `php artisan rollcall:scan`.
+
+Left on the desk for your agent
+
+### Notes for the substitute
+
+Your coding agent is the substitute teacher: it has never met this class. Leave it a note. Copy one, or run it straight in OpenCode, Claude Code, Codex or ChatGPT. Each note says where the register is, what it may not touch, and to ask before it guesses.
+
+#### Get started with Rollcall
+
+Call the sample roll from a checkout, with the bundled fixtures, and have the agent read the report back to you.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing and always exits 0.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, the index of Rollcall's pages, each one as Markdown. Work from them, not from memory.
+- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs with project rollcall, and policy_lookup for PHP. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
+- The README in this folder, if this folder is a Rollcall checkout. If it is not, ask me whether to clone https://github.com/waynestate/rollcall first.
+
+Task:
+1. Install the dependencies once with `composer install` (PHP 8.3 or newer). If the host has no PHP, use the Docker line in the README's Run the checks section.
+2. Point Rollcall at the bundled fixtures: set ROLLCALL_POLICY_FILE, ROLLCALL_REPOS_DIR, ROLLCALL_IMAGES_FILE, ROLLCALL_PROCTOR_DIR and ROLLCALL_STORE_DIR the way the README's Quick start does.
+3. Call the roll with `php bin/rollcall scan`, then print it with `php bin/rollcall report`.
+4. Read the report back to me: each PHP image, the state CREED gives it, and the days left before end of life.
+
+Constraints:
+- Fixtures only: no network and no GitLab token. A real scan needs a read_api token that a person gives you; never invent one.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- The per-app list (report --internal) stays inside the project. Never paste app names anywhere public.
+- Ask me before you guess, and before you touch anything outside this folder.
+
+Output: the commands you ran, the report, then a short reading of it and your questions.
+```
+
+#### Or leave the note for your kind of app
+
+#### Rollcall as a plain PHP tool
+
+The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the /metrics and /report.json endpoints.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections.
+- ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with permutation raw-php for the rules that apply, and policy_lookup for PHP. If it is not connected, say so and work from the pages.
+- This project's composer.json, and how this host runs scheduled jobs.
+
+Task:
+1. Add Rollcall with `composer require waynestate/rollcall`. The CLI is `vendor/bin/rollcall`.
+2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once I give you a token and a group.
+3. Schedule the scan subcommand once a day with --prune, and show me the report subcommand in text and in json.
+4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
+
+Constraints:
+- Rollcall is read-only toward every source and writes only its snapshot folder. Keep it that way.
+- The GitLab token is a read_api token from the environment. Never commit it, log it or print it.
+- Metrics and the public report stay off unless I turn them on.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
+- Ask me before you guess, and before you touch a deploy or a scheduler.
+
+Output: the files you changed, the schedule entry for each OS, then your questions.
+```
+
+#### Rollcall in a Laravel app
+
+The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with.
+
+A prompt for your coding agent. Copy it as it stands:
+
+```text
+You are a coding agent adding Rollcall, the fleet scanner of WELD, the Wayne State application stack, to a Laravel app: the scheduled scan, the dashboard page of totals and, only if I ask, the internal per-app page.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Laravel, Configuration and Metrics sections.
+- ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with the permutation that fits this app (laravel-blade, laravel-blade-vue or laravel-inertia-vue), and policy_lookup for PHP and Laravel. If it is not connected, say so and work from the pages.
+- composer.json, composer.lock, config/, routes/, bootstrap/app.php and .env.example.
+
+Task:
+1. Add Rollcall with `composer require waynestate/rollcall`. Its service provider registers itself.
+2. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, and add the settings to .env.example as placeholders.
+3. Schedule `php artisan rollcall:scan` once a day.
+4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. It is the package's Blade page in WayneUI's class names, even in an Inertia app; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS.
+5. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED) off unless I ask. It runs behind the web and auth.sesame middleware and fails closed without them.
+
+Constraints:
+- Meet each setting the Laravel way (config, the scheduler, middleware) before writing code of your own.
+- If this app already serves /metrics (HELMET does), leave Rollcall's metrics off.
+- Never commit a real token or a .env file.
+- Ask me before you guess, and before you touch migrations, auth or anything that deploys.
+
+Output: the files you changed, the scheduler entry, then your questions.
+```
+
+The substitute reads the same register you do: [llms.txt](https://rollcall.apps.wayne.edu/llms.txt) lists the pages, [llms-full.txt](https://rollcall.apps.wayne.edu/llms-full.txt) holds them in one file, and this page has a [Markdown twin](https://rollcall.apps.wayne.edu/index.md). Nothing here phones home; the buttons only copy text or open the tool you picked. No note asks the sub to mark anyone absent.
+
+Classroom rules
+
+### For noticing who is missing, not for shaming them
+
+1. ### It enforces nothing.
+   No issues opened, no comments, no deploys. It exits `0` whatever it finds.
+2. ### Totals, not names.
+   The public report is counts and progress only: no app names, no owners, no ranking.
+3. ### Read-only everywhere.
+   `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. The one thing it writes is its own snapshot folder.
+4. ### Metrics stay off until you turn them on.
+   Then `/metrics` wants a bearer token or an allowed address. With neither set, nobody gets in.
+
+Sources in, one register out
+
+### Where the answers come from
+
+Three sources and one policy go in; one snapshot a day comes out. Each source has a fixture adapter, so nothing here needs a live host to try.
+
+- Repositories`composer.json` and `.lock`, from GitLab or a folder
+- App listthe PHP image each app runs
+- [PROCTOR](https://proctor.apps.wayne.edu/) one JSON report per app
+- [CREED](https://creed.apps.wayne.edu/) `policy.json`, the dates
+
+Rollcall scan, snapshot, compare
+
+- Terminal`text` and `json` reports
+- /metricsPrometheus text, off by default
+- Grafanathe bundled burn-down dashboard
+- Laravel pagea WayneUI dashboard of totals
+
+Rollcall's place in WELD
+
+### The class list
+
+WELD is Wayne State's application stack. Every part answers present here too.
+
+1. [WayneUI](https://wayneui.apps.wayne.edu/)the interface; the dashboard wears its classes
+2. [CREED](https://creed.apps.wayne.edu/)writes the dates Rollcall reads
+3. [PROCTOR](https://proctor.apps.wayne.edu/)checks one app; Rollcall collects the results
+4. [Preflight](https://preflight.apps.wayne.edu/)CI templates, where PROCTOR reports are born
+5. [SESAME](https://sesame.apps.wayne.edu/)the auth package Rollcall counts
+6. [HELMET](https://helmet.apps.wayne.edu/)baseline runtime, with its own `/metrics`
+7. [Pinstripe](https://pinstripe.apps.wayne.edu/)the Pint and PHPStan rules this repo wears
+8. [Sourdough](https://sourdough.apps.wayne.edu/)starters that begin in the front row
+9. [WELD](https://weld.apps.wayne.edu/)the whole stack, joined in one app
+10. Rollcallyou are here: the fleet census and EOL burn-down
+11. [Booster](https://booster.apps.wayne.edu/)moves the back row forward
+12. [Squire](https://squire.apps.wayne.edu/)carries the release to Citadel
+13. [Drawbridge](https://drawbridge.apps.wayne.edu/)the Citadel sign-in gateway
+14. [ADVISOR](https://advisor.apps.wayne.edu/)ask what applies to your app
