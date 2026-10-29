@@ -14,9 +14,9 @@ final class Application extends BaseApplication
     public function __construct(array $env = [])
     {
         parent::__construct('rollcall', ReportBuilder::VERSION);
-        $this->add(new ScanCommand($env));
-        $this->add(new ReportCommand($env));
-        $this->add(new DriftCommand($env));
-        $this->add(new PruneCommand($env));
+        $this->addCommand(new ScanCommand($env));
+        $this->addCommand(new ReportCommand($env));
+        $this->addCommand(new DriftCommand($env));
+        $this->addCommand(new PruneCommand($env));
     }
 }
