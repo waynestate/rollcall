@@ -1,12 +1,13 @@
-# Same settings as Pinstripe's phpstan/raw.neon. Swap for an include once waynestate/pinstripe is on Packagist.
+# PHPStan runs on Pinstripe's raw preset (level 8 plus deprecation checks); this file adds only
+# ROLLCALL's paths and PHP range.
+includes:
+    - vendor/waynestate/pinstripe/phpstan/raw.neon
+
 parameters:
-    level: 8
     paths:
         - src
         - bin/rollcall
         - public
-    reportIgnoresWithoutComments: true
-    reportUnmatchedIgnoredErrors: true
     phpVersion:
         min: 80300
         max: 80599
