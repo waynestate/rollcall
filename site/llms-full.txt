@@ -1,6 +1,6 @@
 # Rollcall: everything in one file
 
-> Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+> Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.
 
 The README and the Markdown twin of every page, joined. The index is https://rollcall.apps.wayne.edu/llms.txt. Written by Squire's agent-ready kit; do not edit.
 
@@ -308,11 +308,11 @@ Every app answers “present”.
 
 The ones on PHP 7.4 answer from the back row.
 
-WELD's fleet scanner. For every app it writes down the PHP image, the declared PHP floor, Laravel, the auth package and the PROCTOR result, then checks each one against CREED's `policy.json` by date. One snapshot a day gives you drift and an EOL burn-down.
+Rollcall is the stack's fleet scanner. For each app it records the PHP image, the lowest PHP its `composer.json` allows, the Laravel version, the auth package and the PROCTOR result. Then it looks up each version in CREED's `policy.json`. Every scan is kept as a snapshot, so you can see drift and how fast the EOL apps are going away.
 
 `$ composer require waynestate/rollcall`
 
-**Works alongside [WELD](https://weld.apps.wayne.edu/).** Rollcall doesn't go inside an app: run it when you need to know what every app in the fleet is running, WELD apps included.
+**Works alongside [WELD](https://weld.apps.wayne.edu/).** Rollcall doesn't go inside your app. You run it on its own to see what every app in the fleet is running, WELD apps included.
 
 [Quick start](https://rollcall.apps.wayne.edu/#start-title) [Take the roll](https://rollcall.apps.wayne.edu/#roll-title)
 
@@ -326,11 +326,11 @@ Today's roll sample data
 
 Answered 5 of 5
 
-The magic trick is attendance
+A sample roll
 
 ### Take the roll
 
-Seventeen apps, seated front to back by PHP version. Scroll, and Rollcall calls each name down the list. Everyone answers. The back row answers with a hand in the air.
+Seventeen made-up apps, seated by PHP version with the newest at the front. As you scroll, Rollcall calls each name. The back row answers with a hand in the air.
 
 Sample data · fictional apps · policy as of 2026-10-28
 
@@ -365,20 +365,20 @@ Sample data · fictional apps · policy as of 2026-10-28
 - **inaudible**: 1
 - **Answered**: 17
 
-Nobody is ever marked absent: a gap in one source becomes a note on that app, never a failed scan. The public report shows only totals like these; the per-app list is the internal view (`--internal`) and stays inside the project.
+Nobody is marked absent. If one source has a gap, like a missing PROCTOR report or a bad image tag, that app gets a note and the scan carries on. The public report only shows totals like these. The per-app list is the internal view (`--internal`), and it stays inside the project.
 
 Five answers per app
 
 ### What “present” means
 
-Each answer is a version, and every version is checked against the dates in CREED's `policy.json`. State is never decided in code.
+Four of the answers are versions, and Rollcall looks each one up by date in CREED's `policy.json`. No support date is written into Rollcall's code. The fifth answer is PROCTOR's own result.
 
 1. ### PHP image
-   The runtime the app really ships on, read from the app list's image tag.
+   The image the app actually runs on, read from its tag in the app list.
 2. ### PHP floor
    The lowest PHP its `composer.json` allows. `*` counts as no floor at all.
 3. ### Laravel
-   The installed version from `composer.lock`, never a guess.
+   The version that's installed, read from `composer.lock`.
 4. ### Auth package
    Which sign-in package is installed: SESAME, a CAS client, or none.
 5. ### PROCTOR
@@ -387,7 +387,7 @@ Each answer is a version, and every version is checked against the dates in CREE
 Key to the marks
 
 - present `active`: fully supported
-- late `security_only`: fixes only, a date is coming
+- late `security_only`: security fixes only, and the end date is set
 - back row `eol`: past its security date, or older than anything the policy lists
 - inaudible `unknown`: newer than the policy knows, or a tag nobody can read
 
@@ -395,7 +395,7 @@ Drift and the burn-down
 
 ### Watch the back row empty
 
-One snapshot per scan day. Count the apps on an EOL image each day and you get a line that should only go one way.
+Rollcall keeps one snapshot per scan day. Count the apps on an EOL image in each one and you get a line that should only go down.
 
 Apps on an EOL PHP image, one scan a week Sample data
 
@@ -420,7 +420,7 @@ From a checkout, with the bundled fixtures
 
 ### Quick start
 
-No network, no token. PHP 8.3 or newer. Install dependencies once with `composer install`, then call the roll.
+This runs on the fixtures in the repo, so you need no network and no token, just PHP 8.3 or newer. Run `composer install` once, then the commands below.
 
 **Linux and macOS**
 
@@ -472,7 +472,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
 
 **exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
 
-- **`rollcall scan`**: Calls the roll once and stores `<date>.json`. Scan twice in a day and that day's snapshot is replaced.
+- **`rollcall scan`**: Scans once and saves `<date>.json`. A second scan on the same day replaces it.
 - **`rollcall report`**: `--format=text|json|prometheus`. `--internal` adds the per-app list; keep that inside the project.
 - **`rollcall drift`**: `--feed=<file>`, a saved endoflife.date page. Rollcall never fetches it itself.
 - **In Laravel**: The package registers itself. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, then schedule `php artisan rollcall:scan`.
@@ -481,7 +481,7 @@ Left on the desk for your agent
 
 ### Notes for the substitute
 
-Your coding agent is the substitute teacher: it has never met this class. Leave it a note. Copy one, or run it straight in OpenCode, Claude Code, Codex or ChatGPT. Each note says where the register is, what it may not touch, and to ask before it guesses.
+Your coding agent is the substitute teacher here: it has never met this class. Each note tells it where to read up on Rollcall and what it must leave alone, and asks it to check with you before it guesses. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT.
 
 #### Get started with Rollcall
 
@@ -574,44 +574,44 @@ Constraints:
 Output: the files you changed, the scheduler entry, then your questions.
 ```
 
-The substitute reads the same register you do: [llms.txt](https://rollcall.apps.wayne.edu/llms.txt) lists the pages, [llms-full.txt](https://rollcall.apps.wayne.edu/llms-full.txt) holds them in one file, and this page has a [Markdown twin](https://rollcall.apps.wayne.edu/index.md). Nothing here phones home; the buttons only copy text or open the tool you picked. No note asks the sub to mark anyone absent.
+Your agent reads the same pages you do. [llms.txt](https://rollcall.apps.wayne.edu/llms.txt) lists them, [llms-full.txt](https://rollcall.apps.wayne.edu/llms-full.txt) has all of them in one file, and this page has a [Markdown twin](https://rollcall.apps.wayne.edu/index.md). The buttons only copy text or open the tool you pick; nothing is sent anywhere.
 
 Classroom rules
 
 ### For noticing who is missing, not for shaming them
 
 1. ### It enforces nothing.
-   No issues opened, no comments, no deploys. It exits `0` whatever it finds.
-2. ### Totals, not names.
-   The public report is counts and progress only: no app names, no owners, no ranking.
-3. ### Read-only everywhere.
+   It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever it finds.
+2. ### The public report has totals only.
+   Counts and progress. There are no app names, owners or rankings in it.
+3. ### It only reads.
    `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. The one thing it writes is its own snapshot folder.
 4. ### Metrics stay off until you turn them on.
-   Then `/metrics` wants a bearer token or an allowed address. With neither set, nobody gets in.
+   Once they're on, `/metrics` needs a bearer token or an allowed address. If neither is set, nobody gets in.
 
-Sources in, one register out
+Three sources and a policy
 
 ### Where the answers come from
 
-Three sources and one policy go in; one snapshot a day comes out. Each source has a fixture adapter, so nothing here needs a live host to try.
+Rollcall reads three sources plus CREED's policy, and writes one snapshot per scan day. Each source also has a fixture adapter, so you can try all of it without a live GitLab.
 
 - Repositories`composer.json` and `.lock`, from GitLab or a folder
 - App listthe PHP image each app runs
 - [PROCTOR](https://proctor.apps.wayne.edu/) one JSON report per app
 - [CREED](https://creed.apps.wayne.edu/) `policy.json`, the dates
 
-Rollcall scan, snapshot, compare
+Rollcall scans and compares
 
 - Terminal`text` and `json` reports
 - /metricsPrometheus text, off by default
 - Grafanathe bundled burn-down dashboard
 - Laravel pagea WayneUI dashboard of totals
 
-Rollcall's place in WELD
+Rollcall's place in the stack
 
 ### The class list
 
-WELD is Wayne State's application stack. Every part answers present here too.
+These are the parts of the Wayne State application stack, and what each one has to do with Rollcall. WELD is the Laravel starter app that has most of them installed.
 
 1. [WayneUI](https://wayneui.apps.wayne.edu/)the interface; the dashboard wears its classes
 2. [CREED](https://creed.apps.wayne.edu/)writes the dates Rollcall reads
@@ -621,9 +621,9 @@ WELD is Wayne State's application stack. Every part answers present here too.
 6. [HELMET](https://helmet.apps.wayne.edu/)baseline runtime, with its own `/metrics`
 7. [Pinstripe](https://pinstripe.apps.wayne.edu/)the Pint and PHPStan rules this repo wears
 8. [Sourdough](https://sourdough.apps.wayne.edu/)starters that begin in the front row
-9. [WELD](https://weld.apps.wayne.edu/)the whole stack, joined in one app
+9. [WELD](https://weld.apps.wayne.edu/)the Laravel starter app, with the stack already set up
 10. Rollcallyou are here: the fleet census and EOL burn-down
 11. [Booster](https://booster.apps.wayne.edu/)moves the back row forward
 12. [Squire](https://squire.apps.wayne.edu/)carries the release to Citadel
-13. [Drawbridge](https://drawbridge.apps.wayne.edu/)the Citadel sign-in gateway
-14. [ADVISOR](https://advisor.apps.wayne.edu/)ask what applies to your app
+13. [Drawbridge](https://drawbridge.apps.wayne.edu/)the planned sign-in gateway for Citadel
+14. [ADVISOR](https://advisor.apps.wayne.edu/)the MCP server your agent asks about the stack
