@@ -57,7 +57,8 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
 CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
-made by CREED's `bin/export.php` until CREED is on Packagist. Refresh it from a CREED checkout with
+made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of
+`waynestate/creed`; until ROLLCALL switches, the copy stays. Refresh it from a CREED checkout with
 `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed`, and prove the copy has not
 drifted with `composer creed-copy:check` (it reads the checkout from `CREED_PATH`). A hand edit to `src/Creed/`
 fails that check.
@@ -75,11 +76,11 @@ Everything is read-only toward every source. The only thing ROLLCALL writes is i
 ## Install
 
 ```
-composer require waynestate/rollcall
+composer require waynestate/rollcall:dev-main
 ```
 
-Until the package is on Packagist, add the repository first (`composer config repositories.rollcall vcs <url>`).
-Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+ROLLCALL is on Packagist with no tagged release yet, so ask for `dev-main` for now; once 0.1.0 is tagged, plain
+`composer require waynestate/rollcall` does it. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 
