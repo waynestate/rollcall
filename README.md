@@ -15,27 +15,27 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 > Every app answers "present". The ones on PHP 7.4 answer from the back row.
 
-Front page: [`site/index.html`](site/index.html) (static, no build step; see `site/README.md`).
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+Front page: [`site/index.html`](site/index.html). It is static, with no build step (see `site/README.md`).
+On Citadel, the raw-PHP deploy layer in [`deploy/`](deploy/) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
 
-Rollcall is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
-against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
-version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
-per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
-(default 90 days; the newest snapshot always stays).
+Rollcall is the fleet scanner for the Wayne State application stack. For each app it records the PHP image, the
+lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, and the PROCTOR
+result. Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per scan, so you can
+see drift and an EOL burn-down over time. It prunes old snapshots after the retention window (default 90 days; the
+newest one always stays).
 
-Rollcall enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
-The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
-(Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
+Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
+the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The
+per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
 
 <div align="center">
   <img src="docs/readme/register.svg" width="100%" alt="A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">
   <br><sub>One page of the roll book, called name by name. Sample data: the apps are fictional, and a real scan's per-app list stays internal.</sub>
 </div>
 
-## Where it sits in WELD
+## Where it sits in the stack
 
-WELD is Wayne State's application stack. Rollcall is the roll book for the whole party:
+The parts of the Wayne State application stack, and their jobs. WELD is the Laravel starter app that has most of them installed:
 
 | Part | Job |
 |---|---|
@@ -57,14 +57,14 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
-CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
-made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of
-`waynestate/creed`; until Rollcall switches, the copy stays. Refresh it from a CREED checkout with
-`php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed`, and prove the copy has not
-drifted with `composer creed-copy:check` (it reads the checkout from `CREED_PATH`). A hand edit to `src/Creed/`
-fails that check.
+CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made
+by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`;
+until Rollcall switches, the copy stays. To refresh it, run
+`php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed` from a CREED checkout.
+`composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit
+to `src/Creed/` fails that check.
 
-Data comes in through three interfaces, each with a fixture adapter, so nothing here needs a live host to try:
+Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
 | Source | Interface | 0.1 adapters |
 |---|---|---|
@@ -72,7 +72,7 @@ Data comes in through three interfaces, each with a fixture adapter, so nothing 
 | Runtime image per app | `ImageSource` | a JSON export of the app list |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Everything is read-only toward every source. The only thing Rollcall writes is its own snapshot directory.
+Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
 
 ## Install
 
@@ -84,8 +84,8 @@ Rollcall 0.1.6 is on Packagist. No extra repository needed. Requires PHP `^8.3`.
 
 ## Quick start
 
-From a checkout, with the bundled fixtures (no network, no token). Install dependencies once with
-`composer install` (or the Docker line under "Run the checks").
+This runs on the fixtures in the repo, so you need no network and no token. Run `composer install` once
+(or the Docker line under "Run the checks"), then the commands below.
 
 Linux and macOS (bash):
 
@@ -124,9 +124,9 @@ rollcall advisories --feed=<file> [--today=YYYY-MM-DD]
 rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 ```
 
-- `scan` calls the roll once and stores `<ROLLCALL_STORE_DIR>/<date>.json`. Scanning twice in a day replaces that
-  day's snapshot. A gap in one source (a missing report, a bad image tag) becomes a note on that app, not a failed
-  scan. A refused GitLab token stops the scan loudly instead of producing a flattering partial answer.
+- `scan` scans once and stores `<ROLLCALL_STORE_DIR>/<date>.json`. A second scan on the same day replaces it. A
+   gap in one source (a missing report, a bad image tag) becomes a note on that app, and the scan carries on. A
+   refused GitLab token stops the scan loudly instead of producing a flattering partial answer.
   `--prune[=DAYS]` deletes snapshots older than that many days after saving (default: `ROLLCALL_RETENTION_DAYS`,
   90; 0 keeps everything).
 - `report` prints the latest snapshot against the policy as of today. `text` is a terminal table, `json` is the
@@ -191,9 +191,9 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_INTERNAL_ENABLED` | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` |
 | `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
-Scanning GitLab (once a person gives you a token and a group): set `ROLLCALL_SOURCE=gitlab` and the three GitLab
-variables. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob
-id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
+To scan GitLab you need a token and a group from a person. Set `ROLLCALL_SOURCE=gitlab` and the three GitLab
+variables. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose
+blob id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
 
 ## WSU values (Playbook)
 
@@ -246,8 +246,8 @@ Playbook is private on git.wayne.edu. If you get a 404, ask the Enterprise Appli
 
 ## Metrics
 
-Off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves Prometheus text built from the latest
-snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
+Metrics are off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves
+Prometheus text built from the latest snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
 `ROLLCALL_METRICS_ALLOW`; with neither set, nobody gets in. Labels are version numbers, state names, drift kinds and
 public package names: no app names or personal data. The dashboard JSON is in `grafana/rollcall-burn-down.json`; import
 it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`

@@ -6,18 +6,18 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 > Every app answers "present". The ones on PHP 7.4 answer from the back row.
 
-Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/HEAD/site/index.html) (static, no build step; see `site/README.md`).
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/HEAD/site/index.html). It is static, with no build step (see `site/README.md`).
+On Citadel, the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/blob/HEAD/deploy/) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
 
-Rollcall is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
-against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
-version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
-per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
-(default 90 days; the newest snapshot always stays).
+Rollcall is the fleet scanner for the Wayne State application stack. For each app it records the PHP image, the
+lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, and the PROCTOR
+result. Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per scan, so you can
+see drift and an EOL burn-down over time. It prunes old snapshots after the retention window (default 90 days; the
+newest one always stays).
 
-Rollcall enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
-The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
-(Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
+Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
+the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The
+per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
 
 Every page below is Markdown. The HTML pages send the same Markdown to a client that asks for `text/markdown`. Written by Squire's agent-ready kit from the README and the pages; do not edit.
 
