@@ -80,7 +80,7 @@ Everything is read-only toward every source. The only thing ROLLCALL writes is i
 composer require waynestate/rollcall
 ```
 
-ROLLCALL 0.1.0 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+ROLLCALL 0.1.4 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 
