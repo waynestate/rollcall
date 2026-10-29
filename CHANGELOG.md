@@ -5,6 +5,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Changed: project names written as words except acronyms.
+- Fixed: Rollcall reported 0.1.0 after later releases.
 
 ## [0.1.4] - 2026-10-29
 
