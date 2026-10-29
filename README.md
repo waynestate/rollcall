@@ -222,12 +222,27 @@ git.wayne.edu with the token in `auth.json`.
 composer require waynestate/playbook
 ```
 
-Without Composer: fetch the package from the same repository with your git.wayne.edu token (curl on Linux and
-macOS, `Invoke-WebRequest` on Windows), or clone it:
+curl (Linux, macOS):
+
+```
+curl --fail -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main" -o .env.playbook
+```
+
+PowerShell (Windows):
+
+```
+Invoke-WebRequest -Headers @{ 'PRIVATE-TOKEN' = $env:GITLAB_TOKEN } -Uri "https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main" -OutFile .env.playbook
+```
+
+Clone:
 
 ```
 git clone https://git.wayne.edu/enterprise-apps/playbook.git
 ```
+
+The token is your own: `read_api` for curl, `read_repository` for clone and Composer.
+
+PLAYBOOK is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.
 
 ## Metrics
 
