@@ -8,7 +8,7 @@
 <meta name="stack-env" content="auto">
 <script src="assets/stack-env.js" defer></script>
 <title>Rollcall: Every app answers present.</title>
-<meta name="description" content="Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.">
+<meta name="description" content="Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.">
 <meta name="theme-color" content="#f7f2e6">
 <link rel="canonical" href="https://rollcall.apps.wayne.edu/">
 <!-- For agents (ADR-0019): this page as Markdown. bin/agent-ready.php writes it from
@@ -45,7 +45,7 @@
       <img src="brand/rollcall-avatar-256.png" width="28" height="28" alt="">
       <span>ROLLCALL</span>
     </a>
-    <p class="masthead__meta">Register 0.1 <span aria-hidden="true">·</span> <span class="masthead__part">a part of WELD</span></p>
+    <p class="masthead__meta">Register 0.1 <span aria-hidden="true">·</span> <span class="masthead__part">part of the Wayne State app stack</span></p>
   </div>
 </header>
 
@@ -65,14 +65,14 @@
         </div>
         <p class="titlepage__tagline">Every app answers <mark class="hl">“present”</mark>.</p>
         <p class="titlepage__joke">The ones on PHP 7.4 answer from the back row.</p>
-        <p class="titlepage__blurb">WELD's fleet scanner. For every app it writes down the PHP image, the declared PHP floor, Laravel, the auth package and the PROCTOR result, then checks each one against CREED's <code>policy.json</code> by date. One snapshot a day gives you drift and an EOL burn-down.</p>
+        <p class="titlepage__blurb">Rollcall is the stack's fleet scanner. For each app it records the PHP image, the lowest PHP its <code>composer.json</code> allows, the Laravel version, the auth package and the PROCTOR result. Then it looks up each version in CREED's <code>policy.json</code>. Every scan is kept as a snapshot, so you can see drift and how fast the EOL apps are going away.</p>
 
         <div class="slip">
           <code class="slip__code"><span class="slip__dim" aria-hidden="true">$</span> composer require waynestate/rollcall</code>
           <button class="copy" type="button" data-copy="composer require waynestate/rollcall"><span class="copy__label">Copy</span></button>
         </div>
 
-        <p class="titlepage__weld"><b>Works alongside <a href="https://weld.apps.wayne.edu/">WELD</a>.</b> Rollcall doesn't go inside an app: run it when you need to know what every app in the fleet is running, WELD apps included.</p>
+        <p class="titlepage__weld"><b>Works alongside <a href="https://weld.apps.wayne.edu/">WELD</a>.</b> Rollcall doesn't go inside your app. You run it on its own to see what every app in the fleet is running, WELD apps included.</p>
 
         <p class="titlepage__cta">
           <a class="stamp-btn" href="#start-title">Quick start</a>
@@ -114,11 +114,11 @@
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
         <p class="folio" aria-hidden="true">§ 1</p>
-        <p class="kicker">The magic trick is attendance</p>
+        <p class="kicker">A sample roll</p>
       </div>
       <div class="chapter__body">
         <h2 id="roll-title">Take the roll</h2>
-        <p class="lede">Seventeen apps, seated front to back by PHP version. Scroll, and Rollcall calls each name down the list. Everyone answers. The back row answers with a hand in the air.</p>
+        <p class="lede">Seventeen made-up apps, seated by PHP version with the newest at the front. As you scroll, Rollcall calls each name. The back row answers with a hand in the air.</p>
 
         <div class="register" data-roll>
           <div class="register__top">
@@ -167,7 +167,7 @@
             <div><dt><span class="stamp stamp--mumble stamp--sm">inaudible</span></dt><dd data-count="1">1</dd></div>
             <div class="totals__sum"><dt>Answered</dt><dd data-count="17">17</dd></div>
           </dl>
-          <p class="register__note">Nobody is ever marked absent: a gap in one source becomes a note on that app, never a failed scan. The public report shows only totals like these; the per-app list is the internal view (<code>--internal</code>) and stays inside the project.</p>
+          <p class="register__note">Nobody is marked absent. If one source has a gap, like a missing PROCTOR report or a bad image tag, that app gets a note and the scan carries on. The public report only shows totals like these. The per-app list is the internal view (<code>--internal</code>), and it stays inside the project.</p>
         </div>
       </div>
     </div>
@@ -182,12 +182,12 @@
       </div>
       <div class="chapter__body">
         <h2 id="answers-title">What “present” means</h2>
-        <p class="lede">Each answer is a version, and every version is checked against the dates in CREED's <code>policy.json</code>. State is never decided in code.</p>
+        <p class="lede">Four of the answers are versions, and Rollcall looks each one up by date in CREED's <code>policy.json</code>. No support date is written into Rollcall's code. The fifth answer is PROCTOR's own result.</p>
 
         <ol class="columns reveal">
-          <li><h3>PHP image</h3><p>The runtime the app really ships on, read from the app list's image tag.</p></li>
+          <li><h3>PHP image</h3><p>The image the app actually runs on, read from its tag in the app list.</p></li>
           <li><h3>PHP floor</h3><p>The lowest PHP its <code>composer.json</code> allows. <code>*</code> counts as no floor at all.</p></li>
-          <li><h3>Laravel</h3><p>The installed version from <code>composer.lock</code>, never a guess.</p></li>
+          <li><h3>Laravel</h3><p>The version that's installed, read from <code>composer.lock</code>.</p></li>
           <li><h3>Auth package</h3><p>Which sign-in package is installed: SESAME, a CAS client, or none.</p></li>
           <li><h3>PROCTOR</h3><p><code>pass</code>, <code>fail</code> or <code>none</code>, from PROCTOR's JSON report. Rollcall never re-runs a rule.</p></li>
         </ol>
@@ -196,7 +196,7 @@
           <p class="key__title">Key to the marks</p>
           <ul class="key__list">
             <li><span class="stamp stamp--present">present</span> <span><code>active</code>: fully supported</span></li>
-            <li><span class="stamp stamp--late">late</span> <span><code>security_only</code>: fixes only, a date is coming</span></li>
+            <li><span class="stamp stamp--late">late</span> <span><code>security_only</code>: security fixes only, and the end date is set</span></li>
             <li><span class="stamp stamp--back">back row</span> <span><code>eol</code>: past its security date, or older than anything the policy lists</span></li>
             <li><span class="stamp stamp--mumble">inaudible</span> <span><code>unknown</code>: newer than the policy knows, or a tag nobody can read</span></li>
           </ul>
@@ -214,7 +214,7 @@
       </div>
       <div class="chapter__body">
         <h2 id="burn-title">Watch the back row empty</h2>
-        <p class="lede">One snapshot per scan day. Count the apps on an EOL image each day and you get a line that should only go one way.</p>
+        <p class="lede">Rollcall keeps one snapshot per scan day. Count the apps on an EOL image in each one and you get a line that should only go down.</p>
 
         <figure class="chart" data-chart>
           <figcaption class="chart__cap"><span>Apps on an EOL PHP image, one scan a week</span> <span class="sample">Sample data</span></figcaption>
@@ -289,7 +289,7 @@
       </div>
       <div class="chapter__body">
         <h2 id="start-title">Quick start</h2>
-        <p class="lede">No network, no token. PHP 8.3 or newer. Install dependencies once with <code>composer install</code>, then call the roll.</p>
+        <p class="lede">This runs on the fixtures in the repo, so you need no network and no token, just PHP 8.3 or newer. Run <code>composer install</code> once, then the commands below.</p>
 
         <div class="tabbed">
           <div class="tabs" role="tablist" aria-label="Your operating system">
@@ -343,7 +343,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
         </div>
 
         <dl class="commands reveal">
-          <div><dt><code>rollcall scan</code></dt><dd>Calls the roll once and stores <code>&lt;date&gt;.json</code>. Scan twice in a day and that day's snapshot is replaced.</dd></div>
+          <div><dt><code>rollcall scan</code></dt><dd>Scans once and saves <code>&lt;date&gt;.json</code>. A second scan on the same day replaces it.</dd></div>
           <div><dt><code>rollcall report</code></dt><dd><code>--format=text|json|prometheus</code>. <code>--internal</code> adds the per-app list; keep that inside the project.</dd></div>
           <div><dt><code>rollcall drift</code></dt><dd><code>--feed=&lt;file&gt;</code>, a saved endoflife.date page. Rollcall never fetches it itself.</dd></div>
           <div><dt>In Laravel</dt><dd>The package registers itself. Publish the config with <code>php artisan vendor:publish --tag=rollcall-config</code>, then schedule <code>php artisan rollcall:scan</code>.</dd></div>
@@ -367,7 +367,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
       </div>
       <div class="chapter__body">
         <h2 id="sub-title">Notes for the substitute</h2>
-        <p class="lede">Your coding agent is the substitute teacher: it has never met this class. Leave it a note. Copy one, or run it straight in OpenCode, Claude Code, Codex or ChatGPT. Each note says where the register is, what it may not touch, and to ask before it guesses.</p>
+        <p class="lede">Your coding agent is the substitute teacher here: it has never met this class. Each note tells it where to read up on Rollcall and what it must leave alone, and asks it to check with you before it guesses. Copy one, or open it in OpenCode, Claude Code, Codex or ChatGPT.</p>
 
         <div class="subnotes">
         <section class="ar-prompt ar-prompt--lead subnote" id="prompt-get-started" aria-labelledby="prompt-get-started-title" data-ar-prompt>
@@ -468,7 +468,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
         </section>
         </div>
 
-        <p class="subnotes__fine">The substitute reads the same register you do: <a href="llms.txt">llms.txt</a> lists the pages, <a href="llms-full.txt">llms-full.txt</a> holds them in one file, and this page has a <a href="index.md" type="text/markdown">Markdown twin</a>. Nothing here phones home; the buttons only copy text or open the tool you picked. No note asks the sub to mark anyone absent.</p>
+        <p class="subnotes__fine">Your agent reads the same pages you do. <a href="llms.txt">llms.txt</a> lists them, <a href="llms-full.txt">llms-full.txt</a> has all of them in one file, and this page has a <a href="index.md" type="text/markdown">Markdown twin</a>. The buttons only copy text or open the tool you pick; nothing is sent anywhere.</p>
         </div>
       </div>
     </div>
@@ -484,10 +484,10 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
       <div class="chapter__body">
         <h2 id="rules-title">For noticing who is missing, not for shaming them</h2>
         <ol class="rules">
-          <li class="reveal"><h3>It enforces nothing.</h3><p>No issues opened, no comments, no deploys. It exits <code>0</code> whatever it finds.</p></li>
-          <li class="reveal"><h3>Totals, not names.</h3><p>The public report is counts and progress only: no app names, no owners, no ranking.</p></li>
-          <li class="reveal"><h3>Read-only everywhere.</h3><p><code>GET</code> and <code>HEAD</code> only, and a test fails if a write verb shows up in <code>src/</code>. The one thing it writes is its own snapshot folder.</p></li>
-          <li class="reveal"><h3>Metrics stay off until you turn them on.</h3><p>Then <code>/metrics</code> wants a bearer token or an allowed address. With neither set, nobody gets in.</p></li>
+          <li class="reveal"><h3>It enforces nothing.</h3><p>It never opens an issue, leaves a comment or deploys anything, and it exits <code>0</code> whatever it finds.</p></li>
+          <li class="reveal"><h3>The public report has totals only.</h3><p>Counts and progress. There are no app names, owners or rankings in it.</p></li>
+          <li class="reveal"><h3>It only reads.</h3><p><code>GET</code> and <code>HEAD</code> only, and a test fails if a write verb shows up in <code>src/</code>. The one thing it writes is its own snapshot folder.</p></li>
+          <li class="reveal"><h3>Metrics stay off until you turn them on.</h3><p>Once they're on, <code>/metrics</code> needs a bearer token or an allowed address. If neither is set, nobody gets in.</p></li>
         </ol>
       </div>
     </div>
@@ -498,11 +498,11 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
         <p class="folio" aria-hidden="true">§ 7</p>
-        <p class="kicker">Sources in, one register out</p>
+        <p class="kicker">Three sources and a policy</p>
       </div>
       <div class="chapter__body">
         <h2 id="flow-title">Where the answers come from</h2>
-        <p class="lede">Three sources and one policy go in; one snapshot a day comes out. Each source has a fixture adapter, so nothing here needs a live host to try.</p>
+        <p class="lede">Rollcall reads three sources plus CREED's policy, and writes one snapshot per scan day. Each source also has a fixture adapter, so you can try all of it without a live GitLab.</p>
         <div class="flow reveal">
           <ul class="flow__col">
             <li class="card"><span class="card__k">Repositories</span><span class="card__v"><code>composer.json</code> and <code>.lock</code>, from GitLab or a folder</span></li>
@@ -511,7 +511,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
             <li class="card card--part"><img src="assets/marks/creed.png" width="36" height="36" alt=""><span><span class="card__k"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="card__v"><code>policy.json</code>, the dates</span></span></li>
           </ul>
           <span class="flow__wire" aria-hidden="true"></span>
-          <div class="flow__hub card"><img src="brand/rollcall-avatar-256.png" width="64" height="64" alt=""><span class="card__k">Rollcall</span><span class="card__v">scan, snapshot, compare</span></div>
+          <div class="flow__hub card"><img src="brand/rollcall-avatar-256.png" width="64" height="64" alt=""><span class="card__k">Rollcall</span><span class="card__v">scans and compares</span></div>
           <span class="flow__wire" aria-hidden="true"></span>
           <ul class="flow__col">
             <li class="card"><span class="card__k">Terminal</span><span class="card__v"><code>text</code> and <code>json</code> reports</span></li>
@@ -529,11 +529,11 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
         <p class="folio" aria-hidden="true">§ 8</p>
-        <p class="kicker">Rollcall's place in WELD</p>
+        <p class="kicker">Rollcall's place in the stack</p>
       </div>
       <div class="chapter__body">
         <h2 id="class-title">The class list</h2>
-        <p class="lede">WELD is Wayne State's application stack. Every part answers present here too.</p>
+        <p class="lede">These are the parts of the Wayne State application stack, and what each one has to do with Rollcall. WELD is the Laravel starter app that has most of them installed.</p>
         <ol class="classlist">
           <li><span class="classlist__mark classlist__mark--tile"><img src="assets/marks/wayneui.svg" width="24" height="24" alt=""></span><span class="classlist__name"><a class="part-link" href="https://wayneui.apps.wayne.edu/">WayneUI</a></span><span class="classlist__line">the interface; the dashboard wears its classes</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/creed.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="classlist__line">writes the dates Rollcall reads</span></li>
@@ -543,12 +543,12 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
           <li><span class="classlist__mark"><img src="assets/marks/helmet.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://helmet.apps.wayne.edu/">HELMET</a></span><span class="classlist__line">baseline runtime, with its own <code>/metrics</code></span></li>
           <li><span class="classlist__mark"><img src="assets/marks/pinstripe.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://pinstripe.apps.wayne.edu/">Pinstripe</a></span><span class="classlist__line">the Pint and PHPStan rules this repo wears</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/sourdough.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://sourdough.apps.wayne.edu/">Sourdough</a></span><span class="classlist__line">starters that begin in the front row</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/weld.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://weld.apps.wayne.edu/">WELD</a></span><span class="classlist__line">the whole stack, joined in one app</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/weld.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://weld.apps.wayne.edu/">WELD</a></span><span class="classlist__line">the Laravel starter app, with the stack already set up</span></li>
           <li class="is-self"><span class="classlist__mark"><img src="brand/rollcall-avatar-256.png" width="256" height="256" alt=""></span><span class="classlist__name"><mark class="hl">Rollcall</mark></span><span class="classlist__line">you are here: the fleet census and EOL burn-down</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/booster.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://booster.apps.wayne.edu/">Booster</a></span><span class="classlist__line">moves the back row forward</span></li>
           <li><span class="classlist__mark"><img src="assets/marks/squire.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://squire.apps.wayne.edu/">Squire</a></span><span class="classlist__line">carries the release to Citadel</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://drawbridge.apps.wayne.edu/">Drawbridge</a></span><span class="classlist__line">the Citadel sign-in gateway</span></li>
-          <li><span class="classlist__mark"><img src="assets/marks/advisor.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://advisor.apps.wayne.edu/">ADVISOR</a></span><span class="classlist__line">ask what applies to your app</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/drawbridge.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://drawbridge.apps.wayne.edu/">Drawbridge</a></span><span class="classlist__line">the planned sign-in gateway for Citadel</span></li>
+          <li><span class="classlist__mark"><img src="assets/marks/advisor.png" width="256" height="256" alt=""></span><span class="classlist__name"><a class="part-link" href="https://advisor.apps.wayne.edu/">ADVISOR</a></span><span class="classlist__line">the MCP server your agent asks about the stack</span></li>
         </ol>
       </div>
     </div>

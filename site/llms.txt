@@ -1,6 +1,6 @@
 # Rollcall
 
-> Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+> Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.
 
 Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
@@ -23,7 +23,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 
 ## Pages
 
-- [Rollcall: Every app answers present.](https://rollcall.apps.wayne.edu/index.md): Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+- [Rollcall: Every app answers present.](https://rollcall.apps.wayne.edu/index.md): Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.
 
 ## Prompts
 
