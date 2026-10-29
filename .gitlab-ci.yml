@@ -1,7 +1,7 @@
 # composer ci is the contract: the checks are defined there, and this pipeline only wraps them.
-# ROLLCALL's pipeline, built from the PREFLIGHT components on this GitLab.
-# Pinned to PREFLIGHT 0.1.0. Never use ~latest.
-# ROLLCALL requires PHP ^8.3, so the test matrix starts at 8.3.
+# Rollcall's pipeline, built from the Preflight components on this GitLab.
+# Pinned to Preflight 0.1.0. Never use ~latest.
+# Rollcall requires PHP ^8.3, so the test matrix starts at 8.3.
 include:
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.1.0
     inputs:
