@@ -11,7 +11,7 @@ use Waynestate\Rollcall\Factory;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Support\Setting;
 
-require __DIR__ . '/fixtures/playbook-stub.php';
+require_once __DIR__ . '/fixtures/playbook-stub.php';
 
 /**
  * ROLLCALL_GITLAB_URL is a WSU value: the environment wins, then PLAYBOOK
