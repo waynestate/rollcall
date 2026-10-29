@@ -4,6 +4,8 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-29
+
 ### Added
 
 - `rollcall advisories --feed=<file>`: checks each app's locked `laravel/framework` and auth-package versions
