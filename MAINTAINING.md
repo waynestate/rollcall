@@ -71,11 +71,12 @@ app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in t
 
 1. Move the lines under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog) to a new `## [X.Y.Z] - YYYY-MM-DD`
    heading.
-2. `composer ci` and the CREED copy check green locally, then both pipelines green for that commit.
-3. Run a secrets scan of the history and check that nothing internal (server names, people, app names, IDs) is in the
+2. Bump `ReportBuilder::VERSION` in the release commit.
+3. `composer ci` and the CREED copy check green locally, then both pipelines green for that commit.
+4. Run a secrets scan of the history and check that nothing internal (server names, people, app names, IDs) is in the
    tree.
-4. Tag `X.Y.Z` (no `v`) on GitLab. The mirror carries the tag to GitHub, and Packagist picks it up from there.
-5. A release needs a maintainer's approval. Never move or delete a published tag.
+5. Tag `X.Y.Z` (no `v`) on GitLab. The mirror carries the tag to GitHub, and Packagist picks it up from there.
+6. A release needs a maintainer's approval. Never move or delete a published tag.
 
 ## The front page
 

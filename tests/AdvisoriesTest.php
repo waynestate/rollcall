@@ -67,7 +67,7 @@ final class AdvisoriesTest extends TestCase
 
     public function test_a_package_absent_from_the_feed_is_no_data(): void
     {
-        $this->assertSame(['status' => 'no data', 'count' => 0, 'ids' => []], $this->lookup()->check('waynestate/sesame', '0.1.0'));
+        $this->assertSame(['status' => 'no data', 'count' => 0, 'ids' => []], $this->lookup()->check('waynestate/sesame', '0.1.3'));
     }
 
     public function test_a_null_version_is_no_data(): void
@@ -113,7 +113,7 @@ final class AdvisoriesTest extends TestCase
         $this->assertStringContainsString('apereo/phpcas 1.6.1: clear (0 advisories, none) in 1 apps', $display);
         $this->assertStringContainsString('laravel/framework 10.48.2: affected (1 advisories, PKSA-2026-0001) in 1 apps', $display);
         $this->assertStringContainsString('laravel/framework 12.3.1: clear (0 advisories, none) in 1 apps', $display);
-        $this->assertStringContainsString('waynestate/sesame 0.1.0: no data (0 advisories, none) in 1 apps', $display);
+        $this->assertStringContainsString('waynestate/sesame 0.1.3: no data (0 advisories, none) in 1 apps', $display);
         foreach (['demo/atlas', 'demo/broken', 'demo/ledger', 'demo/relic'] as $id) {
             $this->assertStringNotContainsString($id, $display, 'app ids stay internal');
         }

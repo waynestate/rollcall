@@ -28,7 +28,7 @@ final class ParseTest extends TestCase
         $this->assertSame('12.3.1', $facts->laravel);
         $this->assertSame('12', $facts->laravelMajor());
         $this->assertSame('waynestate/sesame', $facts->authPackage);
-        $this->assertSame('0.1.0', $facts->authVersion, 'the require-dev package must not count');
+        $this->assertSame('0.1.3', $facts->authVersion, 'the require-dev package must not count');
         $this->assertSame([], $facts->notes);
     }
 
@@ -90,7 +90,7 @@ final class ParseTest extends TestCase
         $report = (new ProctorReportReader())->read((string) file_get_contents(self::FIXTURES . '/proctor/demo__atlas.json'));
 
         $this->assertSame('fail', $report['result']);
-        $this->assertSame('0.1.0', $report['version']);
+        $this->assertSame('0.1.3', $report['version']);
         $this->assertCount(1, $report['overrides']);
         $this->assertTrue($report['overrides'][0]->expired);
         $this->assertSame('Upgrade scheduled', $report['overrides'][0]->reason);

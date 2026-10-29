@@ -12,6 +12,7 @@ use Waynestate\Rollcall\Console\Application;
 use Waynestate\Rollcall\Console\ScanCommand;
 use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Lifecycle\EndOfLifeDrift;
+use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Source\RepositorySource;
 use Waynestate\Rollcall\Source\TokenExpiry;
@@ -86,7 +87,7 @@ final class ConsoleTest extends TestCase
         $tester->run(['command' => 'scan', '--today' => '2026-10-28']);
 
         $this->assertSame(0, $tester->run(['command' => 'report', '--today' => '2026-10-28']));
-        $this->assertStringContainsString('ROLLCALL 0.1.0 | scan 2026-10-28 | as of 2026-10-28 | public', $tester->getDisplay());
+        $this->assertStringContainsString(sprintf('ROLLCALL %s | scan 2026-10-28 | as of 2026-10-28 | public', ReportBuilder::VERSION), $tester->getDisplay());
     }
 
     public function test_a_second_scan_reports_progress_against_the_first(): void
