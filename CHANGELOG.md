@@ -4,6 +4,8 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-29
+
 - CREED reader re-exported from CREED 0.1.2: versions older than the oldest listed line are now end of life instead of refused.
 
 ## [0.1.2] - 2026-10-29
