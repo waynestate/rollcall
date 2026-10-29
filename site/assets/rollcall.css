@@ -447,6 +447,32 @@ h1, h2, h3 {
   color: var(--muted);
 }
 
+/* A fine-print line typed under the slip, like a note in the register's margin. */
+.titlepage__weld {
+  max-width: 34rem;
+  margin: 0.9rem 0 0;
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.titlepage__weld b {
+  color: var(--ink);
+}
+
+.titlepage__weld a {
+  color: var(--ink-blue);
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.titlepage__weld a:hover {
+  color: var(--red);
+}
+
 .titlepage__cta {
   display: flex;
   flex-wrap: wrap;

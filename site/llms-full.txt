@@ -312,6 +312,8 @@ WELD's fleet scanner. For every app it writes down the PHP image, the declared P
 
 `$ composer require waynestate/rollcall`
 
+**Works alongside [WELD](https://weld.apps.wayne.edu/).** Rollcall doesn't go inside an app: run it when you need to know what every app in the fleet is running, WELD apps included.
+
 [Quick start](https://rollcall.apps.wayne.edu/#start-title) [Take the roll](https://rollcall.apps.wayne.edu/#roll-title)
 
 Today's roll sample data
