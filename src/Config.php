@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall;
 
+use Waynestate\Rollcall\Support\Setting;
+
 /**
- * Every setting, read from environment variables. Nothing is read from a file
- * in the repository and nothing has a secret default. Secrets are hidden from
- * var_dump() and print_r() so a debug line cannot leak them.
+ * Every setting, read from environment variables. The GitLab URL also falls
+ * back to PLAYBOOK (waynestate/playbook) when the environment has none;
+ * tokens never do. Nothing is read from a file in the repository and nothing
+ * has a secret default. Secrets are hidden from var_dump() and print_r() so a
+ * debug line cannot leak them.
  */
 final class Config
 {
@@ -50,7 +54,7 @@ final class Config
             storeDir: $get('ROLLCALL_STORE_DIR') ?? 'var/snapshots',
             source: $source,
             reposDir: $get('ROLLCALL_REPOS_DIR'),
-            gitlabUrl: $get('ROLLCALL_GITLAB_URL'),
+            gitlabUrl: Setting::get('ROLLCALL_GITLAB_URL'),
             gitlabToken: $get('ROLLCALL_GITLAB_TOKEN') ?? '',
             gitlabGroups: $list($get('ROLLCALL_GITLAB_GROUPS')),
             imagesFile: $get('ROLLCALL_IMAGES_FILE'),

@@ -80,7 +80,7 @@ final class Factory
     {
         if ($this->config->source === 'gitlab') {
             if ($this->config->gitlabUrl === null || $this->config->gitlabGroups === []) {
-                throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS to scan GitLab.');
+                throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).');
             }
             $psr17 = new Psr17Factory();
 
