@@ -16,6 +16,7 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 > Every app answers "present". The ones on PHP 7.4 answer from the back row.
 
 Front page: [`site/index.html`](site/index.html) (static, no build step; see `site/README.md`).
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a SQUIRE kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
 ROLLCALL is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
 against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
