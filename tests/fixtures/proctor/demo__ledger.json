@@ -1,6 +1,6 @@
 {
     "tool": "proctor",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "path": ".",
     "today": "2026-10-28",
     "result": "pass",
