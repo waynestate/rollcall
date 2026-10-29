@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Source\GitLab;
 
+use DateTimeImmutable;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -24,6 +25,9 @@ use Waynestate\Rollcall\Source\RepositorySource;
  * - HTTP 429 waits for Retry-After and tries again, a bounded number of times.
  * - An unauthorised token stops the scan loudly. A silent partial scan would
  *   read as "the fleet got better".
+ * - tokenExpiry() asks the instance for the calling token's own record
+ *   (personal_access_tokens/self) so a person can rotate it before it dies.
+ *   That check is advisory: any failure there is null, never an exception.
  *
  * The token comes from the caller (env var). It is never put in a message.
  */
@@ -103,6 +107,37 @@ final class GitLabRepositorySource implements RepositorySource
         $this->expectOk($raw);
 
         return RepoFile::found((string) $raw->getBody(), $blob !== '' ? $blob : null);
+    }
+
+    /**
+     * The date the calling token expires, or null when it never expires or
+     * the answer cannot be read. Advisory by contract: a refused (401, 403,
+     * 404), non-2xx, unreachable or unparseable answer is null, never an
+     * exception, so this check can never fail a scan. The token value and
+     * the response body never appear in any message.
+     */
+    public function tokenExpiry(): ?DateTimeImmutable
+    {
+        try {
+            $response = $this->send('GET', $this->origin() . '/api/v4/personal_access_tokens/self');
+        } catch (RollcallException) {
+            return null;
+        }
+        $status = $response->getStatusCode();
+        if ($status < 200 || $status >= 300) {
+            return null;
+        }
+        try {
+            $data = json_decode((string) $response->getBody(), true, 16, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return null;
+        }
+        if (! is_array($data) || ! isset($data['expires_at']) || ! is_string($data['expires_at'])) {
+            return null;
+        }
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $data['expires_at']);
+
+        return $date === false ? null : $date;
     }
 
     /** @return array<string, array{id: int, ref: string}> */
