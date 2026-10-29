@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Tests;
 
+use DateTimeImmutable;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -177,6 +178,43 @@ final class GitLabRepositorySourceTest extends TestCase
             $this->assertStringContainsString('refused the token', $e->getMessage());
             $this->assertStringNotContainsString(self::TOKEN, $e->getMessage());
         }
+    }
+
+    public function test_token_expiry_reads_the_self_endpoint_with_a_get_and_the_token_header(): void
+    {
+        $source = $this->source(fn(string $m, string $u): MockResponse => str_ends_with($u, '/api/v4/personal_access_tokens/self')
+            ? new MockResponse($this->fixture('token-self.json'))
+            : new MockResponse('', ['http_code' => 500]));
+
+        $expiry = $source->tokenExpiry();
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $expiry);
+        $this->assertSame('2027-01-15', $expiry->format('Y-m-d'));
+        $this->assertCount(1, $this->requests, 'one request to the self endpoint and nothing else');
+        $this->assertSame('GET', $this->requests[0]['method']);
+        $this->assertSame(self::BASE . '/api/v4/personal_access_tokens/self', $this->requests[0]['url']);
+        $this->assertSame(self::TOKEN, $this->requests[0]['token'], 'the token rides in the request header only');
+    }
+
+    public function test_a_token_without_an_expiry_date_gives_null(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('{"id": 12, "name": "rollcall", "scopes": ["read_api"], "active": true, "revoked": false, "expires_at": null}'));
+
+        $this->assertNull($source->tokenExpiry());
+    }
+
+    public function test_a_refused_self_answer_gives_null_not_an_error(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('', ['http_code' => 403]));
+
+        $this->assertNull($source->tokenExpiry());
+    }
+
+    public function test_a_malformed_expiry_date_gives_null(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('{"id": 12, "name": "rollcall", "expires_at": "soon"}'));
+
+        $this->assertNull($source->tokenExpiry());
     }
 
     public function test_it_only_ever_sends_get_and_head_and_always_the_token_header(): void

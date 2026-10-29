@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Waynestate\Rollcall\Config;
 use Waynestate\Rollcall\Console\Application;
+use Waynestate\Rollcall\Console\ScanCommand;
 use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Lifecycle\EndOfLifeDrift;
 use Waynestate\Rollcall\RollcallException;
+use Waynestate\Rollcall\Source\RepositorySource;
+use Waynestate\Rollcall\Source\TokenExpiry;
+use Waynestate\Rollcall\Tests\Support\ExpiringSource;
 use Waynestate\Rollcall\Tests\Support\Fleet;
 
 final class ConsoleTest extends TestCase
@@ -39,6 +44,21 @@ final class ConsoleTest extends TestCase
             ...$extra,
         ]);
         $app->setAutoExit(false);
+
+        return new ApplicationTester($app);
+    }
+
+    /** Runs `scan` with a prebuilt source that stands in for GitLab. */
+    private function scanTester(RepositorySource&TokenExpiry $source): ApplicationTester
+    {
+        $app = new BaseApplication();
+        $app->setAutoExit(false);
+        $app->add(new ScanCommand([
+            'ROLLCALL_POLICY_FILE' => Fleet::FIXTURES . '/policy.json',
+            'ROLLCALL_STORE_DIR' => $this->store,
+            'ROLLCALL_IMAGES_FILE' => Fleet::FIXTURES . '/images.json',
+            'ROLLCALL_PROCTOR_DIR' => Fleet::FIXTURES . '/proctor',
+        ], $source));
 
         return new ApplicationTester($app);
     }
@@ -116,6 +136,33 @@ final class ConsoleTest extends TestCase
         $this->assertSame(2, $tester->run(['command' => 'scan']));
         $this->assertStringContainsString('ROLLCALL_GITLAB_URL', $tester->getDisplay());
         $this->assertStringNotContainsString('glpat-visible-secret', $tester->getDisplay());
+    }
+
+    public function test_scan_warns_when_the_gitlab_token_expires_in_ten_days(): void
+    {
+        $tester = $this->scanTester(new ExpiringSource(Fleet::repositories(), '2026-11-07'));
+
+        $this->assertSame(0, $tester->run(['command' => 'scan', '--today' => '2026-10-28']));
+        $this->assertStringContainsString('Note: the GitLab token expires on 2026-11-07 (10 days left).', $tester->getDisplay());
+        $this->assertFileExists($this->store . '/2026-10-28.json');
+    }
+
+    public function test_scan_warns_when_the_gitlab_token_has_already_expired(): void
+    {
+        $tester = $this->scanTester(new ExpiringSource(Fleet::repositories(), '2026-10-20'));
+
+        $this->assertSame(0, $tester->run(['command' => 'scan', '--today' => '2026-10-28']));
+        $this->assertStringContainsString('Note: the GitLab token expired on 2026-10-20.', $tester->getDisplay());
+    }
+
+    public function test_scan_stays_quiet_when_the_gitlab_token_is_fresh(): void
+    {
+        $tester = $this->scanTester(new ExpiringSource(Fleet::repositories(), '2026-12-27'));
+
+        $this->assertSame(0, $tester->run(['command' => 'scan', '--today' => '2026-10-28']));
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Present: 4 apps.', $display);
+        $this->assertStringNotContainsString('token expir', $display);
     }
 
     public function test_secrets_are_hidden_from_debug_output(): void
