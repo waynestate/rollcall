@@ -207,6 +207,6 @@ final class ReportTest extends TestCase
         $text = (new PrometheusRenderer())->render($report);
 
         $this->assertStringContainsString('rollcall_php_image_apps{version="9.0",state="active"} 1', $text);
-        $this->assertStringContainsString('rollcall_php_image_apps{version="8.0",state="unknown"} 1', $text);
+        $this->assertStringContainsString('rollcall_php_image_apps{version="8.0",state="eol"} 1', $text);
     }
 }

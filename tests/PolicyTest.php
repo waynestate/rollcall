@@ -35,11 +35,11 @@ final class PolicyTest extends TestCase
         yield 'php 8.2 is still supported on its last day' => ['php', '8.2', '2026-12-31', Support::SecurityOnly];
         yield 'php 8.2 is EOL the day after' => ['php', '8.2', '2027-01-01', Support::Eol];
         yield 'php 8.1 has only a security date and is EOL after it' => ['php', '8.1', '2026-10-28', Support::Eol];
-        yield 'php 7.4 is older than anything listed, so unknown' => ['php', '7.4', '2026-10-28', Support::Unknown];
+        yield 'php 7.4 is older than anything listed, so unknown' => ['php', '7.4', '2026-10-28', Support::Eol];
         yield 'php 9.0 is newer than the policy, so treated as current' => ['php', '9.0', '2026-10-28', Support::Active];
         yield 'node 21 falls between listed lines, so unknown' => ['node', '21', '2026-10-28', Support::Unknown];
         yield 'laravel 10 is EOL' => ['laravel', '10', '2026-10-28', Support::Eol];
-        yield 'laravel 9 is older than listed, so unknown' => ['laravel', '9', '2026-10-28', Support::Unknown];
+        yield 'laravel 9 is older than listed, so unknown' => ['laravel', '9', '2026-10-28', Support::Eol];
         yield 'laravel 12 is security-only' => ['laravel', '12', '2026-10-28', Support::SecurityOnly];
         yield 'an unlisted component is unknown' => ['cobol', '1', '2026-10-28', Support::Unknown];
     }
