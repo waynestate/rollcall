@@ -77,11 +77,10 @@ Everything is read-only toward every source. The only thing ROLLCALL writes is i
 ## Install
 
 ```
-composer require waynestate/rollcall:dev-main
+composer require waynestate/rollcall
 ```
 
-ROLLCALL is on Packagist with no tagged release yet, so ask for `dev-main` for now; once 0.1.0 is tagged, plain
-`composer require waynestate/rollcall` does it. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+ROLLCALL 0.1.0 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 
