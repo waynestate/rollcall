@@ -53,4 +53,4 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 ## Not yet
 
 Citadel read-only adapter, the upgrade-record reader, ownership verification, the live Packagist advisories fetch,
-the CycloneDX bill of materials, the front page and the a11y gate run. See `OPEN_QUESTIONS.md`, "Not built yet".
+the CycloneDX bill of materials and the a11y gate run on the dashboard. See `OPEN_QUESTIONS.md`, "Not built yet".

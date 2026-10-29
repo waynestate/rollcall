@@ -52,11 +52,10 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
 | ADVISOR/MCP tool module | Waits on the stack MCP server |
-| Marketing front page, brand site, quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The front page is built separately; the dashboard page here has not been run through WayneUI's a11y gate |
+| Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The front page (`site/index.html`) is built and hand-written; the dashboard page here has not been run through WayneUI's a11y gate |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
-| Snapshot pruning, retention | Question 9 |
 | Secret-scan hooks | Question 3 |
-| Tags `0.1.0` and `1.0.0`, the git.wayne.edu mirror | Release steps for the lead and the user |
+| Tag `1.0.0` and the git.wayne.edu mirror | Release steps for the lead and the user |
 | A live trial against git.wayne.edu | Forbidden for the build; the GitLab adapter has only been run against recorded responses. Confirm `default_branch` is returned by `simple=true`, that `HEAD` returns `X-Gitlab-Blob-Id`, and the rate limit |
 
 ## Choices worth a second look
