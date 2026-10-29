@@ -33,6 +33,7 @@
     },
     "suggest": {
         "laravel/framework": "For the Laravel adapter: the dashboard page and the scheduled scan",
+        "waynestate/playbook": "WSU's shared values (CAS, Entra, gateway); private, git.wayne.edu",
         "waynestate/wayne-ui": "Styles the Laravel dashboard page; until it is on Packagist, link its stylesheet with ROLLCALL_WAYNEUI_CSS"
     },
     "autoload": {
