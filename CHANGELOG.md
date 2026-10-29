@@ -4,6 +4,8 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-29
+
 ### Added
 
 - Framework-free core: policy reader with state by date, Composer file reader, image-tag reader, PROCTOR report
