@@ -208,6 +208,8 @@ on a separate app or leave metrics off.
 
 ## Run the checks
 
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
+
 `composer ci` is the contract: manifest, tests, Pint, PHPStan and `composer audit`. PHP is not needed on the host:
 
 ```
