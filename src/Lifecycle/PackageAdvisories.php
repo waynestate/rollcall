@@ -36,7 +36,8 @@ final class PackageAdvisories
         }
         $advisories = [];
         foreach ($data['advisories'] as $package => $list) {
-            if (is_string($package) && is_array($list)) {
+            // A package whose value is not a list of advisories is treated as absent.
+            if (is_string($package) && is_array($list) && array_is_list($list)) {
                 $advisories[strtolower($package)] = $list;
             }
         }
@@ -58,11 +59,11 @@ final class PackageAdvisories
     public function check(string $package, ?string $version): array
     {
         if ($version === null || trim($version) === '') {
-            return $this->result('no data', []);
+            return $this->result('no data');
         }
         $key = strtolower(trim($package));
         if ($key === '' || ! array_key_exists($key, $this->advisories)) {
-            return $this->result('no data', []);
+            return $this->result('no data');
         }
 
         // Normalise before matching: a lock file may carry a leading "v".
@@ -70,7 +71,7 @@ final class PackageAdvisories
         try {
             $normalized = (new VersionParser())->normalize($normalized);
         } catch (\UnexpectedValueException) {
-            return $this->result('no data', []);
+            return $this->result('no data');
         }
 
         $matched = 0;
@@ -78,13 +79,13 @@ final class PackageAdvisories
         foreach ($this->advisories[$key] as $advisory) {
             if (! is_array($advisory) || ! is_string($advisory['affectedVersions'] ?? null)) {
                 // An advisory without a readable range cannot be judged.
-                return $this->result('no data', []);
+                return $this->result('no data');
             }
             try {
                 $covers = Semver::satisfies($normalized, $advisory['affectedVersions']);
             } catch (\UnexpectedValueException) {
                 // An unparseable range cannot be ruled out: "no data", not "clear".
-                return $this->result('no data', []);
+                return $this->result('no data');
             }
             if ($covers) {
                 $matched++;
