@@ -13,7 +13,7 @@ final class Application extends BaseApplication
     /** @param  array<string, string|false|null>  $env */
     public function __construct(array $env = [])
     {
-        parent::__construct('rollcall', ReportBuilder::VERSION);
+        parent::__construct('rollcall', ReportBuilder::version());
         $this->addCommand(new ScanCommand($env));
         $this->addCommand(new ReportCommand($env));
         $this->addCommand(new DriftCommand($env));

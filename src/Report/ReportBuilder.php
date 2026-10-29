@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Report;
 
+use Composer\InstalledVersions;
 use DateTimeImmutable;
 use Waynestate\Rollcall\Creed\Policy;
 use Waynestate\Rollcall\Lifecycle\Support;
@@ -19,7 +20,35 @@ use Waynestate\Rollcall\Model\Snapshot;
  */
 final class ReportBuilder
 {
-    public const VERSION = '0.1.0';
+    public const VERSION = '0.1.4';          // fallback for a dev checkout
+    private const PACKAGE = 'waynestate/rollcall';
+
+    /**
+     * The installed release version when Rollcall runs from a Packagist
+     * install, the constant otherwise. A report must never print a stale
+     * version.
+     */
+    public static function version(): string
+    {
+        return self::installedVersion() ?? self::VERSION;
+    }
+
+    private static function installedVersion(): ?string
+    {
+        try {
+            if (InstalledVersions::getRootPackage()['name'] === self::PACKAGE) {
+                return null; // this repo is the root package: no release version
+            }
+            $pretty = InstalledVersions::getPrettyVersion(self::PACKAGE);
+        } catch (\Throwable) {
+            return null;
+        }
+        if ($pretty === null || $pretty === '' || str_contains($pretty, 'no-version-set')) {
+            return null;
+        }
+
+        return preg_replace('/^v/i', '', $pretty) ?? $pretty;
+    }
 
     /** Every drift kind, so a report always lists all of them, zeros included. */
     public const DRIFT_KINDS = [
@@ -87,7 +116,7 @@ final class ReportBuilder
 
         $report = [
             'tool' => 'rollcall',
-            'version' => self::VERSION,
+            'version' => self::version(),
             'scan_date' => $current->date->format('Y-m-d'),
             'as_of' => $today->format('Y-m-d'),
             'visibility' => $internal ? 'internal' : 'public',
