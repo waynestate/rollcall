@@ -4,6 +4,12 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Added
+
+- `ROLLCALL_GITLAB_URL` may now come from PLAYBOOK (`waynestate/playbook`, private on git.wayne.edu) when the
+  environment has none: the environment wins, PLAYBOOK fills the gap, and the missing-setting error now points at
+  the README. The GitLab token stays environment-only.
+
 ## [0.1.3] - 2026-10-29
 
 - CREED reader re-exported from CREED 0.1.2: versions older than the oldest listed line are now end of life instead of refused.

@@ -195,6 +195,40 @@ Scanning GitLab (once a person gives you a token and a group): set `ROLLCALL_SOU
 variables. ROLLCALL sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob
 id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
 
+## WSU values (PLAYBOOK)
+
+`ROLLCALL_GITLAB_URL` is a Wayne State value, so it may come from PLAYBOOK (`waynestate/playbook`) when the
+environment has none. The environment always wins; PLAYBOOK only fills what the environment leaves out. The GitLab
+token never comes through PLAYBOOK and stays an environment variable.
+
+| Setting | Value |
+|---|---|
+| `ROLLCALL_GITLAB_URL` | The `https://` base URL of the GitLab instance |
+
+PLAYBOOK is private and lives on git.wayne.edu. Getting it into your app:
+
+Composer: add the repository to your `composer.json`, then require the package. Composer authenticates to
+git.wayne.edu with the token in `auth.json`.
+
+```json
+{
+    "repositories": [
+        {"type": "vcs", "url": "https://git.wayne.edu/enterprise-apps/playbook.git"}
+    ]
+}
+```
+
+```
+composer require waynestate/playbook
+```
+
+Without Composer: fetch the package from the same repository with your git.wayne.edu token (curl on Linux and
+macOS, `Invoke-WebRequest` on Windows), or clone it:
+
+```
+git clone https://git.wayne.edu/enterprise-apps/playbook.git
+```
+
 ## Metrics
 
 Off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves Prometheus text built from the latest
