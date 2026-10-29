@@ -1,11 +1,11 @@
 # MAINTAINING: taking attendance of the attendance-taker
 
-How to build, test, release and keep ROLLCALL current. ROLLCALL is the fleet census: every app answers "present" with
+How to build, test, release and keep Rollcall current. Rollcall is the fleet census: every app answers "present" with
 its PHP image, Laravel and auth-package versions and its PROCTOR result, checked against CREED's policy, and the
 report shows the burn-down of unsupported versions. Somebody has to make sure the roll book itself is up to date.
 That somebody is you.
 
-## What ROLLCALL is and what it depends on
+## What Rollcall is and what it depends on
 
 - `waynestate/rollcall` on Packagist, with the CLI `bin/rollcall` (`scan`, `report`) and an optional Laravel
   provider. Metrics in Prometheus format, off by default.
@@ -47,8 +47,8 @@ CREED copy check, which needs a CREED checkout (it exits 2 without `CREED_PATH`)
 
 ## CI
 
-- **GitLab:** PREFLIGHT's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
-- **GitHub:** `.github/workflows/ci.yml` calls PREFLIGHT's reusable workflow with `composer ci`.
+- **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
+- **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
 - Green means `composer ci` passed on all three PHP versions on both.
 
 ## Refreshing the CREED copy
@@ -80,7 +80,7 @@ app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in t
 ## The front page
 
 `site/` is the static front page, for `https://rollcall.apps.wayne.edu/` on Citadel, served through a small raw-PHP
-`deploy/` layer generated with SQUIRE. Run ROLLCALL's own `/metrics` separately from HELMET's; the routes collide.
+`deploy/` layer generated with Squire. Run Rollcall's own `/metrics` separately from HELMET's; the routes collide.
 
 ## Who maintains it
 

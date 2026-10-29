@@ -1,4 +1,4 @@
-# ROLLCALL README art kit
+# Rollcall README art kit
 
 Regenerates the README images under `docs/readme/` from this repo's own static
 front page (`site/`) and brand files. Nothing is drawn by hand: the hero and

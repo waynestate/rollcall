@@ -1,8 +1,10 @@
 # Changelog
 
-All notable changes to ROLLCALL. The format follows Keep a Changelog; versions follow SemVer.
+All notable changes to Rollcall. The format follows Keep a Changelog; versions follow SemVer.
 
 ## [Unreleased]
+
+- Changed: project names written as words except acronyms.
 
 ## [0.1.4] - 2026-10-29
 

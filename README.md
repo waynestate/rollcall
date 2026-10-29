@@ -1,8 +1,8 @@
 <div align="center">
-  <a href="site/index.html"><img src="docs/readme/hero.jpg" width="100%" alt="ROLLCALL's front page: the headline 'Every app answers present.' beside a sheet of ruled register paper listing sample apps, each marked present, late or back row, over the green roll-book mark."></a>
+  <a href="site/index.html"><img src="docs/readme/hero.jpg" width="100%" alt="Rollcall's front page: the headline 'Every app answers present.' beside a sheet of ruled register paper listing sample apps, each marked present, late or back row, over the green roll-book mark."></a>
 </div>
 
-# ROLLCALL
+# Rollcall
 
 <p>
   <img src="docs/readme/badges/php.svg" alt="php ^8.3">
@@ -16,38 +16,38 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 > Every app answers "present". The ones on PHP 7.4 answer from the back row.
 
 Front page: [`site/index.html`](site/index.html) (static, no build step; see `site/README.md`).
-On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a SQUIRE kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
 
-ROLLCALL is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
+Rollcall is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
 against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
 version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
 per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
 (default 90 days; the newest snapshot always stays).
 
-ROLLCALL enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
+Rollcall enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
 The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
 (Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
 
 <div align="center">
-  <img src="docs/readme/register.svg" width="100%" alt="A page of ROLLCALL's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">
+  <img src="docs/readme/register.svg" width="100%" alt="A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">
   <br><sub>One page of the roll book, called name by name. Sample data: the apps are fictional, and a real scan's per-app list stays internal.</sub>
 </div>
 
 ## Where it sits in WELD
 
-WELD is Wayne State's application stack. ROLLCALL is the roll book for the whole party:
+WELD is Wayne State's application stack. Rollcall is the roll book for the whole party:
 
 | Part | Job |
 |---|---|
 | WayneUI (project 0) | The interface layer: tokens, components, four consumer paths |
-| CREED | The standards and `policy.json`, the dates ROLLCALL reads |
-| PROCTOR | Measures one app against the policy; ROLLCALL reads its JSON report and never re-runs a rule |
-| PREFLIGHT | CI templates |
-| SESAME | Protocol-neutral auth; ROLLCALL reports which auth package each app uses |
+| CREED | The standards and `policy.json`, the dates Rollcall reads |
+| PROCTOR | Measures one app against the policy; Rollcall reads its JSON report and never re-runs a rule |
+| Preflight | CI templates |
+| SESAME | Protocol-neutral auth; Rollcall reports which auth package each app uses |
 | HELMET | Baseline runtime and its own optional `/metrics` |
 | Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
 | Sourdough | Starters |
-| ROLLCALL | The fleet census and EOL burn-down |
+| Rollcall | The fleet census and EOL burn-down |
 
 ## How it is built
 
@@ -59,7 +59,7 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 CREED's policy reader is carried as a generated copy under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`),
 made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of
-`waynestate/creed`; until ROLLCALL switches, the copy stays. Refresh it from a CREED checkout with
+`waynestate/creed`; until Rollcall switches, the copy stays. Refresh it from a CREED checkout with
 `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed`, and prove the copy has not
 drifted with `composer creed-copy:check` (it reads the checkout from `CREED_PATH`). A hand edit to `src/Creed/`
 fails that check.
@@ -72,7 +72,7 @@ Data comes in through three interfaces, each with a fixture adapter, so nothing 
 | Runtime image per app | `ImageSource` | a JSON export of the app list |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Everything is read-only toward every source. The only thing ROLLCALL writes is its own snapshot directory.
+Everything is read-only toward every source. The only thing Rollcall writes is its own snapshot directory.
 
 ## Install
 
@@ -80,7 +80,7 @@ Everything is read-only toward every source. The only thing ROLLCALL writes is i
 composer require waynestate/rollcall
 ```
 
-ROLLCALL 0.1.4 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+Rollcall 0.1.4 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 
@@ -134,20 +134,20 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
   `--internal` adds the per-app list; keep that output inside the project.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
-  policy stays the source of truth. ROLLCALL does not fetch that page itself.
+   policy stays the source of truth. Rollcall does not fetch that page itself.
 - `advisories` checks each app's locked `laravel/framework` and auth-package versions against a saved Packagist
   security-advisories response (for example
   `https://packagist.org/api/security-advisories/?packages[]=laravel/framework` saved to a file). One line per
   package and version, sorted by package then version: the status (`affected`, `clear` or `no data`), the count and
   the advisory ids, and how many apps hold that pair. A package with no advisory data prints `no data`, never
   `safe`: an absent row proves nothing about the package, and a version nobody can parse says `no data` too.
-  ROLLCALL does not fetch that page itself; a person saves it and `--feed` points at the file. Output is package
+     Rollcall does not fetch that page itself; a person saves it and `--feed` points at the file. Output is package
   names and counts only: no app ids.
 - `prune` deletes snapshots older than `--days` (default: `ROLLCALL_RETENTION_DAYS`, 90; 0 keeps everything). The
   newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
   `--dry-run` lists what would go without deleting anything.
 
-Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: ROLLCALL
+Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: Rollcall
 does not gate anything.
 
 ## What the report says
@@ -172,7 +172,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | Variable | Meaning | Default |
 |---|---|---|
 | `ROLLCALL_POLICY_FILE` | Path to CREED's `policy.json` | none (required for `report`, `drift`) |
-| `ROLLCALL_STORE_DIR` | Snapshot directory, the only place ROLLCALL writes | `var/snapshots` |
+| `ROLLCALL_STORE_DIR` | Snapshot directory, the only place Rollcall writes | `var/snapshots` |
 | `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
 | `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none |
 | `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
@@ -192,20 +192,20 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
 Scanning GitLab (once a person gives you a token and a group): set `ROLLCALL_SOURCE=gitlab` and the three GitLab
-variables. ROLLCALL sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob
+variables. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob
 id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
 
-## WSU values (PLAYBOOK)
+## WSU values (Playbook)
 
-`ROLLCALL_GITLAB_URL` is a Wayne State value, so it may come from PLAYBOOK (`waynestate/playbook`) when the
-environment has none. The environment always wins; PLAYBOOK only fills what the environment leaves out. The GitLab
-token never comes through PLAYBOOK and stays an environment variable.
+`ROLLCALL_GITLAB_URL` is a Wayne State value, so it may come from Playbook (`waynestate/playbook`) when the
+environment has none. The environment always wins; Playbook only fills what the environment leaves out. The GitLab
+token never comes through Playbook and stays an environment variable.
 
 | Setting | Value |
 |---|---|
 | `ROLLCALL_GITLAB_URL` | The `https://` base URL of the GitLab instance |
 
-PLAYBOOK is private and lives on git.wayne.edu. Getting it into your app:
+Playbook is private and lives on git.wayne.edu. Getting it into your app:
 
 Composer: add the repository to your `composer.json`, then require the package. Composer authenticates to
 git.wayne.edu with the token in `auth.json`.
@@ -242,7 +242,7 @@ git clone https://git.wayne.edu/enterprise-apps/playbook.git
 
 The token is your own: `read_api` for curl, `read_repository` for clone and Composer.
 
-PLAYBOOK is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.
+Playbook is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.
 
 ## Metrics
 
@@ -260,7 +260,7 @@ The package registers itself (`extra.laravel.providers`). Publish the config wit
 dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it
 runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
-The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run ROLLCALL's
+The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
 on a separate app or leave metrics off.
 
 ## Run the checks
@@ -287,7 +287,7 @@ check can run beside the code it protects.
   output and error messages. Use a `read_api` token with an expiry and a named rotation owner. When the source is
   GitLab, `scan` reads the token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days
   before it expires, or when it has already expired. The note names the date; rotating the token stays the owner's
-  job, never ROLLCALL's. The check is advisory: a refused, unreachable or unparseable answer prints nothing and
+     job, never Rollcall's. The check is advisory: a refused, unreachable or unparseable answer prints nothing and
   never fails the scan, and the token value never appears in output.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
@@ -298,7 +298,7 @@ check can run beside the code it protects.
 
 <br>
 
-<img src="docs/readme/burn-down.jpg" width="100%" alt="ROLLCALL's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.">
+<img src="docs/readme/burn-down.jpg" width="100%" alt="Rollcall's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.">
 
 <sub>The same line Grafana draws from <code>/metrics</code>. Made-up apps, real arithmetic.</sub>
 
@@ -309,7 +309,7 @@ check can run beside the code it protects.
 
 <br>
 
-<img src="docs/readme/board.jpg" width="100%" alt="ROLLCALL's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.">
+<img src="docs/readme/board.jpg" width="100%" alt="Rollcall's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.">
 
 </details>
 
@@ -329,12 +329,12 @@ Licence: MIT, Copyright Wayne State University.
   <a href="https://github.com/waynestate/sesame" title="SESAME"><img src="docs/readme/cast/sesame.png" width="40" alt="SESAME"></a>
   <a href="https://github.com/waynestate/helmet" title="HELMET"><img src="docs/readme/cast/helmet.png" width="40" alt="HELMET"></a>
   <a href="https://github.com/waynestate/sourdough" title="Sourdough"><img src="docs/readme/cast/sourdough.png" width="40" alt="Sourdough"></a>
-  <a href="https://github.com/waynestate/squire" title="SQUIRE"><img src="docs/readme/cast/squire.png" width="40" alt="SQUIRE"></a>
-  <a href="https://github.com/waynestate/preflight" title="PREFLIGHT"><img src="docs/readme/cast/preflight.png" width="40" alt="PREFLIGHT"></a>
+  <a href="https://github.com/waynestate/squire" title="Squire"><img src="docs/readme/cast/squire.png" width="40" alt="Squire"></a>
+  <a href="https://github.com/waynestate/preflight" title="Preflight"><img src="docs/readme/cast/preflight.png" width="40" alt="Preflight"></a>
   <a href="https://github.com/waynestate/pinstripe" title="Pinstripe"><img src="docs/readme/cast/pinstripe.png" width="40" alt="Pinstripe"></a>
-  <a href="https://github.com/waynestate/booster" title="BOOSTER"><img src="docs/readme/cast/booster.png" width="40" alt="BOOSTER"></a>
-  <a href="https://github.com/waynestate/rollcall" title="ROLLCALL"><img src="docs/readme/cast/rollcall.png" width="40" alt="ROLLCALL"></a>
-  <a href="https://github.com/waynestate/drawbridge" title="DRAWBRIDGE"><img src="docs/readme/cast/drawbridge.png" width="40" alt="DRAWBRIDGE"></a>
+  <a href="https://github.com/waynestate/booster" title="Booster"><img src="docs/readme/cast/booster.png" width="40" alt="Booster"></a>
+  <a href="https://github.com/waynestate/rollcall" title="Rollcall"><img src="docs/readme/cast/rollcall.png" width="40" alt="Rollcall"></a>
+  <a href="https://github.com/waynestate/drawbridge" title="Drawbridge"><img src="docs/readme/cast/drawbridge.png" width="40" alt="Drawbridge"></a>
   <a href="https://github.com/waynestate/advisor" title="ADVISOR"><img src="docs/readme/cast/advisor.png" width="40" alt="ADVISOR"></a>
   <a href="https://github.com/waynestate/weld" title="WELD"><img src="docs/readme/cast/weld.png" width="40" alt="WELD"></a>
 </div>

@@ -1,13 +1,13 @@
-# ROLLCALL open questions
+# Rollcall open questions
 
-What ROLLCALL 0.1 could not settle without a person, and the default it was built with. Roles, not names.
+What Rollcall 0.1 could not settle without a person, and the default it was built with. Roles, not names.
 
 ## Questions
 
 | # | Question | Who can answer | What it blocks | Default built |
 |---|---|---|---|---|
-| 1 | Where are PROCTOR JSON reports stored (CI artifacts, a shared directory, an object store)? | PROCTOR/PREFLIGHT maintainer | Reading real results | A directory of reports, one file per app named `group__project.json`. `ProctorReportSource` is an interface, so an artifact or bucket reader drops in |
-| 2 | How do we get the Citadel app list, image tag and any forced-upgrade date: a read-only account or an export? And how does an app in that list map to a GitLab project? | Citadel platform team | Real image data; apps that are not in GitLab | A JSON export `{"apps":[{"project":"group/project","image":"..."}]}` joined on the repository path. ROLLCALL never calls Citadel |
+| 1 | Where are PROCTOR JSON reports stored (CI artifacts, a shared directory, an object store)? | PROCTOR/Preflight maintainer | Reading real results | A directory of reports, one file per app named `group__project.json`. `ProctorReportSource` is an interface, so an artifact or bucket reader drops in |
+| 2 | How do we get the Citadel app list, image tag and any forced-upgrade date: a read-only account or an export? And how does an app in that list map to a GitLab project? | Citadel platform team | Real image data; apps that are not in GitLab | A JSON export `{"apps":[{"project":"group/project","image":"..."}]}` joined on the repository path. Rollcall never calls Citadel |
 | 3 | Which GitLab tier and version does git.wayne.edu run? | GitLab administrator | Leaked-token response, whether `HEAD` blob ids and `simple=true` behave as documented | Assumes the documented API on any tier; nothing needs Premium or Ultimate. The token-expiry warning uses `personal_access_tokens/self`, which exists on the 19.x series |
 | 4 | Who owns and rotates the `read_api` scanner token, and how long does it live? | Platform/security owner | Scanning the real fleet | The token is an env var; a 401/403 stops the scan loudly. `scan` prints a note 14 days before the token expires (and when it has already expired); rotating the token is still the owner's job |
 | 5 | What is the lowest project role that can read the two Composer files with `read_api`? | GitLab administrator | Choosing the service account's role | Not tested on the instance; documented as an open check |
@@ -16,12 +16,12 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | 8 | May the public counts (`/report.json`, the dashboard) be published, and to whom? | Project owner | Serving them | `/report.json` is off by default; the Laravel dashboard is off by default and sends `noindex` |
 | 9 | How long are snapshots and per-app detail kept? | Project owner / records owner | Disk growth, privacy | Pruning is built: `ROLLCALL_RETENTION_DAYS` (default 90; 0 keeps forever), `rollcall scan --prune` and `rollcall prune [--dry-run]`. The newest snapshot is never deleted. The default window is still the owner's call |
 | 10 | CycloneDX or SPDX for a bill of materials, and is Dependency-Track wanted? | Security owner | The BOM feature | CycloneDX where a BOM is produced (lead decision); none is produced in 0.1 |
-| 11 | Should ROLLCALL fetch endoflife.date itself? | Project owner | Automatic drift flags | No. `rollcall drift` reads a saved page, so no unattended outbound call exists |
+| 11 | Should Rollcall fetch endoflife.date itself? | Project owner | Automatic drift flags | No. `rollcall drift` reads a saved page, so no unattended outbound call exists |
 | 12 | Who confirms an app's owner, and where is that recorded? | Project owner | "Owner unknown" tracking | Not built; the report carries no owner field at all |
 | 13 | Does the dashboard need WayneUI's `app-shell` (public or internal template)? | WayneUI maintainer | Matching WayneUI exactly and the a11y gate | The Laravel page is plain HTML with WayneUI class names (`wsu-table`, `wsu-stat`, skip link) and links `ROLLCALL_WAYNEUI_CSS`. Swap to `<x-wsu::app-shell>` once WayneUI installs as a Composer dependency |
 | 14 | Who runs a Prometheus server for `/metrics`, and whether the Grafana instance imports the bundled dashboard as is | Grafana owner | Live burn-down | Dashboard JSON and endpoint are built and tested; nothing depends on a server |
 | 15 | Does the snapshot-per-day cadence suit the burn-down, and who schedules `rollcall scan`? | Project owner | Burn-down resolution | One snapshot per day; scheduling is the deployer's (cron, a Laravel schedule or a CI schedule) |
-| 16 | Should ROLLCALL fetch Packagist's security advisories itself? | Project owner | Automatic advisory flags | No. `rollcall advisories` reads a saved response, so no unattended outbound call exists (the same default as question 11) |
+| 16 | Should Rollcall fetch Packagist's security advisories itself? | Project owner | Automatic advisory flags | No. `rollcall advisories` reads a saved response, so no unattended outbound call exists (the same default as question 11) |
 
 ## Missing configuration
 
@@ -48,7 +48,7 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
 | Host census importer for apps not in GitLab | Needs the Citadel export format (question 2) |
 | endoflife.date client | Only the saved-file drift check is built (question 11) |
 | Live Packagist advisories fetch | The saved-file lookup is built (`rollcall advisories`); fetching it itself waits on question 16 |
-| Override storage owned by ROLLCALL | 0.1 shows the overrides PROCTOR reports, with reason and expiry; ROLLCALL keeps none of its own |
+| Override storage owned by Rollcall | 0.1 shows the overrides PROCTOR reports, with reason and expiry; Rollcall keeps none of its own |
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
 | ADVISOR/MCP tool module | Waits on the stack MCP server |
@@ -67,4 +67,4 @@ What ROLLCALL 0.1 could not settle without a person, and the default it was buil
   are counted as `floor_unbounded`.
 - **Image tag parsing.** A tag must contain a dotted PHP version (`8.4`) or `php84`; anything else is `unknown`, never a guess.
 - **Test dependency.** The Laravel adapter's tests pull Testbench (Laravel 12 or 13); the core installs without Laravel.
-- **`/metrics` path.** The Laravel adapter registers `/metrics`; an app that already serves `/metrics` (HELMET) should run ROLLCALL separately.
+- **`/metrics` path.** The Laravel adapter registers `/metrics`; an app that already serves `/metrics` (HELMET) should run Rollcall separately.

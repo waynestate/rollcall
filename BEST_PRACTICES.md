@@ -1,7 +1,7 @@
-# ROLLCALL best practices
+# Rollcall best practices
 
 Drawn from the stack's long guide (with sources). This is the short list for people who
-change ROLLCALL, tagged by how the repository holds each rule at 0.1.
+change Rollcall, tagged by how the repository holds each rule at 0.1.
 
 Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), **Documented** (written down only),
 **Not yet** (a gap, listed in `OPEN_QUESTIONS.md`).
@@ -11,7 +11,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Rule | Tag | How |
 |---|---|---|
 | Never write to the systems you scan | Enforced | `GitLabRepositorySource::send()` allows only `GET` and `HEAD`; `ReadOnlyAndDocsTest` fails on a write verb in `src/` and on file writes outside the snapshot store |
-| Use the smallest token scope (`read_api`), owned by a group or service account | Documented | README; ROLLCALL cannot see a token's scopes |
+| Use the smallest token scope (`read_api`), owned by a group or service account | Documented | README; Rollcall cannot see a token's scopes |
 | Plan token expiry and rotation; an expired token is a loud failure | Enforced (warning, loud failure) / Documented (rotation) | A 401 or 403 stops the scan with a plain message; `scan` prints a note 14 days before the token expires (and when it has already expired); rotation is in `OPEN_QUESTIONS.md` |
 | List projects per group with subgroups, in the small form | Enforced | `include_subgroups=true&simple=true&archived=false`, tested |
 | Fetch only the files you need, never clone | Enforced | File endpoints only; the directory adapter reads two named files |
