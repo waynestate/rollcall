@@ -4,6 +4,8 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-29
+
 ### Added
 
 - `ROLLCALL_GITLAB_URL` may now come from PLAYBOOK (`waynestate/playbook`, private on git.wayne.edu) when the
