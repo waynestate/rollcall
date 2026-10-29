@@ -10,6 +10,11 @@
 <title>Rollcall: Every app answers present.</title>
 <meta name="description" content="Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.">
 <meta name="theme-color" content="#f7f2e6">
+<link rel="canonical" href="https://rollcall.apps.wayne.edu/">
+<!-- For agents (ADR-0019): this page as Markdown. bin/agent-ready.php writes it from
+     Squire's kit, and the front controller also sends it to any client that asks for
+     text/markdown. The register, in plain text, for readers who skip the ink. -->
+<link rel="alternate" type="text/markdown" href="index.md">
 <link rel="icon" href="brand/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
 <link rel="apple-touch-icon" href="brand/rollcall-avatar-256.png">
@@ -21,6 +26,7 @@
   floor. rollcall.css then dresses it as a roll book.
 -->
 <link rel="stylesheet" href="assets/wayne-ui/wayne-ui.css">
+<link rel="stylesheet" href="assets/agent-ready.css">
 <link rel="stylesheet" href="assets/rollcall.css">
 <script>
   /* Call the roll out loud only for people who are happy with motion.
@@ -70,6 +76,18 @@
           <a class="stamp-btn" href="#start-title">Quick start</a>
           <a class="ink-link" href="#roll-title">Take the roll</a>
         </p>
+
+        <!-- The note clipped inside the cover: where the substitute (your agent) reads the
+             book. The script adds Copy page as Markdown and Open in ChatGPT; without it, the
+             plain links still work. -->
+        <nav class="ar-page cover-note" aria-labelledby="cover-note-label" data-ar-page>
+          <p class="ar-page__label" id="cover-note-label">For the substitute</p>
+          <ul class="ar-page__list">
+            <li><a class="ar-page__link" href="#sub-title">Get started with an agent</a></li>
+            <li><a class="ar-page__link" href="index.md" type="text/markdown">This page as Markdown</a></li>
+            <li><a class="ar-page__link" href="llms.txt">llms.txt</a></li>
+          </ul>
+        </nav>
       </div>
 
       <!-- Today's sheet: the mark's two pages (lines on the left, ticks on the
@@ -332,11 +350,133 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
     </div>
   </section>
 
-  <!-- ===================================================== § 5 house rules -->
-  <section class="chapter" aria-labelledby="rules-title">
+  <!-- ================================================ § 5 notes for the substitute -->
+  <!-- § 5: the prompts. Your coding agent is the substitute teacher; these are the notes left
+       on the desk: who it is, what the class is doing today, the house rules, what to hand in,
+       and a standing order to ask before it guesses. The text is plain HTML, so an agent reading
+       this page (or index.md) gets it without the script; agent-ready.js only adds the buttons.
+       Keep every command in step with the README: bin/agent-ready.php --check fails a prompt
+       that runs a command the docs do not. -->
+  <section class="chapter chapter--sub" aria-labelledby="sub-title">
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
         <p class="folio" aria-hidden="true">§ 5</p>
+        <p class="kicker">Left on the desk for your agent</p>
+      </div>
+      <div class="chapter__body">
+        <h2 id="sub-title">Notes for the substitute</h2>
+        <p class="lede">Your coding agent is the substitute teacher: it has never met this class. Leave it a note. Copy one, or run it straight in OpenCode, Claude Code, Codex or ChatGPT. Each note says where the register is, what it may not touch, and to ask before it guesses.</p>
+
+        <div class="subnotes">
+        <section class="ar-prompt ar-prompt--lead subnote" id="prompt-get-started" aria-labelledby="prompt-get-started-title" data-ar-prompt>
+          <span class="stamp stamp--present subnote__stamp" aria-hidden="true">for the sub</span>
+          <header class="ar-prompt__head">
+            <span class="ar-prompt__glyph" aria-hidden="true">&gt;_</span>
+            <div>
+              <p class="ar-prompt__kicker">Note 1 · Any machine with PHP or Docker</p>
+              <h3 class="ar-prompt__title" id="prompt-get-started-title">Get started with Rollcall</h3>
+              <p class="ar-prompt__desc">Call the sample roll from a checkout, with the bundled fixtures, and have the agent read the report back to you.</p>
+            </div>
+          </header>
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing and always exits 0.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, the index of Rollcall's pages, each one as Markdown. Work from them, not from memory.
+- ADVISOR, the stack's MCP server, if it is connected: get_project_status and read_project_docs with project rollcall, and policy_lookup for PHP. If it is not connected, say so and work from the pages. How to add it: https://advisor.apps.wayne.edu/llms.txt
+- The README in this folder, if this folder is a Rollcall checkout. If it is not, ask me whether to clone https://github.com/waynestate/rollcall first.
+
+Task:
+1. Install the dependencies once with `composer install` (PHP 8.3 or newer). If the host has no PHP, use the Docker line in the README's Run the checks section.
+2. Point Rollcall at the bundled fixtures: set ROLLCALL_POLICY_FILE, ROLLCALL_REPOS_DIR, ROLLCALL_IMAGES_FILE, ROLLCALL_PROCTOR_DIR and ROLLCALL_STORE_DIR the way the README's Quick start does.
+3. Call the roll with `php bin/rollcall scan`, then print it with `php bin/rollcall report`.
+4. Read the report back to me: each PHP image, the state CREED gives it, and the days left before end of life.
+
+Constraints:
+- Fixtures only: no network and no GitLab token. A real scan needs a read_api token that a person gives you; never invent one.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
+- The per-app list (report --internal) stays inside the project. Never paste app names anywhere public.
+- Ask me before you guess, and before you touch anything outside this folder.
+
+Output: the commands you ran, the report, then a short reading of it and your questions.</code></pre>
+        </section>
+
+        <h3 class="subnotes__title">Or leave the note for your kind of app</h3>
+        <div class="subnotes__paths">
+        <section class="ar-prompt subnote" id="prompt-raw-php" aria-labelledby="prompt-raw-php-title" data-ar-prompt>
+          <header class="ar-prompt__head">
+            <span class="ar-prompt__glyph" aria-hidden="true">&gt;_</span>
+            <div>
+              <p class="ar-prompt__kicker">Note 2 · Raw PHP, no framework</p>
+              <h3 class="ar-prompt__title" id="prompt-raw-php-title">Rollcall as a plain PHP tool</h3>
+              <p class="ar-prompt__desc">The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them.</p>
+            </div>
+          </header>
+          <pre class="ar-prompt__text"><code>You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the /metrics and /report.json endpoints.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections.
+- ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with permutation raw-php for the rules that apply, and policy_lookup for PHP. If it is not connected, say so and work from the pages.
+- This project's composer.json, and how this host runs scheduled jobs.
+
+Task:
+1. Add Rollcall with `composer require waynestate/rollcall`. The CLI is `vendor/bin/rollcall`.
+2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once I give you a token and a group.
+3. Schedule the scan subcommand once a day with --prune, and show me the report subcommand in text and in json.
+4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
+
+Constraints:
+- Rollcall is read-only toward every source and writes only its snapshot folder. Keep it that way.
+- The GitLab token is a read_api token from the environment. Never commit it, log it or print it.
+- Metrics and the public report stay off unless I turn them on.
+- Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
+- Ask me before you guess, and before you touch a deploy or a scheduler.
+
+Output: the files you changed, the schedule entry for each OS, then your questions.</code></pre>
+        </section>
+        <section class="ar-prompt subnote" id="prompt-laravel" aria-labelledby="prompt-laravel-title" data-ar-prompt>
+          <header class="ar-prompt__head">
+            <span class="ar-prompt__glyph" aria-hidden="true">&gt;_</span>
+            <div>
+              <p class="ar-prompt__kicker">Note 3 · Laravel, Blade or Inertia</p>
+              <h3 class="ar-prompt__title" id="prompt-laravel-title">Rollcall in a Laravel app</h3>
+              <p class="ar-prompt__desc">The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with.</p>
+            </div>
+          </header>
+          <pre class="ar-prompt__text"><code>You are a coding agent adding Rollcall, the fleet scanner of WELD, the Wayne State application stack, to a Laravel app: the scheduled scan, the dashboard page of totals and, only if I ask, the internal per-app page.
+
+Read first:
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Laravel, Configuration and Metrics sections.
+- ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with the permutation that fits this app (laravel-blade, laravel-blade-vue or laravel-inertia-vue), and policy_lookup for PHP and Laravel. If it is not connected, say so and work from the pages.
+- composer.json, composer.lock, config/, routes/, bootstrap/app.php and .env.example.
+
+Task:
+1. Add Rollcall with `composer require waynestate/rollcall`. Its service provider registers itself.
+2. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, and add the settings to .env.example as placeholders.
+3. Schedule `php artisan rollcall:scan` once a day.
+4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. It is the package's Blade page in WayneUI's class names, even in an Inertia app; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS.
+5. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED) off unless I ask. It runs behind the web and auth.sesame middleware and fails closed without them.
+
+Constraints:
+- Meet each setting the Laravel way (config, the scheduler, middleware) before writing code of your own.
+- If this app already serves /metrics (HELMET does), leave Rollcall's metrics off.
+- Never commit a real token or a .env file.
+- Ask me before you guess, and before you touch migrations, auth or anything that deploys.
+
+Output: the files you changed, the scheduler entry, then your questions.</code></pre>
+        </section>
+        </div>
+
+        <p class="subnotes__fine">The substitute reads the same register you do: <a href="llms.txt">llms.txt</a> lists the pages, <a href="llms-full.txt">llms-full.txt</a> holds them in one file, and this page has a <a href="index.md" type="text/markdown">Markdown twin</a>. Nothing here phones home; the buttons only copy text or open the tool you picked. No note asks the sub to mark anyone absent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== § 6 house rules -->
+  <section class="chapter" aria-labelledby="rules-title">
+    <div class="wrap chapter__grid">
+      <div class="chapter__margin">
+        <p class="folio" aria-hidden="true">§ 6</p>
         <p class="kicker">Classroom rules</p>
       </div>
       <div class="chapter__body">
@@ -351,11 +491,11 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
     </div>
   </section>
 
-  <!-- =================================================== § 6 where it comes from -->
+  <!-- =================================================== § 7 where it comes from -->
   <section class="chapter" aria-labelledby="flow-title">
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
-        <p class="folio" aria-hidden="true">§ 6</p>
+        <p class="folio" aria-hidden="true">§ 7</p>
         <p class="kicker">Sources in, one register out</p>
       </div>
       <div class="chapter__body">
@@ -382,11 +522,11 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
     </div>
   </section>
 
-  <!-- ===================================================== § 7 class list -->
+  <!-- ===================================================== § 8 class list -->
   <section class="chapter" aria-labelledby="class-title">
     <div class="wrap chapter__grid">
       <div class="chapter__margin">
-        <p class="folio" aria-hidden="true">§ 7</p>
+        <p class="folio" aria-hidden="true">§ 8</p>
         <p class="kicker">Rollcall's place in WELD</p>
       </div>
       <div class="chapter__body">
@@ -440,6 +580,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
   </defs>
 </svg>
 
+<script src="assets/agent-ready.js" defer></script>
 <script src="assets/rollcall.js" defer></script>
 </body>
 </html>

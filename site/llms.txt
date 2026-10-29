@@ -1,0 +1,42 @@
+# Rollcall
+
+> Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+
+Checks: `composer ci` (the same command runs on GitLab and GitHub).
+
+> Every app answers "present". The ones on PHP 7.4 answer from the back row.
+
+Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/HEAD/site/index.html) (static, no build step; see `site/README.md`).
+On Citadel it is served by the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/blob/HEAD/deploy/): a Squire kit whose front controller serves `site/` behind HELMET's security headers. For local development, keep serving `site/` directly.
+
+Rollcall is the fleet scanner. For every app it answers one question: what is it running, and where does that stand
+against the policy? It reports the PHP image, the declared PHP floor, the Laravel version, the auth package and its
+version, and the PROCTOR result, then checks each version against CREED's `policy.json` by date. It keeps one snapshot
+per scan, so it can show drift and an EOL burn-down over time, and prunes the old ones after the retention window
+(default 90 days; the newest snapshot always stays).
+
+Rollcall enforces nothing. It never opens an issue, comments, or deploys, and it exits `0` however the fleet looks.
+The public report is counts and progress only: no app names, no owners, no ranking. The per-app list is internal.
+(Like a good attendance sheet, it is for noticing who is missing, not for shaming them.)
+
+Every page below is Markdown. The HTML pages send the same Markdown to a client that asks for `text/markdown`. Written by Squire's agent-ready kit from the README and the pages; do not edit.
+
+## Pages
+
+- [Rollcall: Every app answers present.](https://rollcall.apps.wayne.edu/index.md): Rollcall is WELD's fleet scanner. Every Wayne State app answers present with its PHP image, Laravel, auth package and PROCTOR result, checked against CREED's policy. It shows drift and an EOL burn-down.
+
+## Prompts
+
+- [Get started with Rollcall](https://rollcall.apps.wayne.edu/#prompt-get-started): Call the sample roll from a checkout, with the bundled fixtures, and have the agent read the report back to you. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
+- [Rollcall as a plain PHP tool](https://rollcall.apps.wayne.edu/#prompt-raw-php): The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
+- [Rollcall in a Laravel app](https://rollcall.apps.wayne.edu/#prompt-laravel): The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
+
+## Source
+
+- [README](https://github.com/waynestate/rollcall/blob/HEAD/README.md): the project's README, with install, commands and checks
+- [Everything in one file](https://rollcall.apps.wayne.edu/llms-full.txt): the README and every page above, as one Markdown file
+
+## Optional
+
+- [ADVISOR](https://advisor.apps.wayne.edu/llms.txt): the stack's MCP server: read-only tools that answer from CREED's policy and the parts' docs instead of from memory
+- [WELD](https://weld.apps.wayne.edu/llms.txt): the Wayne State application stack: every part, and the reference app
