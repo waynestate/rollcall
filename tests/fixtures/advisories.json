@@ -1,0 +1,15 @@
+{
+    "advisories": {
+        "laravel/framework": [
+            {
+                "advisoryId": "PKSA-2026-0001",
+                "packageName": "laravel/framework",
+                "title": "Fixture advisory: crafted input reaches the query builder (fictional)",
+                "cve": "CVE-2026-0001",
+                "affectedVersions": ">=10.0.0,<10.49.0",
+                "reportedAt": "2026-03-01 00:00:00"
+            }
+        ],
+        "apereo/phpcas": []
+    }
+}
