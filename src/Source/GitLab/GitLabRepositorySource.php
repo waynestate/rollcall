@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Source\RepoFile;
 use Waynestate\Rollcall\Source\RepositorySource;
+use Waynestate\Rollcall\Source\TokenExpiry;
 
 /**
  * Reads repositories through the GitLab REST API, and only reads them.
@@ -31,7 +32,7 @@ use Waynestate\Rollcall\Source\RepositorySource;
  *
  * The token comes from the caller (env var). It is never put in a message.
  */
-final class GitLabRepositorySource implements RepositorySource
+final class GitLabRepositorySource implements RepositorySource, TokenExpiry
 {
     private const MAX_PAGES = 500;
 
