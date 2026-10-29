@@ -4,6 +4,15 @@ All notable changes to ROLLCALL. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Changed
+
+- Include Pinstripe's raw PHPStan preset (`waynestate/pinstripe:^0.1` dev dependency) instead of carrying a hand
+  copy: `phpstan.neon` now includes `vendor/waynestate/pinstripe/phpstan/raw.neon` and keeps only ROLLCALL's paths
+  and PHP range. The preset adds deprecation checks, so four calls to the deprecated Symfony Console
+  `Application::add()` became `addCommand()`. Pint keeps its own `pint.json`: Pint has no include mechanism for
+  config files, and the file already uses the same `per` preset as Pinstripe's `pint/per.json`, plus this repo's
+  exclude list.
+
 ## [0.1.0] - 2026-10-29
 
 ### Added

@@ -44,7 +44,7 @@ WELD is Wayne State's application stack. ROLLCALL is the roll book for the whole
 | PREFLIGHT | CI templates |
 | SESAME | Protocol-neutral auth; ROLLCALL reports which auth package each app uses |
 | HELMET | Baseline runtime and its own optional `/metrics` |
-| Pinstripe | The coding standard behind this repo's Pint and PHPStan settings |
+| Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
 | Sourdough | Starters |
 | ROLLCALL | The fleet census and EOL burn-down |
 
