@@ -26,9 +26,9 @@ use Waynestate\Rollcall\Source\TokenExpiry;
  * - HTTP 429 waits for Retry-After and tries again, a bounded number of times.
  * - An unauthorised token stops the scan loudly. A silent partial scan would
  *   read as "the fleet got better".
- * - tokenExpiry() asks the instance for the calling token's own record
- *   (personal_access_tokens/self) so a person can rotate it before it dies.
- *   That check is advisory: any failure there is null, never an exception.
+ * - tokenExpiry() asks the instance for the calling token's own record, so a
+ *   person can rotate it before it dies. That check is advisory: any failure
+ *   there is null, never an exception.
  *
  * The token comes from the caller (env var). It is never put in a message.
  */
