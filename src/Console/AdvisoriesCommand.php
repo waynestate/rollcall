@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Console;
 
-use Composer\Semver\VersionParser;
+use Composer\Semver\Comparator;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -95,8 +95,16 @@ final class AdvisoriesCommand extends RollcallCommand
             return $byPackage;
         }
         try {
-            return (new VersionParser())->sortVersions($a['version'], $b['version']);
+            if (Comparator::greaterThan($a['version'], $b['version'])) {
+                return 1;
+            }
+            if (Comparator::lessThan($a['version'], $b['version'])) {
+                return -1;
+            }
+
+            return 0;
         } catch (\UnexpectedValueException) {
+            // A version neither side can parse still sorts, by string.
             return strcmp($a['version'], $b['version']);
         }
     }
