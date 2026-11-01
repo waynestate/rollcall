@@ -3,8 +3,8 @@
     on the internal page and nowhere else.
 
     This page uses WayneUI's class names (wsu-table, wsu-stat) and links its
-    stylesheet from ROLLCALL_WAYNEUI_CSS. It becomes <x-wsu::app-shell> once
-    WayneUI is installable as a Composer dependency (see OPEN_QUESTIONS.md).
+    stylesheet from ROLLCALL_WAYNEUI_CSS. It can become <x-wsu::app-shell>
+    now that WayneUI is on Packagist (see OPEN_QUESTIONS.md, question 13).
     State is spelled out in words, never colour alone (WCAG 1.4.1).
 --}}
 <!DOCTYPE html>
