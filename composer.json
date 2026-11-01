@@ -54,6 +54,9 @@
             "providers": [
                 "Waynestate\\Rollcall\\Laravel\\RollcallServiceProvider"
             ]
+        },
+        "proctor": {
+            "wayneui.copies": "fail"
         }
     },
     "scripts": {
