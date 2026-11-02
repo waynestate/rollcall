@@ -34,6 +34,7 @@ directly.
 | Fix code style | `composer fix` |
 | Check the CREED copy, Windows | `$env:CREED_PATH = "..\creed"; composer creed-copy:check` |
 | Check the CREED copy, Linux and macOS | `CREED_PATH=../creed composer creed-copy:check` |
+| Regenerate the front page versions table | `composer site:versions` |
 
 The README's "Quick start" runs `scan` and `report` against fixtures on Windows (PowerShell `$env:ROLLCALL_*`
 settings) and on Linux and macOS (`export ROLLCALL_*`).
@@ -44,8 +45,9 @@ With only Docker:
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
 ```
 
-`composer ci` runs `composer validate --strict`, PHPUnit, Pint, PHPStan and `composer audit`. It does not run the
-CREED copy check, which needs a CREED checkout (it exits 2 without `CREED_PATH`).
+`composer ci` runs `composer validate --strict`, PHPUnit, Pint, PHPStan, `composer audit` and the front page
+versions table check. It does not run the CREED copy check, which needs a CREED checkout (it exits 2 without
+`CREED_PATH`).
 
 ## CI
 
@@ -84,6 +86,16 @@ app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in t
 
 `site/` is the static front page, for `https://rollcall.apps.wayne.edu/` on Citadel, served through a small raw-PHP
 `deploy/` layer generated with Squire. Run Rollcall's own `/metrics` separately from HELMET's; the routes collide.
+
+The supported-versions table on the front page is generated data. It sits between the `versions-table` markers in
+`site/index.html` and `site/index.md`; every row comes from CREED's bundled `policy.json`, judged by
+`src/Creed/Policy.php`, so no support date is typed by hand. When the bundled policy changes, regenerate with
+`composer site:versions` (which also rewrites the agent-ready twins) and commit the result.
+
+`composer ci` runs the matching check, `composer site:versions-check`. The generation date is stored in the start
+marker, and the check re-judges the rows as of that stored date, so CI goes red only when the policy or the table
+itself drifts, not because a day passed. The Squire agent-ready kit strips HTML comments from the Markdown twin,
+so the committed `site/index.md` carries the table without markers; the check accepts both forms.
 
 ## Who maintains it
 
