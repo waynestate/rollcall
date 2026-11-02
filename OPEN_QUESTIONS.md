@@ -51,7 +51,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | Override storage owned by Rollcall | 0.1 shows the overrides PROCTOR reports, with reason and expiry; Rollcall keeps none of its own |
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
-| ADVISOR/MCP tool module | Waits on the stack MCP server |
+| Per-app ADVISOR tools | By design: the module exposes public counts only (question 7); the per-app list stays internal |
 | Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The front page (`site/index.html`) is built and hand-written; the dashboard page here has not been run through WayneUI's a11y gate |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |

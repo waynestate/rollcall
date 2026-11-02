@@ -263,6 +263,40 @@ middleware fails closed. The page uses WayneUI's class names and takes its style
 The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
 on a separate app or leave metrics off.
 
+## Use Rollcall from your coding agent (ADVISOR)
+
+Rollcall ships a module for [ADVISOR](https://packagist.org/packages/waynestate/advisor), the stack's MCP server: three
+read-only tools, and a small creed goes with them: every app answers present, the agent may ask, and nobody gets ranked.
+
+Install both packages where the MCP server runs:
+
+```
+composer require waynestate/advisor waynestate/rollcall
+```
+
+Then name the module in your own manifest file. Rollcall ships none on purpose, so nothing loads by accident:
+
+```json
+{
+    "modules": [
+        "Waynestate\\Rollcall\\Advisor\\RollcallModule"
+    ]
+}
+```
+
+and point `ADVISOR_MODULES_FILE` at that file. The tools read the snapshot store behind `ROLLCALL_STORE_DIR`; with an
+empty store each one says so in plain words and names `rollcall scan`.
+
+| Tool | What it answers |
+|---|---|
+| `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, and the snapshot date |
+| `rollcall_burn_down` | The dated EOL series, one point per scan day; optional `days` (an integer, 1 to 365) keeps only the most recent days |
+| `rollcall_supported_versions` | Every version in CREED's policy, grouped by what it says today: active, security only, or end of life |
+
+The tools take no path, command or URL, make no network call, and answer public counts only: the same fields
+`/report.json` serves. The per-app list stays internal and never leaves through a tool. Each answer names its source
+and its dates.
+
 ## Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
