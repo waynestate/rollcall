@@ -332,7 +332,7 @@
           </div>
           <div class="panel" role="tabpanel" id="panel-nix" aria-labelledby="tab-nix" tabindex="0">
             <p class="panel__shell">bash</p>
-<pre class="carbon" id="code-nix">export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
+<pre class="carbon" id="code-nix" tabindex="0">export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
 export ROLLCALL_REPOS_DIR=tests/fixtures/repos
 export ROLLCALL_IMAGES_FILE=tests/fixtures/images.json
 export ROLLCALL_PROCTOR_DIR=tests/fixtures/proctor
@@ -343,7 +343,7 @@ php bin/rollcall report</pre>
           </div>
           <div class="panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" tabindex="0" hidden>
             <p class="panel__shell">PowerShell, no bash or WSL needed</p>
-<pre class="carbon" id="code-win">$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
+<pre class="carbon" id="code-win" tabindex="0">$env:ROLLCALL_POLICY_FILE = "tests/fixtures/policy.json"
 $env:ROLLCALL_REPOS_DIR = "tests/fixtures/repos"
 $env:ROLLCALL_IMAGES_FILE = "tests/fixtures/images.json"
 $env:ROLLCALL_PROCTOR_DIR = "tests/fixtures/proctor"
@@ -357,7 +357,7 @@ php bin/rollcall report</pre>
         <div class="feed">
         <div class="printout">
           <p class="printout__head">What comes back <span>real output, Rollcall 0.1, bundled fixtures (four demo apps)</span></p>
-<pre class="printout__body">Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
+<pre class="printout__body" tabindex="0">Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
 
 ROLLCALL 0.1.6 | scan 2026-10-28 | as of 2026-10-28 | public
 Apps present: 4 (scan problems: 0)

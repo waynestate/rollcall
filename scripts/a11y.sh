@@ -1,6 +1,8 @@
 #!/bin/sh
 # Front page accessibility gate (axe-core in Playwright), run in Docker so no
-# host browser is needed. Linux and macOS; on Windows use scripts/a11y.ps1.
+# host browser is needed. Linux and macOS; on Windows use scripts/a11y.ps1,
+# or this script from Git Bash (the MSYSTEM block below handles its path
+# conversion).
 #
 # The repo is mounted read-only; only tools/a11y/node_modules lives in a named
 # volume, so npm installs once and later runs reuse it.
@@ -8,10 +10,20 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
+# Git Bash on Windows rewrites absolute-looking arguments for native programs
+# (docker would turn -w /work into a Windows path). Turn that off and pass the
+# Windows form of the repo path instead.
+if [ -n "${MSYSTEM:-}" ]; then
+  export MSYS_NO_PATHCONV=1
+  REPO="$(pwd -W)"
+else
+  REPO="$PWD"
+fi
+
 IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
 
 docker run --rm \
-  -v "${PWD}:/work:ro" \
+  -v "${REPO}:/work:ro" \
   -v rollcall-a11y-node-modules:/work/tools/a11y/node_modules \
   -w /work \
   "$IMAGE" \
