@@ -176,7 +176,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
 | `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none |
 | `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
-| `ROLLCALL_GITLAB_TOKEN` | A `read_api` token on a group or service account (never `api`). Never logged, never printed | none |
+| `ROLLCALL_GITLAB_TOKEN` | A GitLab bot token (project or group bot) with the `read_api` scope only and an expiry, requested from the GitLab administrator. Never in git, never logged, never printed | none |
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
@@ -191,9 +191,11 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_INTERNAL_ENABLED` | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` |
 | `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
-To scan GitLab you need a token and a group from a person. Set `ROLLCALL_SOURCE=gitlab` and the three GitLab
-variables. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose
-blob id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
+To scan GitLab you need the bot token and a group. It is a GitLab bot token (project or group bot, `read_api`
+only, with an expiry) requested from the GitLab administrator; until it exists Rollcall runs on its fixtures. Set
+`ROLLCALL_SOURCE=gitlab` and the three GitLab variables. Rollcall sends only `GET` and `HEAD`, fetches the two
+Composer files without cloning, skips a file whose blob id has not changed, follows `Link` pagination only to the
+configured host, and waits out `429 Retry-After`.
 
 ## WSU values (Playbook)
 
@@ -317,12 +319,13 @@ check can run beside the code it protects.
 
 - Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only `GET` and `HEAD`, and a test
   fails if a write verb appears in `src/`.
-- The GitLab token comes from the environment, is sent only to the configured `https` host, and is hidden from debug
-  output and error messages. Use a `read_api` token with an expiry and a named rotation owner. When the source is
-  GitLab, `scan` reads the token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days
-  before it expires, or when it has already expired. The note names the date; rotating the token stays the owner's
-     job, never Rollcall's. The check is advisory: a refused, unreachable or unparseable answer prints nothing and
-  never fails the scan, and the token value never appears in output.
+- The GitLab token is a bot token (project or group bot, `read_api` only, with an expiry) requested from the GitLab
+  administrator. It goes in the environment as `ROLLCALL_GITLAB_TOKEN`, never in git, is sent only to the configured
+  `https` host, and is hidden from debug output and error messages. When the source is GitLab, `scan` reads the
+  token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days before it expires, or when
+  it has already expired. The note names the date; the administrator rotates the token before its expiry, never
+  Rollcall. The check is advisory: a refused, unreachable or unparseable answer prints nothing and never fails the
+  scan, and the token value never appears in output.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.

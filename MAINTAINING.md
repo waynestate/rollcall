@@ -15,7 +15,9 @@ That somebody is you.
 - **Its policy comes from CREED.** `src/Creed/` is a generated copy of CREED's reader and `policy.json`
   (namespace `Waynestate\Rollcall\Creed`). Never hand-edit it. `tests/fixtures/policy.json` is a separate snapshot used
   only by tests.
-- It reads repositories through a GitLab API token with read-only scope. The token is configuration, never committed.
+- It reads repositories through a GitLab bot token (project or group bot, `read_api` only, with an expiry) requested
+  from the GitLab administrator. The token is configuration, never committed; until it exists Rollcall runs on its
+  fixtures.
 
 ## Where it lives
 

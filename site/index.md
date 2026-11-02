@@ -210,7 +210,7 @@ Task:
 4. Read the report back to me: each PHP image, the state CREED gives it, and the days left before end of life.
 
 Constraints:
-- Fixtures only: no network and no GitLab token. A real scan needs a read_api token that a person gives you; never invent one.
+- Fixtures only: no network and no GitLab token. A real scan needs the read_api bot token requested from the GitLab administrator; never invent one.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ.
 - The per-app list (report --internal) stays inside the project. Never paste app names anywhere public.
 - Ask me before you guess, and before you touch anything outside this folder.
@@ -236,13 +236,13 @@ Read first:
 
 Task:
 1. Add Rollcall with `composer require waynestate/rollcall`. The CLI is `vendor/bin/rollcall`.
-2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once I give you a token and a group.
+2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once the bot token (requested from the GitLab administrator) exists and you have the group.
 3. Schedule the scan subcommand once a day with --prune, and show me the report subcommand in text and in json.
 4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
 
 Constraints:
 - Rollcall is read-only toward every source and writes only its snapshot folder. Keep it that way.
-- The GitLab token is a read_api token from the environment. Never commit it, log it or print it.
+- The GitLab token is a read_api bot token (project or group bot) requested from the GitLab administrator; it comes from the environment as ROLLCALL_GITLAB_TOKEN. Never commit it, log it or print it.
 - Metrics and the public report stay off unless I turn them on.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
 - Ask me before you guess, and before you touch a deploy or a scheduler.
