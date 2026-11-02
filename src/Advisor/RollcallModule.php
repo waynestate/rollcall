@@ -209,7 +209,11 @@ final class RollcallModule implements Module
         ];
     }
 
-    /** An empty store, in plain words, naming the command that fills it. */
+    /**
+     * An empty store, in plain words, naming the command that fills it.
+     *
+     * @return array<string, mixed>
+     */
     private function noSnapshot(): array
     {
         return [
