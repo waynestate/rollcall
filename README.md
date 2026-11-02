@@ -303,7 +303,8 @@ and its dates.
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan and `composer audit`. PHP is not needed on the host:
+`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, and a check that the front page
+versions table still matches CREED's policy. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
