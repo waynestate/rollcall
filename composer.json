@@ -68,20 +68,28 @@
         "creed-copy:check": "@php tools/creed-copy-check.php",
         "site:agent-ready": "php bin/agent-ready.php",
         "site:agent-ready-check": "php bin/agent-ready.php --check",
+        "site:versions": [
+            "php tools/versions-table.php",
+            "@site:agent-ready"
+        ],
+        "site:versions-check": "php tools/versions-table.php --check",
         "ci": [
             "@composer validate --strict",
             "phpunit",
             "pint --test",
             "@site:agent-ready-check",
+            "@site:versions-check",
             "phpstan analyse --memory-limit=1G",
             "@composer audit"
         ]
     },
     "scripts-descriptions": {
-        "ci": "Run every CI check: manifest, tests, style, agent-ready files, static analysis, audit",
+        "ci": "Run every CI check: manifest, tests, style, agent-ready files, versions table, static analysis, audit",
         "creed-copy:check": "Prove the generated CREED copy in src/Creed has not drifted (needs CREED_PATH set to a CREED checkout)",
         "site:agent-ready": "Rewrite the Markdown twins, llms.txt, llms-full.txt, robots.txt and sitemap.xml in site/ (Squire's agent-ready kit).",
-        "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here."
+        "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here.",
+        "site:versions": "Regenerate the front page versions table in site/index.html and site/index.md from CREED's policy.json, then rewrite the agent-ready twins.",
+        "site:versions-check": "Fail when the front page versions table is stale. Judged as of the date stored in the start marker unless --date is passed."
     },
     "config": {
         "sort-packages": true,
