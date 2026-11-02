@@ -35,6 +35,7 @@ directly.
 | Check the CREED copy, Windows | `$env:CREED_PATH = "..\creed"; composer creed-copy:check` |
 | Check the CREED copy, Linux and macOS | `CREED_PATH=../creed composer creed-copy:check` |
 | Regenerate the front page versions table | `composer site:versions` |
+| Front page accessibility gate | `scripts/a11y.sh` (Linux and macOS) or `scripts/a11y.ps1` (Windows); both run in Docker |
 
 The README's "Quick start" runs `scan` and `report` against fixtures on Windows (PowerShell `$env:ROLLCALL_*`
 settings) and on Linux and macOS (`export ROLLCALL_*`).
@@ -96,6 +97,20 @@ The supported-versions table on the front page is generated data. It sits betwee
 marker, and the check re-judges the rows as of that stored date, so CI goes red only when the policy or the table
 itself drifts, not because a day passed. The Squire agent-ready kit strips HTML comments from the Markdown twin,
 so the committed `site/index.md` carries the table without markers; the check accepts both forms.
+
+### Accessibility gate
+
+The front page must pass an accessibility gate: axe-core with the WCAG 2.2 AA tag set (`wcag2a`, `wcag2aa`,
+`wcag21a`, `wcag21aa`, `wcag22aa`), run in a real Chromium browser by Playwright. The check lives in `tools/a11y/`
+and runs in Docker (image `mcr.microsoft.com/playwright:v1.49.1-noble`), so no host browser is needed:
+
+- Linux and macOS: `scripts/a11y.sh`
+- Windows: `scripts/a11y.ps1` (PowerShell 5.1 and 7)
+
+It serves `site/` on a local port and analyzes `index.html` in light mode and in dark mode at 360 px and 1280 px
+wide; any violation fails the run (exit 1, exit 2 on a tool error). Run it after any change under `site/` and
+before every release. It is not part of `composer ci`: CI has no browser, so the gate is run by hand. The Laravel
+dashboard page (Blade) is not covered; only the static front page is gated.
 
 ## Who maintains it
 
