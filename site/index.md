@@ -97,6 +97,34 @@ Key to the marks
 - back row `eol`: past its security date, or older than anything the policy lists
 - inaudible `unknown`: newer than the policy knows, or a tag nobody can read
 
+**Supported versions from CREED's policy.json: runtime or tool, version, support state and end of support**
+
+| Runtime or tool | Version | Support state | End of support |
+| --- | --- | --- | --- |
+| php | 8.1 | eol_grace_expired | 2025-12-31 |
+| php | 8.2 | security | 2026-12-31 |
+| php | 8.3 | security | 2027-12-31 |
+| php | 8.4 | active | 2028-12-31 |
+| php | 8.5 | active | 2029-12-31 |
+| laravel | 10 | eol_grace_expired | 2025-02-04 |
+| laravel | 11 | eol_grace_expired | 2026-03-12 |
+| laravel | 12 | security | 2027-02-24 |
+| laravel | 13 | active | 2028-03-17 |
+| node | 20 | eol_grace_expired | 2026-04-30 |
+| node | 22 | security | 2027-04-30 |
+| node | 24 | security | 2028-04-30 |
+| node | 26 | active | 2029-04-30 |
+| mysql | 5.6 | eol_grace_expired | 2021-02-28 |
+| mysql | 5.7 | eol_grace_expired | 2023-10-31 |
+| mysql | 8.0 | eol_grace_expired | 2026-04-30 |
+| mysql | 8.4 | active | 2032-04-30 |
+| mysql | 9.7 | active | 2034-04-30 |
+| vue | 2 | eol_grace_expired | 2023-12-31 |
+| vue | 3 | active | n/a |
+| inertia | 2 | active | n/a |
+| inertia | 3 | active | n/a |
+| composer | 2.8.0 | minimum | n/a |
+
 Drift and the burn-down
 
 ## Watch the back row empty
