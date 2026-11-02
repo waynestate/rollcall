@@ -97,7 +97,7 @@ async function main() {
         const page = await context.newPage();
         await page.goto(`${base}/${pageName}`, { waitUntil: "load" });
         await page.evaluate(() => document.fonts.ready);
-        const results = await new AxeBuilder({ tags: TAGS }).analyze(page);
+        const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
         total += results.violations.length;
         console.log(`${scheme} ${width}px: ${results.violations.length} violation${results.violations.length === 1 ? "" : "s"}`);
         for (const violation of results.violations) {
