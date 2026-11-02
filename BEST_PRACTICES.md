@@ -42,6 +42,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Credit an upgrade on the day it lands | Checked | `upgraded_on` in the internal report; tested |
 | Keep a snapshot per scan | Enforced | One atomic JSON file per day |
 | Per-app lists stay internal | Enforced | Off in the public report, `/report.json`, `/metrics`; the Laravel per-app page is opt-in behind your middleware |
+| ADVISOR tools answer public counts only, read-only | Enforced | `RollcallModule` builds from the public report and declares every tool `readOnly`; `RollcallModuleTest` fails if a fixture app name or path appears in any tool output |
 
 ## Metrics
 
