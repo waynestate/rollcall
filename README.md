@@ -6,7 +6,7 @@
 
 <p>
   <img src="docs/readme/badges/php.svg" alt="php ^8.3">
-  <img src="docs/readme/badges/license.svg" alt="licence MIT">
+  <img src="docs/readme/badges/license.svg" alt="license MIT">
   <img src="docs/readme/badges/exit-codes.svg" alt="exit codes 0 ok, 2 error">
   <a href="https://github.com/waynestate/rollcall/actions/workflows/ci.yml"><img src="https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg" alt="GitHub CI"></a>
 </p>
@@ -80,7 +80,7 @@ Rollcall only reads from every source. The one thing it writes is its own snapsh
 composer require waynestate/rollcall
 ```
 
-Rollcall 0.1.6 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+Rollcall 0.1.7 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 
@@ -359,7 +359,7 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
 first; Wayne State developers open issues and merge requests on the internal project.
 
-Licence: MIT, Copyright Wayne State University.
+License: MIT, Copyright Wayne State University.
 
 <div align="center"><b>The whole class</b><br><sub>WayneUI and the stack. Everyone is here today; the ones in the back row know who they are.</sub></div>
 
