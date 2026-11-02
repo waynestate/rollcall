@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-02
+
 - Added: an ADVISOR module (waynestate/advisor) with three read-only tools over the public counts.
 - Added: the front page versions table is generated from policy.json, and composer ci fails when it is stale.
 - Changed: docs say the read_api token is a GitLab bot token requested from the GitLab administrator.
