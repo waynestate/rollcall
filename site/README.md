@@ -11,10 +11,10 @@ type: Libre Caslon Display (display) and Courier Prime (typewriter); body text i
   thumps down in wet ink that dries, and the back row raises its hands. The burn-down chart rules itself by hand.
 - **Built on WayneUI 2.0.8** (`assets/wayne-ui/`, copied, no CDN): tokens, Lato, skip link, `wsu-sr-only`. The
   look is overridden in `assets/rollcall.css`.
-- **Fonts** are self-hosted from `@fontsource` under the SIL Open Font License; licences in `assets/fonts/`.
+- **Fonts** are self-hosted from `@fontsource` under the SIL Open Font License; licenses in `assets/fonts/`.
 - **Reduced motion:** with `prefers-reduced-motion: reduce` the page arrives with the roll already taken, every word
   at first paint.
-- **Sample data:** every app name on the page is fictional and labelled as sample data. The printout is real output
+- **Sample data:** every app name on the page is fictional and labeled as sample data. The printout is real output
    from Rollcall 0.1 against the bundled fixtures.
 - Screenshots: `screenshots/` (desktop 1440, mobile 390, reduced motion, motion GIF).
 

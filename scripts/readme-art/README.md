@@ -3,7 +3,7 @@
 Regenerates the README images under `docs/readme/` from this repo's own static
 front page (`site/`) and brand files. Nothing is drawn by hand: the hero and
 the burn-down cut are screenshots of the real page, the register is a page of
-the roll book built from the page's own sample table (fictional apps, labelled
+the roll book built from the page's own sample table (fictional apps, labeled
 as sample data), the cast is the marks resized, and the badges read their
 facts from `composer.json` and the README.
 
@@ -31,7 +31,7 @@ network. Same inputs, same outputs.
 - `docs/readme/burn-down.jpg`: the sample burn-down chart, cut from the page.
 - `docs/readme/board.jpg`: `site/brand/rollcall-board.png`, re-encoded small.
 - `docs/readme/cast/*.png`: one 96x96 mark per stack part.
-- `docs/readme/badges/*.svg`: `php`, `licence` and `exit-codes`, made locally
+- `docs/readme/badges/*.svg`: `php`, `license` and `exit-codes`, made locally
   by `badge-maker` from `composer.json` and the README's exit-code line.
 
 Every file must stay at or under 300 KB, and nothing captured may mention an

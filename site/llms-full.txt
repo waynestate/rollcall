@@ -332,7 +332,7 @@ check can run beside the code it protects.
 This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
 first; Wayne State developers open issues and merge requests on the internal project.
 
-Licence: MIT, Copyright Wayne State University.
+License: MIT, Copyright Wayne State University.
 
 ---
 

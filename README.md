@@ -6,7 +6,7 @@
 
 <p>
   <img src="docs/readme/badges/php.svg" alt="php ^8.3">
-  <img src="docs/readme/badges/license.svg" alt="licence MIT">
+  <img src="docs/readme/badges/license.svg" alt="license MIT">
   <img src="docs/readme/badges/exit-codes.svg" alt="exit codes 0 ok, 2 error">
   <a href="https://github.com/waynestate/rollcall/actions/workflows/ci.yml"><img src="https://github.com/waynestate/rollcall/actions/workflows/ci.yml/badge.svg" alt="GitHub CI"></a>
 </p>
@@ -356,7 +356,7 @@ check can run beside the code it protects.
 This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
 first; Wayne State developers open issues and merge requests on the internal project.
 
-Licence: MIT, Copyright Wayne State University.
+License: MIT, Copyright Wayne State University.
 
 <div align="center"><b>The whole class</b><br><sub>WayneUI and the stack. Everyone is here today; the ones in the back row know who they are.</sub></div>
 
