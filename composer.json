@@ -73,6 +73,7 @@
             "@site:agent-ready"
         ],
         "site:versions-check": "php tools/versions-table.php --check",
+        "a11y": "echo \"Front page accessibility gate (axe-core in Playwright, needs Docker): run scripts/a11y.sh on Linux and macOS or scripts/a11y.ps1 on Windows. It stays out of composer ci because CI has no browser.\"",
         "ci": [
             "@composer validate --strict",
             "phpunit",
@@ -89,7 +90,8 @@
         "site:agent-ready": "Rewrite the Markdown twins, llms.txt, llms-full.txt, robots.txt and sitemap.xml in site/ (Squire's agent-ready kit).",
         "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here.",
         "site:versions": "Regenerate the front page versions table in site/index.html and site/index.md from CREED's policy.json, then rewrite the agent-ready twins.",
-        "site:versions-check": "Fail when the front page versions table is stale. Judged as of the date stored in the start marker unless --date is passed."
+        "site:versions-check": "Fail when the front page versions table is stale. Judged as of the date stored in the start marker unless --date is passed.",
+        "a11y": "Print how to run the front page accessibility gate (scripts/a11y.sh, scripts/a11y.ps1); it needs a browser, so it is not part of composer ci"
     },
     "config": {
         "sort-packages": true,

@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: an accessibility gate for the front page (axe-core in Playwright, Docker), run by hand before a release.
+
 ## [0.1.7] - 2026-11-02
 
 - Added: an ADVISOR module (waynestate/advisor) with three read-only tools over the public counts.
