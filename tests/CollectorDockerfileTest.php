@@ -27,7 +27,7 @@ final class CollectorDockerfileTest extends TestCase
     {
         $userLines = array_values(array_filter(
             $this->linesOf(self::DOCKERFILE),
-            static fn (string $line): bool => str_starts_with(trim($line), 'USER')
+            static fn(string $line): bool => str_starts_with(trim($line), 'USER'),
         ));
         $this->assertNotEmpty($userLines, 'The Dockerfile needs a USER line.');
         foreach ($userLines as $line) {
@@ -41,7 +41,7 @@ final class CollectorDockerfileTest extends TestCase
     {
         $entrypoints = array_values(array_filter(
             $this->linesOf(self::DOCKERFILE),
-            static fn (string $line): bool => str_starts_with(trim($line), 'ENTRYPOINT')
+            static fn(string $line): bool => str_starts_with(trim($line), 'ENTRYPOINT'),
         ));
         $this->assertNotEmpty($entrypoints, 'The Dockerfile needs an ENTRYPOINT.');
     }
@@ -50,7 +50,7 @@ final class CollectorDockerfileTest extends TestCase
     {
         $tokenLines = array_values(array_filter(
             $this->linesOf(self::DOCKERFILE),
-            static fn (string $line): bool => str_contains($line, 'ROLLCALL_GITLAB_TOKEN')
+            static fn(string $line): bool => str_contains($line, 'ROLLCALL_GITLAB_TOKEN'),
         ));
         $this->assertSame([], $tokenLines, 'No line of the Dockerfile may carry the GitLab token name.');
     }
@@ -68,7 +68,7 @@ final class CollectorDockerfileTest extends TestCase
         $this->assertStringContainsString(
             'Run the collector in Docker',
             $this->read(self::README),
-            'The README needs a Docker section.'
+            'The README needs a Docker section.',
         );
     }
 
