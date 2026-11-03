@@ -1,0 +1,72 @@
+{
+  "title": "Rollcall",
+  "tagline": "Every app answers \"present\". The ones on PHP 7.4 answer from the back row.",
+  "items": [
+    {
+      "title": "Overview",
+      "path": "index"
+    },
+    {
+      "title": "Install",
+      "path": "install"
+    },
+    {
+      "title": "Guides",
+      "items": [
+        {
+          "title": "Quick start",
+          "path": "guides/quick-start"
+        },
+        {
+          "title": "What the report says",
+          "path": "guides/what-the-report-says"
+        },
+        {
+          "title": "Run the collector in Docker",
+          "path": "guides/collector-docker"
+        },
+        {
+          "title": "WSU values (Playbook)",
+          "path": "guides/wsu-values"
+        },
+        {
+          "title": "Metrics",
+          "path": "guides/metrics"
+        },
+        {
+          "title": "Laravel",
+          "path": "guides/laravel"
+        },
+        {
+          "title": "Use Rollcall from your coding agent (ADVISOR)",
+          "path": "guides/advisor"
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "items": [
+        {
+          "title": "Commands",
+          "path": "reference/commands"
+        },
+        {
+          "title": "Configuration",
+          "path": "reference/configuration"
+        }
+      ]
+    },
+    {
+      "title": "Architecture",
+      "path": "architecture"
+    },
+    {
+      "title": "Security",
+      "path": "security"
+    },
+    {
+      "title": "Checks",
+      "path": "checks"
+    }
+  ]
+}
