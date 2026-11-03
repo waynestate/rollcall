@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+Docs: the front-page sample report shows ROLLCALL 0.1.9.
+
 ## [0.1.9] - 2026-11-03
 
 - Added: ROLLCALL_GITLAB_PROJECTS, a project allowlist for the GitLab source (only those projects are read; no group is listed).
