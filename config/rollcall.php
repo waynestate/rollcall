@@ -15,6 +15,7 @@ return [
     'gitlab_url' => env('ROLLCALL_GITLAB_URL'),
     'gitlab_token' => env('ROLLCALL_GITLAB_TOKEN'),
     'gitlab_groups' => env('ROLLCALL_GITLAB_GROUPS'),
+    'gitlab_projects' => env('ROLLCALL_GITLAB_PROJECTS'),
     'images_file' => env('ROLLCALL_IMAGES_FILE'),
     'proctor_dir' => env('ROLLCALL_PROCTOR_DIR'),
     'auth_packages' => env('ROLLCALL_AUTH_PACKAGES'),
