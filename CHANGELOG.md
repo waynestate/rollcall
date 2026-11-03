@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-11-03
+
 - Added: a three-OS smoke test checklist in MAINTAINING.md.
 - Added: an accessibility gate for the front page (axe-core in Playwright, Docker), run by hand before a release.
 - Added: a Dockerfile that runs the collector as a non-root user, settings from environment variables.
