@@ -379,10 +379,15 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 
 </details>
 
+## Where the code lives
+
+The canonical repository is on nougat: [enterprise-apps/rollcall](https://nougat.snu.gs/enterprise-apps/rollcall). git.wayne.edu and GitHub ([waynestate/rollcall](https://github.com/waynestate/rollcall)) are read-only mirrors of it.
+Open issues and merge requests on nougat, not on the mirrors.
+This moves to git.wayne.edu once it has CI runners. Roll call: nougat? Present. The mirrors? Copies of the sheet.
+
 ## Contributing
 
-This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
-first; Wayne State developers open issues and merge requests on the internal project.
+Issues and merge requests go to nougat; see Where the code lives above.
 
 License: MIT, Copyright Wayne State University.
 
