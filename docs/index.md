@@ -64,6 +64,15 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 
 <div align="center"><sub>Images are regenerated from the front page by <a href="https://github.com/waynestate/rollcall/tree/main/scripts/readme-art"><code>scripts/readme-art</code></a>. Present.</sub></div>
 
+<details>
+<summary>The brand board (the cover of the book)</summary>
+
+<br>
+
+<img src="readme/board.jpg" width="100%" alt="Rollcall's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.">
+
+</details>
+
 ## Install
 
 One line:
