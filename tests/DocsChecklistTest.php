@@ -16,9 +16,9 @@ final class DocsChecklistTest extends TestCase
         $root = dirname(__DIR__);
 
         return [
-            'MAINTAINING.md' => file_get_contents($root.'/MAINTAINING.md'),
-            'OPEN_QUESTIONS.md' => file_get_contents($root.'/OPEN_QUESTIONS.md'),
-            'CHANGELOG.md' => file_get_contents($root.'/CHANGELOG.md'),
+            'MAINTAINING.md' => file_get_contents($root . '/MAINTAINING.md'),
+            'OPEN_QUESTIONS.md' => file_get_contents($root . '/OPEN_QUESTIONS.md'),
+            'CHANGELOG.md' => file_get_contents($root . '/CHANGELOG.md'),
         ];
     }
 
@@ -44,8 +44,8 @@ final class DocsChecklistTest extends TestCase
     public function test_touched_files_have_no_em_or_en_dashes(): void
     {
         foreach ($this->touchedFiles() as $name => $content) {
-            $this->assertStringNotContainsString("\u{2014}", $content, $name.' has an em dash');
-            $this->assertStringNotContainsString("\u{2013}", $content, $name.' has an en dash');
+            $this->assertStringNotContainsString("\u{2014}", $content, $name . ' has an em dash');
+            $this->assertStringNotContainsString("\u{2013}", $content, $name . ' has an en dash');
         }
     }
 }
