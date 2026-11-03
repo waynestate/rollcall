@@ -1,0 +1,8 @@
+# Mirror the Dockerfile: only src, bin, config, resources and composer.json leave the host.
+.git
+.env
+.env.*
+tests
+site
+deploy
+var

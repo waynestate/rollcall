@@ -5,6 +5,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Added: an accessibility gate for the front page (axe-core in Playwright, Docker), run by hand before a release.
+- Added: a Dockerfile that runs the collector as a non-root user, settings from environment variables.
 - Changed: CI pulls its Docker Hub images through the GitLab Dependency Proxy (the group's CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX), so pipelines no longer hit Docker Hub's anonymous pull limit.
 
 ## [0.1.7] - 2026-11-02
