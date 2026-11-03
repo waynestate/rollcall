@@ -8,7 +8,7 @@ The README and the Markdown twin of every page, joined. The index is https://rol
 
 ## README
 
-Source: https://github.com/waynestate/rollcall/blob/HEAD/README.md
+Source: https://nougat.snu.gs/enterprise-apps/rollcall/blob/HEAD/README.md
 
 ## Rollcall
 
@@ -16,8 +16,8 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 > Every app answers "present". The ones on PHP 7.4 answer from the back row.
 
-Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/HEAD/site/index.html). It is static, with no build step (see `site/README.md`).
-On Citadel, the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/blob/HEAD/deploy/) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
+Front page: [`site/index.html`](https://nougat.snu.gs/enterprise-apps/rollcall/blob/HEAD/site/index.html). It is static, with no build step (see `site/README.md`).
+On Citadel, the raw-PHP deploy layer in [`deploy/`](https://nougat.snu.gs/enterprise-apps/rollcall/blob/HEAD/deploy/) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
 
 Rollcall is the fleet scanner for the Wayne State application stack. For each app it records the PHP image, the
 lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, and the PROCTOR
@@ -322,7 +322,7 @@ and its dates.
 
 ### Run the checks
 
-Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/HEAD/MAINTAINING.md).
+Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://nougat.snu.gs/enterprise-apps/rollcall/blob/HEAD/MAINTAINING.md).
 
 `composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, and a check that the front page
 versions table still matches CREED's policy. PHP is not needed on the host:
@@ -355,10 +355,15 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.
 
+### Where the code lives
+
+The canonical repository is on nougat: [enterprise-apps/rollcall](https://nougat.snu.gs/enterprise-apps/rollcall). git.wayne.edu and GitHub ([waynestate/rollcall](https://github.com/waynestate/rollcall)) are read-only mirrors of it.
+Open issues and merge requests on nougat, not on the mirrors.
+This moves to git.wayne.edu once it has CI runners. Roll call: nougat? Present. The mirrors? Copies of the sheet.
+
 ### Contributing
 
-This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
-first; Wayne State developers open issues and merge requests on the internal project.
+Issues and merge requests go to nougat; see Where the code lives above.
 
 License: MIT, Copyright Wayne State University.
 
