@@ -19,8 +19,9 @@ docker build -t rollcall-collector .
 ```
 
 That reads the `Dockerfile` next to it and tags the result `rollcall-collector`. Then run a scan. Each `-e`
-flag is a setting from [the configuration table](../reference/configuration.md), and the two `-v` flags mount your policy file and snapshot folder so
-the answer survives the container:
+flag is a setting from [the configuration table](../reference/configuration.md); for the narrow scan add
+`-e ROLLCALL_GITLAB_PROJECTS=group/project,other-group/other-project` and only those projects are read, no group
+is listed. The two `-v` flags mount your policy file and snapshot folder so the answer survives the container:
 
 ```
 docker run --rm -e ROLLCALL_SOURCE=gitlab -e ROLLCALL_GITLAB_URL=https://gitlab.example.test -e ROLLCALL_GITLAB_TOKEN="$ROLLCALL_GITLAB_TOKEN" -e ROLLCALL_GITLAB_GROUPS=your-group -e ROLLCALL_POLICY_FILE=/app/policy.json -v "$PWD/policy.json:/app/policy.json" -v "$PWD/var:/app/var" rollcall-collector scan

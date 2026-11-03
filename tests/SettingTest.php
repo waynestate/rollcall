@@ -67,4 +67,36 @@ final class SettingTest extends TestCase
             $this->assertStringContainsString('Set it in the environment, or install waynestate/playbook (see the README).', $e->getMessage());
         }
     }
+
+    public function test_from_env_reads_the_project_allowlist_and_trims_it(): void
+    {
+        $config = Config::fromEnv(['ROLLCALL_GITLAB_PROJECTS' => ' a/b , c/d ,, e/f ']);
+
+        $this->assertSame(['a/b', 'c/d', 'e/f'], $config->gitlabProjects);
+        $this->assertSame([], Config::fromEnv([])->gitlabProjects);
+    }
+
+    public function test_the_factory_accepts_projects_without_groups(): void
+    {
+        $factory = new Factory(Config::fromEnv([
+            'ROLLCALL_SOURCE' => 'gitlab',
+            'ROLLCALL_GITLAB_URL' => 'https://gitlab.example.test',
+            'ROLLCALL_GITLAB_TOKEN' => 'glpat-not-a-real-token',
+            'ROLLCALL_GITLAB_PROJECTS' => 'enterprise-apps/creed',
+        ]));
+
+        $this->assertInstanceOf(\Waynestate\Rollcall\Source\GitLab\GitLabRepositorySource::class, $factory->repositories());
+    }
+
+    public function test_the_factory_still_refuses_when_there_is_neither_groups_nor_projects(): void
+    {
+        $factory = new Factory(Config::fromEnv(['ROLLCALL_SOURCE' => 'gitlab']));
+
+        try {
+            $factory->repositories();
+            $this->fail('A gitlab source without groups or projects must refuse to start.');
+        } catch (RollcallException $e) {
+            $this->assertSame('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS (or ROLLCALL_GITLAB_PROJECTS) to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).', $e->getMessage());
+        }
+    }
 }

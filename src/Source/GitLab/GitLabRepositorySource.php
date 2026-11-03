@@ -47,6 +47,7 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
     /**
      * @param  list<string>  $groups  group ids or full paths
      * @param  callable(int): void|null  $sleeper  waits that many seconds; replaced in tests
+     * @param  list<string>  $projects  full group/project paths; when set, only these are read and no group is listed
      */
     public function __construct(
         private readonly ClientInterface $client,
@@ -56,6 +57,7 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
         private readonly array $groups,
         ?callable $sleeper = null,
         private readonly int $maxRetries = 3,
+        private readonly array $projects = [],
     ) {
         $parts = parse_url($baseUrl);
         if ($token === '') {
@@ -148,6 +150,34 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
             return $this->catalogue;
         }
         $catalogue = [];
+        if ($this->projects !== []) {
+            // The allowlist wins: one request per named project, and the groups
+            // endpoint is never called, so the token's wider reach stays unused.
+            foreach ($this->projects as $path) {
+                if (preg_match('/^[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)+$/', $path) !== 1) {
+                    throw new RollcallException('ROLLCALL_GITLAB_PROJECTS holds a path that is not group/project: ' . $path);
+                }
+            }
+            foreach ($this->projects as $path) {
+                $response = $this->send('GET', sprintf('%s/api/v4/projects/%s?simple=true', $this->origin(), rawurlencode($path)));
+                if ($response->getStatusCode() === 404) {
+                    throw new RollcallException('A project in ROLLCALL_GITLAB_PROJECTS was not found or the token cannot read it: ' . $path);
+                }
+                $this->expectOk($response);
+                $project = $this->decodeObject((string) $response->getBody());
+                if (($project['archived'] ?? false) === true) {
+                    continue;
+                }
+                if (is_int($project['id'] ?? null) && is_string($project['path_with_namespace'] ?? null)) {
+                    $catalogue[$project['path_with_namespace']] = [
+                        'id' => $project['id'],
+                        'ref' => is_string($project['default_branch'] ?? null) && $project['default_branch'] !== '' ? $project['default_branch'] : 'HEAD',
+                    ];
+                }
+            }
+
+            return $this->catalogue = $catalogue;
+        }
         foreach ($this->groups as $group) {
             $next = sprintf(
                 '%s/api/v4/groups/%s/projects?include_subgroups=true&simple=true&archived=false&per_page=100',
@@ -185,6 +215,25 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
         }
 
         return array_values(array_filter($data, 'is_array'));
+    }
+
+    /**
+     * The single project object behind GET /api/v4/projects/{id}.
+     *
+     * @return array<string, mixed>
+     */
+    private function decodeObject(string $body): array
+    {
+        try {
+            $data = json_decode($body, true, 16, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new RollcallException('GitLab sent a project record that is not JSON.');
+        }
+        if (! is_array($data)) {
+            throw new RollcallException('GitLab sent an unexpected project record.');
+        }
+
+        return $data;
     }
 
     private function nextLink(ResponseInterface $response): ?string

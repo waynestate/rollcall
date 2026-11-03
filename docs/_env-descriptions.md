@@ -9,8 +9,9 @@ Copied from the README's Configuration table so the next task can port these des
 | `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
 | `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none |
 | `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
-| `ROLLCALL_GITLAB_TOKEN` | A GitLab bot token (project or group bot) with the `read_api` scope only and an expiry, requested from the GitLab administrator. Never in git, never logged, never printed | none |
-| `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included | none |
+| `ROLLCALL_GITLAB_TOKEN` | A GitLab bot or personal access token with the `read_api` scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed | none |
+| `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
+| `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package | the built-in list |

@@ -79,8 +79,8 @@ final class Factory
     public function repositories(): RepositorySource
     {
         if ($this->config->source === 'gitlab') {
-            if ($this->config->gitlabUrl === null || $this->config->gitlabGroups === []) {
-                throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).');
+            if ($this->config->gitlabUrl === null || ($this->config->gitlabGroups === [] && $this->config->gitlabProjects === [])) {
+                throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS (or ROLLCALL_GITLAB_PROJECTS) to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).');
             }
             $psr17 = new Psr17Factory();
 
@@ -90,6 +90,7 @@ final class Factory
                 $this->config->gitlabUrl,
                 $this->config->gitlabToken(),
                 $this->config->gitlabGroups,
+                projects: $this->config->gitlabProjects,
             );
         }
         if ($this->config->reposDir === null) {

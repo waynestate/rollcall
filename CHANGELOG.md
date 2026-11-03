@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: ROLLCALL_GITLAB_PROJECTS, a project allowlist for the GitLab source (only those projects are read; no group is listed).
+- Added: a rollcall-scan CI job (weekly schedule with ROLLCALL_JOB=scan, or run by hand) that scans the 13 stack projects read-only and keeps the snapshot as a 30 day artifact; without ROLLCALL_GITLAB_TOKEN it skips green.
 - Changed: backlog items ROLLCALL-6 (SVG brand mark) and ROLLCALL-33 (`rollcall mcp` command) are closed as decided on 2026-11-03. The PNG is the mark, and ADVISOR is a stand-alone MCP server that loads the three read-only tools of the Rollcall module, so neither is needed.
 - Changed: docs and package metadata name nougat as the canonical repository, with git.wayne.edu and GitHub as read-only mirrors, until git.wayne.edu has CI runners.
 

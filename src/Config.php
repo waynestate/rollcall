@@ -18,6 +18,7 @@ final class Config
 {
     /**
      * @param  list<string>  $gitlabGroups
+     * @param  list<string>  $gitlabProjects
      * @param  list<string>  $authPackages
      * @param  list<string>  $metricsAllow
      */
@@ -29,6 +30,7 @@ final class Config
         public readonly ?string $gitlabUrl = null,
         private readonly string $gitlabToken = '',
         public readonly array $gitlabGroups = [],
+        public readonly array $gitlabProjects = [],
         public readonly ?string $imagesFile = null,
         public readonly ?string $proctorDir = null,
         public readonly array $authPackages = [],
@@ -58,6 +60,7 @@ final class Config
             gitlabUrl: $get('ROLLCALL_GITLAB_URL') ?? Setting::get('ROLLCALL_GITLAB_URL'),
             gitlabToken: $get('ROLLCALL_GITLAB_TOKEN') ?? '',
             gitlabGroups: $list($get('ROLLCALL_GITLAB_GROUPS')),
+            gitlabProjects: $list($get('ROLLCALL_GITLAB_PROJECTS')),
             imagesFile: $get('ROLLCALL_IMAGES_FILE'),
             proctorDir: $get('ROLLCALL_PROCTOR_DIR'),
             authPackages: array_map('strtolower', $list($get('ROLLCALL_AUTH_PACKAGES'))),

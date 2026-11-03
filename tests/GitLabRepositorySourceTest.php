@@ -37,8 +37,9 @@ final class GitLabRepositorySourceTest extends TestCase
 
     /**
      * @param  callable(string, string): MockResponse  $respond  method and url to response
+     * @param  list<string>  $projects  project allowlist; when set, only these are read
      */
-    private function source(callable $respond, int $retries = 3): GitLabRepositorySource
+    private function source(callable $respond, int $retries = 3, array $projects = []): GitLabRepositorySource
     {
         $http = new MockHttpClient(function (string $method, string $url, array $options) use ($respond): MockResponse {
             $token = null;
@@ -63,6 +64,7 @@ final class GitLabRepositorySourceTest extends TestCase
                 $this->slept[] = $seconds;
             },
             $retries,
+            $projects,
         );
     }
 
@@ -263,5 +265,81 @@ final class GitLabRepositorySourceTest extends TestCase
         }
         $this->expectExceptionMessage('ROLLCALL_GITLAB_TOKEN');
         new GitLabRepositorySource($client, $psr17, self::BASE, '', ['demo']);
+    }
+
+    public function test_projects_are_read_one_by_one_and_the_groups_endpoint_is_never_called(): void
+    {
+        $source = $this->source(function (string $method, string $url): MockResponse {
+            if (preg_match('#/api/v4/projects/([^?]+)\?#', $url, $m) === 1) {
+                $path = rawurldecode($m[1]);
+
+                return new MockResponse(sprintf('{"id": 301, "name": "%s", "path_with_namespace": "%s", "default_branch": "main"}', basename($path), $path));
+            }
+
+            return new MockResponse('', ['http_code' => 500]);
+        }, 3, ['enterprise-apps/weld', 'enterprise-apps/creed']);
+
+        $this->assertSame(['enterprise-apps/creed', 'enterprise-apps/weld'], $source->projects());
+        $this->assertCount(2, $this->requests, 'one GET per named project');
+        foreach ($this->requests as $request) {
+            $this->assertSame('GET', $request['method']);
+            $this->assertStringNotContainsString('/groups/', $request['url'], 'no group is listed when projects are set');
+            $this->assertStringContainsString('/api/v4/projects/', $request['url']);
+            $this->assertStringContainsString('simple=true', $request['url']);
+        }
+    }
+
+    public function test_a_project_404_names_the_path_loudly(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('', ['http_code' => 404]), 3, ['enterprise-apps/ghost']);
+
+        try {
+            $source->projects();
+            $this->fail('expected a 404 error');
+        } catch (RollcallException $e) {
+            $this->assertSame('A project in ROLLCALL_GITLAB_PROJECTS was not found or the token cannot read it: enterprise-apps/ghost', $e->getMessage());
+        }
+    }
+
+    public function test_a_refused_token_stops_the_scan_loudly_even_with_projects(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('', ['http_code' => 403]), 3, ['enterprise-apps/creed']);
+
+        try {
+            $source->projects();
+            $this->fail('expected an auth error');
+        } catch (RollcallException $e) {
+            $this->assertStringContainsString('refused the token', $e->getMessage());
+        }
+    }
+
+    public function test_a_bad_project_path_is_refused_before_any_request(): void
+    {
+        $source = $this->source(fn(): MockResponse => new MockResponse('', ['http_code' => 500]), 3, ['not-a-path']);
+
+        try {
+            $source->projects();
+            $this->fail('expected a path error');
+        } catch (RollcallException $e) {
+            $this->assertSame('ROLLCALL_GITLAB_PROJECTS holds a path that is not group/project: not-a-path', $e->getMessage());
+        }
+        $this->assertCount(0, $this->requests, 'validation happens before the first request');
+    }
+
+    public function test_an_archived_project_is_skipped(): void
+    {
+        $source = $this->source(function (string $method, string $url): MockResponse {
+            if (str_contains($url, 'enterprise-apps%2Fcreed')) {
+                return new MockResponse($this->fixture('project-single.json'));
+            }
+            if (str_contains($url, 'enterprise-apps%2Fweld')) {
+                return new MockResponse($this->fixture('project-archived.json'));
+            }
+
+            return new MockResponse('', ['http_code' => 500]);
+        }, 3, ['enterprise-apps/creed', 'enterprise-apps/weld']);
+
+        $this->assertSame(['enterprise-apps/creed'], $source->projects());
+        $this->assertCount(2, $this->requests, 'both named projects are asked for; the archived one is dropped afterwards');
     }
 }

@@ -1,4 +1,5 @@
-# composer ci is the contract: the checks are defined there, and this pipeline only wraps them.
+# composer ci is the contract: the checks are defined there, and this pipeline wraps them.
+# It also carries rollcall-scan, a read-only scan of the 13 stack projects on a schedule or by hand.
 # Rollcall's pipeline, built from the Preflight components on this GitLab.
 # Pinned to Preflight 0.1.0. Never use ~latest.
 # Rollcall requires PHP ^8.3, so the test matrix starts at 8.3.
@@ -31,3 +32,25 @@ composer-ci:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
+
+# rollcall-scan: scans the 13 stack projects read-only and keeps the snapshot JSON in
+# var/snapshots/ as a 30 day artifact. The schedule is a GitLab setting (CI/CD > Schedules,
+# weekly, with the variable ROLLCALL_JOB=scan), or run by hand from the web. Without
+# ROLLCALL_GITLAB_TOKEN it skips green.
+rollcall-scan:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLCALL_JOB == "scan"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  script: |
+    set -eu
+    if [ -z "${ROLLCALL_GITLAB_TOKEN:-}" ]; then echo "ROLLCALL_GITLAB_TOKEN not set; skipping the Rollcall scan"; exit 0; fi
+    composer install --no-dev --no-interaction --no-progress --prefer-dist
+    export ROLLCALL_SOURCE=gitlab
+    export ROLLCALL_GITLAB_URL="${ROLLCALL_GITLAB_URL:-https://$CI_SERVER_FQDN}"
+    export ROLLCALL_GITLAB_PROJECTS="${ROLLCALL_GITLAB_PROJECTS:-enterprise-apps/creed,enterprise-apps/proctor,enterprise-apps/preflight,enterprise-apps/sesame,enterprise-apps/helmet,enterprise-apps/sourdough,enterprise-apps/squire,enterprise-apps/rollcall,enterprise-apps/booster,enterprise-apps/advisor,enterprise-apps/drawbridge,enterprise-apps/pinstripe,enterprise-apps/weld}"
+    php bin/rollcall scan
+  artifacts:
+    paths:
+      - var/snapshots/
+    expire_in: 30 days
