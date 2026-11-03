@@ -72,6 +72,76 @@ The per-app list a scan produces is internal data. Nothing in this repo (fixture
 app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in the JSON. Exit codes are 0 or 2, never
 1, so a scan never looks like a failed build.
 
+## Smoke test on every OS
+
+Before a release, one maintainer runs this list on Linux, macOS and Windows (PowerShell) and ticks each box. Each
+item is one command, what a good run prints or does, and what to do when it does not. Run the items in order from a
+clean clone.
+
+1. **Clone and install with no PHP on the host.** From a fresh clone, run the Docker line from the README
+   "Run the checks" section:
+
+   ```
+   docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+   ```
+
+   It should finish installing the dependencies inside the container, so the host never needs PHP. If it cannot
+   start or mount the repo, fix the local Docker setup and the mount path before going on.
+
+2. **`composer ci` through Docker.** The same line above ends with `composer ci`. Expect EXIT 0. If it stops early,
+   read the failing check (PHPUnit, Pint, PHPStan, audit or the versions table) and fix it before the release.
+
+3. **Build the collector image and check its version.** From the repo root:
+
+   ```
+   docker build -t rollcall-collector .
+   docker run --rm rollcall-collector --version
+   ```
+
+   The second command should print the Rollcall version. If the build fails, read the Dockerfile output; if the
+   version is missing or wrong, check `ReportBuilder::VERSION` and the image tag.
+
+4. **Scan the fixtures in the container.** Mount the repo read-only and leave only `var/` writable, so the scan can
+   save its snapshot but cannot touch the source. The fixture paths are `tests/fixtures/repos` and
+   `tests/fixtures/policy.json`.
+
+   Bash (Linux and macOS; in Git Bash use `$(pwd -W)` and set `MSYS_NO_PATHCONV=1`):
+
+   ```
+   REPO="$PWD"
+   if [ -n "${MSYSTEM:-}" ]; then REPO="$(pwd -W)"; fi
+   docker run --rm -e ROLLCALL_SOURCE=directory -e ROLLCALL_REPOS_DIR=tests/fixtures/repos -e ROLLCALL_POLICY_FILE=tests/fixtures/policy.json -e ROLLCALL_STORE_DIR=var/snapshots -v "${REPO}:/app:ro" -v "${REPO}/var:/app/var" -w /app rollcall-collector scan
+   ```
+
+   PowerShell (Windows):
+
+   ```
+   docker run --rm -e ROLLCALL_SOURCE=directory -e ROLLCALL_REPOS_DIR=tests/fixtures/repos -e ROLLCALL_POLICY_FILE=tests/fixtures/policy.json -e ROLLCALL_STORE_DIR=var/snapshots -v "${PWD}:/app:ro" -v "${PWD}/var:/app/var" -w /app rollcall-collector scan
+   ```
+
+   Expect a snapshot file under `var/snapshots`. If there is no file, the store mount is wrong or the scan stopped
+   early; check the mount paths and the scan output.
+
+5. **Read the report back.** In the same mounts, run `report` instead of `scan`:
+
+   ```
+   docker run --rm -e ROLLCALL_SOURCE=directory -e ROLLCALL_REPOS_DIR=tests/fixtures/repos -e ROLLCALL_POLICY_FILE=tests/fixtures/policy.json -e ROLLCALL_STORE_DIR=var/snapshots -v "${PWD}:/app:ro" -v "${PWD}/var:/app/var" -w /app rollcall-collector report
+   ```
+
+   It should print the counts and progress, with no per-app owner, rank or score. If any of those words appear,
+   stop and fix the report before the release.
+
+6. **Run the parity stack.** `deploy/scripts/parity.sh up` on Linux and macOS, or `deploy/scripts/parity.ps1 up` on
+   Windows, as each script's header says (add `--fallback` or `-Fallback` when the real Citadel image is not on the
+   machine). Expect the app to come up on the printed address. If it does not, read the logs the script points at,
+   then bring the stack down with `down`.
+
+7. **Run the front page accessibility gate.** `scripts/a11y.sh` on Linux and macOS, or `scripts/a11y.ps1` on
+   Windows. Expect zero axe violations. If any violation is reported, fix the front page and run the gate again
+   until it is clean.
+
+When the list is done, record the date, the OS and the result of each item in the release merge request.
+
 ## Releasing
 
 1. Move the lines under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog) to a new `## [X.Y.Z] - YYYY-MM-DD`

@@ -52,7 +52,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
 | Per-app ADVISOR tools | By design: the module exposes public counts only (question 7); the per-app list stays internal |
-| Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The front page (`site/index.html`) is built and hand-written; the dashboard page here has not been run through WayneUI's a11y gate |
+| Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The versions table, its `--check` (`composer site:versions-check`, part of `composer ci`) and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) are built; what is left: the Laravel dashboard page (`resources/views/dashboard.blade.php`) has not been run through WayneUI's a11y gate, and the quick-start block is hand-written |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |
 | Tag `1.0.0` and the git.wayne.edu mirror | Release steps for the lead and the user |
