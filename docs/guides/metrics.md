@@ -1,0 +1,26 @@
+---
+title: Metrics
+description: Metrics are off by default; with ROLLCALL_METRICS_ENABLED=true, /metrics serves Prometheus text from the latest snapshot.
+---
+
+# Metrics
+
+This page turns on and protects the Prometheus endpoint. Next: [Laravel](laravel.md) for the dashboard.
+
+Metrics are off by default (the stack's metrics rule). With `ROLLCALL_METRICS_ENABLED=true`, `/metrics` serves
+Prometheus text built from the latest snapshot (a request never triggers a scan). It needs `ROLLCALL_METRICS_TOKEN` as a bearer token or an address in
+`ROLLCALL_METRICS_ALLOW`; with neither set, nobody gets in. Labels are version numbers, state names, drift kinds and
+public package names: no app names or personal data. The dashboard JSON is in `grafana/rollcall-burn-down.json`; import
+it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`
+on a schedule so the series moves.
+
+<details>
+<summary>Watch the back row empty (the burn-down, sample data)</summary>
+
+<br>
+
+<img src="../readme/burn-down.jpg" width="100%" alt="Rollcall's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.">
+
+<sub>The same line Grafana draws from <code>/metrics</code>. Made-up apps, real arithmetic.</sub>
+
+</details>
