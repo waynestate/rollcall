@@ -348,12 +348,25 @@ The tools take no path, command or URL, make no network call, and answer public 
 `/report.json` serves. The per-app list stays internal and never leaves through a tool. Each answer names its source
 and its dates.
 
+## Docs
+
+The full documentation lives at [/docs/](/docs/) on the project site: install, guides, reference and checks, built
+from `docs/` by Squire's docs builder. Two tables are generated so they cannot drift: the command reference comes
+from `php bin/rollcall list --format=json`, and the environment table is scanned out of `src/`, `bin/` and
+`config/`.
+
+- `composer docs` rebuilds `site/docs/` from `docs/`; run it after editing a page.
+- `composer docs:check` fails when the built site is stale or a generated table has drifted; `composer ci` runs it.
+
+The pages are committed because the deploy server serves `site/` without building. Every page links back to its
+Markdown, and the footer stamps the version the docs describe. Roll call: the docs answer present too.
+
 ## Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, and a check that the front page
-versions table still matches CREED's policy. PHP is not needed on the host:
+`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, a check that the front page
+versions table still matches CREED's policy, and a check that the docs site is current. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"

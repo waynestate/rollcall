@@ -24,6 +24,20 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 ## Pages
 
 - [Rollcall: Every app answers present.](https://rollcall.apps.wayne.edu/index.md): Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.
+- [How it is built | Rollcall docs](https://rollcall.apps.wayne.edu/docs/architecture.md): A framework-free core plus thin entry points, a generated copy of CREED's policy reader, and three data sources.
+- [Run the checks | Rollcall docs](https://rollcall.apps.wayne.edu/docs/checks.md): composer ci is the contract, with Docker, pipelines and the front page accessibility gate; Contributing follows.
+- [Use Rollcall from your coding agent (ADVISOR) | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/advisor.md): Rollcall ships an ADVISOR module with three read-only tools that answer public counts only.
+- [Run the collector in Docker | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.md): Build the collector image and run a scan with docker run, with no PHP on the machine.
+- [Laravel | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/laravel.md): Register the package, publish the config, schedule the scan, and enable the dashboard routes.
+- [Metrics | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/metrics.md): Metrics are off by default; with ROLLCALL_METRICS_ENABLED=true, /metrics serves Prometheus text from the latest snapshot.
+- [Quick start | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/quick-start.md): Scan and report on the fixtures in the repo, with no network and no token.
+- [What the report says | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.md): The sections of a Rollcall report: versions, states, drift kinds, progress and the EOL burn-down.
+- [WSU values (Playbook) | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.md): ROLLCALL_GITLAB_URL may come from Playbook when the environment has none; the token never does.
+- [Rollcall | Rollcall docs](https://rollcall.apps.wayne.edu/docs/index.md): Rollcall is the fleet scanner for the Wayne State application stack.
+- [Install | Rollcall docs](https://rollcall.apps.wayne.edu/docs/install.md): Install Rollcall from Packagist with one Composer line.
+- [Commands | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/commands.md): The rollcall commands, generated from the CLI, with the exit codes and what each one prints.
+- [Configuration | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/configuration.md): Every Rollcall setting is an environment variable; the table is generated and the GitLab setup follows it.
+- [Security notes | Rollcall docs](https://rollcall.apps.wayne.edu/docs/security.md): Rollcall is read-only toward every source, keeps the GitLab token out of git and output, and treats scanned files as data.
 
 ## Prompts
 
