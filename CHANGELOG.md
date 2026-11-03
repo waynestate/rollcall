@@ -4,7 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
-Docs: the front-page sample report shows ROLLCALL 0.1.9.
+- Docs: the front-page sample report shows ROLLCALL 0.1.9.
 
 ## [0.1.9] - 2026-11-03
 
