@@ -9,6 +9,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 - Docs: the front-page sample report shows ROLLCALL 0.1.9.
 - Changed: the front-page deploy layer pins HELMET ^0.3, PROCTOR ^0.4 and CREED ^0.1 (lock: HELMET 0.3.0, PROCTOR 0.4.0, CREED 0.1.6).
 - Changed: CI pins Preflight 0.1.4 (GitLab component includes and the GitHub reusable workflow at its tag commit); the deploy layer sets minimum-stability to stable.
+- Docs: OPEN_QUESTIONS records that override storage is closed (PROCTOR is the source of truth), that the front page is deployed, and that the git.wayne.edu mirror exists.
 
 ## [0.1.9] - 2026-11-03
 

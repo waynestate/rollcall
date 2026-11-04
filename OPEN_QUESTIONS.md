@@ -36,7 +36,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | `ROLLCALL_METRICS_TOKEN` or `ROLLCALL_METRICS_ALLOW` | The Prometheus operator: a token for the scrape job, or its addresses | empty (metrics stay off) |
 | `ROLLCALL_STORE_DIR` | A writable, persistent directory on the host. Needed on OpenShift, Coolify or Docker as a mounted volume | `var/snapshots` |
 | `ROLLCALL_WAYNEUI_CSS` | WayneUI's built stylesheet URL | empty |
-| Deploy host and hostname `rollcall.apps.wayne.edu` | Citadel/platform team | none; no deploy is built |
+| Deploy host and hostname `rollcall.apps.wayne.edu` | Citadel/platform team | The front page is deployed on Citadel (pre-production, then production) at that hostname; the signed-in dashboard app is not built yet and waits on a working sign-in and the gateway |
 | A git.wayne.edu instance runner | Platform owner | none; CI runs on the GitLab runners and GitHub |
 
 ## Not built yet
@@ -48,14 +48,14 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | Host census importer for apps not in GitLab | Needs the Citadel export format (question 2) |
 | endoflife.date client | Only the saved-file drift check is built (question 11) |
 | Live Packagist advisories fetch | The saved-file lookup is built (`rollcall advisories`); fetching it itself waits on question 16 |
-| Override storage owned by Rollcall | 0.1 shows the overrides PROCTOR reports, with reason and expiry; Rollcall keeps none of its own |
+| Override storage | Decided 2026-11-03: closed. Showing the overrides PROCTOR reports, with reason and expiry, is the feature. PROCTOR is the one source of truth for overrides, so Rollcall keeps no override storage of its own |
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
 | Per-app ADVISOR tools | By design: the module exposes public counts only (question 7); the per-app list stays internal |
 | Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The versions table, its `--check` (`composer site:versions-check`, part of `composer ci`) and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) are built; what is left: the Laravel dashboard page (`resources/views/dashboard.blade.php`) has not been run through WayneUI's a11y gate, and the quick-start block is hand-written |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |
-| Tag `1.0.0` and the git.wayne.edu mirror | Release steps for the lead and the user |
+| Tag `1.0.0` and the git.wayne.edu mirror | The mirror exists: a push mirror from nougat, which stays canonical. Only the 1.0.0 tag is left, which is the owner's call |
 | A live trial against git.wayne.edu | Forbidden for the build; the GitLab adapter has only been run against recorded responses. Confirm `default_branch` is returned by `simple=true`, that `HEAD` returns `X-Gitlab-Blob-Id`, and the rate limit |
 
 ## Choices worth a second look
