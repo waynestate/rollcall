@@ -330,6 +330,30 @@ h1, h2, h3 {
   color: var(--muted);
 }
 
+/* The main menu: a plain row of typed links, Docs at the end. The links
+   carry the file's usual focus ring from the shared :focus-visible rule. */
+.masthead__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.masthead__nav a {
+  padding: 0.45rem 0.75rem;
+  border-radius: 3px;
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink-blue);
+  text-decoration: none;
+}
+
+.masthead__nav a:hover {
+  color: var(--ink);
+  background: var(--paper-2);
+}
+
 /* ---------------------------------------------- 4. title page and sheet */
 
 .titlepage {
@@ -1689,6 +1713,11 @@ html:not(.motion) .caller {
 }
 
 @media (max-width: 440px) {
+  /* The menu takes the row to itself and its links wrap inside it. */
+  .masthead__nav {
+    flex-basis: 100%;
+  }
+
   .sheet__rows li {
     grid-template-columns: 1.3rem minmax(0, 1fr) 5.4rem;
   }
