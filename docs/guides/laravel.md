@@ -12,5 +12,6 @@ The package registers itself (`extra.laravel.providers`). Publish the config wit
 dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it
 runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
-The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
-on a separate app or leave metrics off.
+The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so
+assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app
+already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.

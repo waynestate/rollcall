@@ -5,6 +5,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Changed: an entry in `ROLLCALL_AUTH_PACKAGES` without a slash is a bare package name and matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash still matches exactly, and the first match in list order wins. The built-in list gains `wayne-cas` and `simplecas` after the existing five, and the report carries the real locked package name, vendor included. The 2026-11-03 proof run over the real fleet found the gap: every app counted as having no auth package, although about half use an in-house CAS client the public-only list missed.
+- Added: the dashboard announces what it shows (a status line) and has a rendered-HTML accessibility test.
 - Changed: the front page has a main menu (sections plus Docs), so the docs site is one click from the front page.
 - Changed: synced Squire's docs builder and agent-ready kit (bin/docs-site.php, bin/agent-ready.php, site/assets/agent-ready.js): table cells strip Symfony console style tags, readme images are copied byte for byte into site/docs/, and the kit JS uses bindingless catch blocks. The command reference and docs site are rebuilt.
 - Docs: the front-page sample report shows ROLLCALL 0.1.9.
