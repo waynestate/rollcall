@@ -32,6 +32,12 @@
                 <strong>Internal view: do not publish.</strong>
             @endif
         </p>
+        <p id="rc-status" role="status">
+            Showing {{ $report['totals']['apps'] }} apps from the scan of {{ $report['scan_date'] }}.
+            @if ($internal)
+                This page lists every app; keep it inside the signed-in app.
+            @endif
+        </p>
 
         <section aria-labelledby="totals">
             <h2 id="totals">Apps present</h2>

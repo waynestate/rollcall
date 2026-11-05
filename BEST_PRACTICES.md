@@ -51,7 +51,14 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Off by default; protected by a token or allowlist | Enforced | `Endpoint` answers 404 while off, 401 without credentials, and denies everyone with no credentials configured |
 | No personal data; low-cardinality labels | Enforced | The renderer builds from the public report and collapses any unexpected value to `unknown` or `other` |
 
+## Accessibility
+
+| Rule | Tag | How |
+|---|---|---|
+| Pointer and focus rules (WCAG 2.2 AA) | Documented | The dashboard has no controls, sticky headers or tooltips; a positive tabindex fails DashboardAccessibilityTest; revisit when a filter is added |
+| Announce refreshed data | Checked | A role=status line names the apps shown and the scan date; DashboardAccessibilityTest |
+
 ## Not yet
 
 Citadel read-only adapter, the upgrade-record reader, ownership verification, the live Packagist advisories fetch,
-the CycloneDX bill of materials and the a11y gate run on the dashboard. See `OPEN_QUESTIONS.md`, "Not built yet".
+the CycloneDX bill of materials and the axe gate run on the rendered dashboard (needs a browser). See `OPEN_QUESTIONS.md`, "Not built yet".

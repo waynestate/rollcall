@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: the dashboard announces what it shows (a status line) and has a rendered-HTML accessibility test.
 - Changed: the front page has a main menu (sections plus Docs), so the docs site is one click from the front page.
 - Changed: synced Squire's docs builder and agent-ready kit (bin/docs-site.php, bin/agent-ready.php, site/assets/agent-ready.js): table cells strip Symfony console style tags, readme images are copied byte for byte into site/docs/, and the kit JS uses bindingless catch blocks. The command reference and docs site are rebuilt.
 - Docs: the front-page sample report shows ROLLCALL 0.1.9.
