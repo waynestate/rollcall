@@ -1,0 +1,22 @@
+<!--
+  The docs pages wear the roll book's masthead (site/index.html). The docs builder puts the header element below in
+  place of its generic one on every page, rewrites the relative links (written as if from site/) to the page's depth,
+  fills the version placeholder and marks the Docs link aria-current. Styles: docs/theme/rollcall.css.
+  Keep the links in step with the front page's masthead nav. Same register, different chapter.
+-->
+<header class="masthead">
+  <div class="wrap masthead__row">
+    <a class="masthead__brand" href="index.html">
+      <img src="brand/rollcall-avatar-256.png" width="28" height="28" alt="">
+      <span>ROLLCALL</span>
+    </a>
+    <nav class="masthead__nav" aria-label="Site">
+      <a href="index.html#roll-title">The roll</a>
+      <a href="index.html#start-title">Quick start</a>
+      <a href="index.html#sub-title">Substitute</a>
+      <a href="index.html#rules-title">Rules</a>
+      <a href="docs/index.html">Docs</a>
+    </nav>
+    <p class="masthead__meta">Register {{version}} <span aria-hidden="true">·</span> <span class="masthead__part">part of the Wayne State app stack</span></p>
+  </div>
+</header>

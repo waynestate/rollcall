@@ -1,4 +1,8 @@
 {
+    "theme": {
+        "css": "theme/rollcall.css",
+        "header": "_header.html"
+    },
     "blocks": {
         "commands": {
             "type": "symfony-commands",

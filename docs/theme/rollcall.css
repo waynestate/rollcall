@@ -1,0 +1,1074 @@
+/* ============================================================================
+   ROLLCALL docs theme: the roll book's back pages (2026-11-05).
+
+   The docs pages are more pages of the same register as the front page
+   (site/assets/rollcall.css): warm ruled paper with blue lines and the red
+   double margin rule down the left, headings set like an engraved ledger
+   title (Libre Caslon Display), everything typed in Courier Prime, links in
+   register blue with a red ink underline, the gold highlighter for "you are
+   here", stamped buttons, and the green cloth back cover for a footer. Every
+   value below comes from the front page; nothing new was invented, only
+   moved to a new page. No roll is taken here: the docs are where you read
+   the rules, not where you get called on.
+
+   How it gets onto the pages: docs/docs.json "theme" names this file and
+   docs/_header.html. The docs builder copies this file to
+   site/docs/theme/rollcall.css and links it after the kit's docs.css, so the
+   --dk-* tokens and the rules below win without !important. The kit's
+   docs.css stays byte for byte Squire's.
+
+   The front page has no dark mode, so the dark set is derived: an ink-blue
+   night with paper-colored type and the highlighter gold for links, as
+   mapped in the stack's docs theme notes.
+
+   File map: 1. fonts and tokens  2. paper  3. masthead  4. sidebar and menu
+             5. article  6. code  7. tables, notes  8. toc, pager, back cover
+             9. dark  10. responsive  11. motion (no-preference only)  12. print
+   ========================================================================== */
+
+/* ---------------------------------------------------- 1. fonts and tokens */
+
+@font-face {
+  font-family: "Libre Caslon Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../assets/fonts/libre-caslon-display-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../assets/fonts/courier-prime-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../assets/fonts/courier-prime-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Courier Prime";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../assets/fonts/courier-prime-latin-400-italic.woff2") format("woff2");
+}
+
+:root {
+  /* The front page's palette, under the same names. */
+  --paper: #f6f0e1;
+  --paper-2: #efe6d0;          /* a second sheet laid on the first */
+  --paper-3: #fffcf3;          /* fresh printout */
+  --ink: #1c2541;
+  --ink-blue: #24427e;
+  --red: #8b2145;
+  --red-rule: rgba(178, 52, 72, 0.6);
+  --green: #0c5449;            /* the binding */
+  --gold: #ffcc33;
+  --hl: rgba(255, 204, 51, 0.62);
+  --muted: #4f5566;
+  --rule: rgba(36, 66, 126, 0.13);
+  --rule-strong: rgba(28, 37, 65, 0.28);
+  --shadow: rgba(28, 37, 65, 0.18);
+  --f-display: "Libre Caslon Display", "Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --f-type: "Courier Prime", "Courier New", ui-monospace, monospace;
+  --f-body: var(--wsu-font-family-body, Lato, Calibri, "Helvetica Neue", Arial, sans-serif);
+  --margin-x: clamp(0.6rem, 3vw, 3rem);   /* where the red rule sits */
+  --line: 2rem;                           /* the paper's ruling */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-thump: cubic-bezier(0.3, 1.6, 0.5, 1);
+  /* The green ink tick the class list ends every name with. */
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12.8l5 5L20 6.2' fill='none' stroke='%230c5449' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --hl-ink: var(--ink);        /* type on the highlighter */
+  --cover-bg: var(--green);
+  --cover-ink: var(--paper);
+
+  /* The kit's tokens, set from the palette above. */
+  --dk-bg: var(--paper);
+  --dk-ink: var(--ink);
+  --dk-muted: var(--muted);
+  --dk-rule: #d7cdb3;
+  --dk-accent: var(--ink-blue);
+  --dk-on-accent: var(--paper-3);
+  --dk-code-bg: var(--paper-2);
+  --dk-note: var(--ink-blue);
+  --dk-tip: var(--green);
+  --dk-warning: #634d00;
+  --dk-danger: var(--red);
+  --dk-display: var(--f-display);
+  --dk-mono: var(--f-type);
+  --dk-radius: 3px;
+  --dk-focus: var(--ink-blue);
+  --dk-focus-w: 3px;
+  --dk-focus-o: 3px;
+  --dk-sidebar: 15.5rem;
+  --dk-prose-max: 46rem;
+  --dk-gap: 1.75rem;
+
+  color-scheme: light;
+}
+
+/* ---------------------------------------------------------------- 2. paper */
+
+html {
+  background: var(--dk-bg);
+  overflow-x: clip;
+}
+
+/* One sheet of ruled paper, the same as the front page. */
+body {
+  position: relative;
+  margin: 0;
+  font-family: var(--f-body);
+  color: var(--dk-ink);
+  background-color: var(--dk-bg);
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px), var(--rule) var(--line));
+  overflow-x: clip;
+}
+
+/* The red double margin rule, all the way down the book. */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-x);
+  width: 5px;
+  border-left: 1.5px solid var(--red-rule);
+  border-right: 1.5px solid var(--red-rule);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.masthead,
+.docs-layout,
+.docs-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Everything sits to the right of the margin rule, like the front page's .wrap. */
+.wrap,
+.docs-layout {
+  box-sizing: border-box;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-left: calc(var(--margin-x) + clamp(1.1rem, 3vw, 2.5rem));
+  padding-right: clamp(1rem, 3vw, 2.5rem);
+}
+
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: var(--dk-focus-w) solid var(--dk-focus);
+  outline-offset: var(--dk-focus-o);
+}
+
+/* ------------------------------------------------------------- 3. masthead */
+
+.masthead {
+  border-bottom: 3px double var(--rule-strong);
+  background: var(--dk-bg);
+}
+
+.masthead__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-block: 1rem;
+}
+
+.masthead__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  letter-spacing: 0.14em;
+  color: var(--dk-ink);
+  text-decoration: none;
+}
+
+.masthead__brand img {
+  border-radius: 6px;
+}
+
+.masthead__meta {
+  margin: 0;
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  color: var(--dk-muted);
+}
+
+.masthead__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.masthead__nav a {
+  padding: 0.45rem 0.75rem;
+  border-radius: 3px;
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dk-accent);
+  text-decoration: none;
+}
+
+.masthead__nav a:hover {
+  color: var(--dk-ink);
+  background: var(--dk-code-bg);
+}
+
+/* You are here: Docs, swiped with the highlighter like "present" in the hero. */
+.masthead__nav a[aria-current="page"],
+.masthead__nav a[aria-current="page"]:hover {
+  color: var(--hl-ink);
+  background: linear-gradient(100deg, transparent 0.35em, var(--hl) 0.45em, var(--hl) calc(100% - 0.35em), transparent calc(100% - 0.25em)) no-repeat 0 62% / 100% 70%;
+}
+
+/* --------------------------------------------------- 4. sidebar and menu */
+
+.docs-layout {
+  gap: 1.5rem clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
+  padding-block: 2.25rem 3.5rem;
+}
+
+/* Group labels are the register's column heads: red, typed in caps, over a
+   double rule in red ink. */
+.docs-nav__label {
+  margin: 1.5rem 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 3px double var(--red);
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+/* Group lists are plain <ul> inside the kit's list: no bullets, no indent. */
+.docs-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-nav__list .docs-nav__list {
+  margin-left: 0;
+}
+
+.docs-nav__group + li {
+  margin-top: 1rem;
+}
+
+/* Each page is a name on the roll: typed, on its own ruled line. */
+.docs-nav li > a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.1rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 3px;
+  font-family: var(--f-type);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--dk-ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.docs-nav a:hover {
+  color: var(--dk-accent);
+  background: var(--dk-code-bg);
+}
+
+/* The page you are on: highlighted, and ticked present in green ink. */
+.docs-nav a[aria-current="page"],
+.docs-nav a[aria-current="page"]:hover {
+  font-weight: 700;
+  color: var(--hl-ink);
+  background: var(--hl);
+}
+
+.docs-nav a[aria-current="page"]::after {
+  content: "";
+  width: 1.1rem;
+  height: 1.1rem;
+  background: var(--tick) center / contain no-repeat;
+}
+
+/* The phone menu is a ledger's index tab. */
+.docs-menu summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-block-size: 44px;
+  box-sizing: border-box;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px 8px 0 0;
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dk-ink);
+  background: var(--paper-3);
+  box-shadow: inset 0 3px 0 var(--red);
+  list-style: none;
+}
+
+.docs-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-menu summary::after {
+  content: "";
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -2px;
+}
+
+.docs-menu[open] summary::after {
+  rotate: 225deg;
+  translate: 0 2px;
+}
+
+.docs-menu[open] > .docs-nav {
+  padding: 0.25rem 1rem 0.9rem;
+  border: 1px solid var(--rule-strong);
+  border-top: 0;
+  background: var(--paper-3);
+}
+
+/* ------------------------------------------------------------- 5. article */
+
+.docs-article {
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--dk-ink);
+}
+
+.docs-article h1,
+.docs-article h2,
+.docs-article h3 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-synthesis: none;
+  color: var(--dk-ink);
+  scroll-margin-top: 1rem;
+  text-wrap: balance;
+}
+
+/* The page title is the chapter's: big Caslon over the title page's double rule. */
+.docs-article h1 {
+  margin: 0 0 1.75rem;
+  padding-bottom: clamp(0.7rem, 1.5vw, 1rem);
+  font-size: clamp(2.4rem, 1.6rem + 3vw, 4rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  border-bottom: 3px double var(--rule-strong);
+}
+
+.docs-article h2 {
+  margin: 2.75rem 0 0.9rem;
+  padding-bottom: 0.35rem;
+  font-size: clamp(1.7rem, 1.4rem + 1vw, 2.25rem);
+  line-height: 1.1;
+  border-bottom: 1.5px solid var(--dk-ink);
+}
+
+.docs-article h3 {
+  margin: 2rem 0 0.5rem;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  color: var(--dk-accent);
+}
+
+.docs-article :is(h1, h2, h3) code {
+  font-size: 0.72em;
+  font-weight: 400;
+}
+
+.docs-heading-link {
+  color: var(--red);
+}
+
+/* Register blue, underlined in red ink, like the front page's ink links. */
+.docs-article a {
+  color: var(--dk-accent);
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+}
+
+.docs-article a:hover {
+  color: var(--red);
+  text-decoration-thickness: 2px;
+}
+
+.docs-article strong {
+  color: var(--dk-ink);
+}
+
+.docs-article :is(ul, ol) {
+  padding-inline-start: 1.4rem;
+}
+
+.docs-article li {
+  margin-block: 0.3rem;
+}
+
+.docs-article li::marker {
+  font-family: var(--f-type);
+  color: var(--red);
+}
+
+.docs-article img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+.docs-article hr {
+  margin-block: 2.5rem;
+  border: 0;
+  border-block-start: 3px double var(--rule-strong);
+}
+
+/* ---------------------------------------------------------------- 6. code */
+
+.docs-article code {
+  padding: 0.05em 0.3em;
+  font-family: var(--f-type);
+  font-size: 0.92em;
+  color: var(--dk-accent);
+  background: var(--dk-code-bg);
+  border-radius: 2px;
+  overflow-wrap: anywhere;
+}
+
+/* A carbon copy, as in the front page's quick start: blue type on the
+   panel's own ruling, behind a red margin rule on fresh stock. Lines keep
+   their shape, so a long one scrolls instead of wrapping. */
+.docs-article pre {
+  --carbon: 1.75rem;
+  margin: 1.1rem 0 1.4rem;
+  padding: 0.75rem 1rem 0.75rem 1.25rem;
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  line-height: var(--carbon);
+  color: var(--dk-accent);
+  background-color: var(--paper-3);
+  background-image:
+    linear-gradient(to right, transparent 0.5rem, var(--red-rule) 0.5rem, var(--red-rule) calc(0.5rem + 1.5px), transparent calc(0.5rem + 1.5px)),
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--carbon) - 1px), var(--rule) calc(var(--carbon) - 1px), var(--rule) var(--carbon));
+  background-position: 0 0, 0 0.75rem;
+  background-attachment: local;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--dk-radius);
+  tab-size: 4;
+  scrollbar-color: var(--rule-strong) transparent;
+}
+
+.docs-article pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border-radius: 0;
+  overflow-wrap: normal;
+}
+
+/* With docs.js the block sits in .docs-copy: the paper moves to the wrapper
+   and the pre stops short of a gutter, so the Copy button never covers a line. */
+.docs-copy {
+  margin: 1.1rem 0 1.4rem;
+  background: var(--paper-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--dk-radius);
+  box-shadow: 0 1px 2px var(--shadow), 0 16px 30px -26px rgba(28, 37, 65, 0.55);
+}
+
+.docs-copy > pre {
+  margin: 0;
+  margin-inline-end: 6rem;
+  border: 0;
+  border-radius: var(--dk-radius) 0 0 var(--dk-radius);
+}
+
+/* The stamped Copy button from the front page's install slip. */
+.docs-copy__button {
+  inset-block-start: 0.7rem;
+  inset-inline-end: 0.85rem;
+  min-block-size: 32px;
+  padding: 0.3rem 0.8rem 0.25rem;
+  font-family: var(--f-type);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper-3);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.docs-copy__button:hover {
+  color: var(--hl-ink);
+  border-color: var(--ink);
+  background: var(--hl);
+}
+
+.docs-copy__button:active {
+  translate: 2px 2px;
+  box-shadow: 0 0 0 var(--ink);
+}
+
+/* A block that scrolls sideways takes focus (docs.js): the ring sits inside the paper. */
+.docs-article pre:focus-visible {
+  outline: 3px solid var(--dk-focus);
+  outline-offset: -4px;
+}
+
+/* ------------------------------------------------------- 7. tables, notes */
+
+/* Tables are the versions table: fresh stock, red column heads over a red
+   double rule, a faint ruling between rows. */
+.docs-table {
+  margin: 1.25rem 0 1.5rem;
+  background: var(--paper-3);
+  box-shadow: 0 1px 2px var(--shadow), 0 18px 36px -28px rgba(28, 37, 65, 0.5);
+}
+
+.docs-article table {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.docs-article th {
+  padding: 0.75rem 0.75rem 0.55rem;
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--red);
+  border-bottom: 3px double var(--red);
+}
+
+.docs-article td {
+  padding: 0.55rem 0.75rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.docs-article td + td {
+  border-left: 1px solid var(--rule);
+}
+
+/* An id or command keeps its shape in a cell: the column sizes to it, and
+   it only breaks if it would spill out of the table. */
+.docs-article td code {
+  overflow-wrap: break-word;
+}
+
+.docs-article tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* A note is an index card: fresh stock with a red top line. */
+.docs-article blockquote {
+  margin: 1.5rem 0;
+  padding: 0.85rem 1.2rem 0.9rem;
+  color: var(--dk-ink);
+  background: var(--paper-3);
+  border-top: 2px solid var(--red-rule);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+
+.docs-article blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Callouts (> [!NOTE] and friends) are index cards too, with the kind
+   stamped on in the front page's inks: blue for a note (the "late" ink),
+   green for a tip (the "present" ink), brown for a warning, red for danger
+   (the "back row" ink). */
+.docs-callout {
+  margin: 1.5rem 0;
+  padding: 0.85rem 1.2rem 0.95rem;
+  color: var(--dk-ink);
+  background: var(--paper-3);
+  border-left: 0;
+  border-top: 2px solid var(--callout, var(--red-rule));
+  border-radius: 2px;
+  box-shadow: 0 1px 2px var(--shadow);
+}
+
+.docs-callout__label {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  padding: 0.05rem 0.4rem 0.02rem;
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--callout, var(--red));
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  transform: rotate(-3deg);
+  opacity: 0.94;
+}
+
+.docs-callout--note { --callout: var(--dk-note); }
+.docs-callout--tip { --callout: var(--dk-tip); }
+.docs-callout--warning { --callout: var(--dk-warning); }
+.docs-callout--danger { --callout: var(--dk-danger); }
+
+.docs-callout--note .docs-callout__label,
+.docs-callout--tip .docs-callout__label,
+.docs-callout--warning .docs-callout__label,
+.docs-callout--danger .docs-callout__label {
+  color: var(--callout);
+}
+
+.docs-callout--tip .docs-callout__label { transform: rotate(2deg); }
+.docs-callout--danger .docs-callout__label { transform: rotate(-5deg); }
+
+/* Code tabs are the front page's quick start: ledger index tabs over a panel. */
+.docs-tabs {
+  margin: 1.25rem 0 1.5rem;
+}
+
+.docs-tabs__tablist {
+  gap: 0.35rem;
+  margin-bottom: 0;
+  padding-left: 1rem;
+}
+
+.docs-tabs__tab {
+  position: relative;
+  top: 1px;
+  padding: 0.5rem 1.1rem 0.4rem;
+  font-family: var(--f-type);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--dk-muted);
+  background: var(--paper-2);
+  border: 1px solid var(--rule-strong);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.docs-tabs__tab:hover {
+  color: var(--dk-accent);
+  border-color: var(--rule-strong);
+}
+
+.docs-tabs__tab[aria-selected="true"] {
+  z-index: 1;
+  color: var(--dk-ink);
+  background: var(--paper-3);
+  border-color: var(--rule-strong);
+  box-shadow: inset 0 3px 0 var(--red);
+}
+
+.docs-tabs__label {
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--red);
+}
+
+.docs-tabs .docs-copy {
+  margin-top: 0;
+}
+
+/* ------------------------------------------- 8. toc, pager, back cover */
+
+.docs-toc__title {
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--red);
+}
+
+/* The contents hang off a red margin rule. */
+.docs-toc__list {
+  border-left: 1.5px solid var(--red-rule);
+}
+
+.docs-toc__item a {
+  font-size: 0.93rem;
+  line-height: 1.4;
+  color: var(--dk-muted);
+}
+
+.docs-toc__item a:hover {
+  color: var(--dk-accent);
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-underline-offset: 0.2em;
+}
+
+/* Previous and next are stamped buttons on fresh stock. */
+.docs-pager {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 3px double var(--rule-strong);
+}
+
+.docs-pager__link {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  max-width: 22rem;
+  padding: 0.75rem 1.1rem 0.85rem;
+  color: var(--dk-ink);
+  background: var(--paper-3);
+  border: 2px solid var(--dk-ink);
+  border-radius: 4px;
+  box-shadow: 4px 4px 0 var(--dk-ink);
+}
+
+.docs-pager__link--next {
+  margin-inline-start: auto;
+}
+
+.docs-pager__link:hover {
+  background: var(--paper-3);
+}
+
+.docs-pager__dir {
+  font-family: var(--f-type);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.docs-pager__title {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--f-display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  color: var(--dk-accent);
+  text-decoration: none;
+}
+
+/* The back cover: green cloth, gold foil, full bleed under a centered row. */
+.docs-footer {
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.5rem;
+  max-width: none;
+  margin-top: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(2rem, 5vw, 3.25rem) clamp(1rem, 3vw, 2.5rem);
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--cover-ink);
+  background-color: var(--cover-bg);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 5px);
+  border-top: 0;
+}
+
+/* The foil title, as on the front page's back cover. Decoration only: the
+   empty alt keeps screen readers from reading the name twice. */
+.docs-footer::before {
+  content: "ROLLCALL" / "";
+  flex-basis: 100%;
+  justify-self: center;
+  margin: 0 auto 0.9rem;
+  max-width: max-content;
+  padding: 0.45rem 1.3rem 0.3rem;
+  border: 1px solid var(--gold);
+  box-shadow: inset 0 0 0 3px var(--cover-bg), inset 0 0 0 4px var(--gold);
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.22em;
+  color: var(--gold);
+}
+
+.docs-footer a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.docs-footer a:hover {
+  color: var(--cover-ink);
+}
+
+.docs-footer :focus-visible {
+  outline-color: var(--gold);
+}
+
+/* ---------------------------------------------------------------- 9. dark */
+
+/* Derived: the front page has no dark mode. The register at night: ink-blue
+   ground, paper-colored type, the highlighter gold where the day page writes
+   in blue ink, and the red ink lightened to stay legible. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper-2: #1c2440;
+    --paper-3: #1a2139;
+    --ink: #f1ead8;
+    --ink-blue: #ffcc33;
+    --red: #f59ab9;
+    --red-rule: rgba(245, 154, 185, 0.45);
+    --muted: #b3b9cc;
+    --rule: rgba(241, 234, 216, 0.06);
+    --rule-strong: rgba(241, 234, 216, 0.22);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --hl: #ffcc33;
+    --hl-ink: #141a2e;
+    --cover-bg: #0c5449;
+    --cover-ink: #f6f0e1;
+
+    --dk-bg: #141a2e;
+    --dk-ink: #f1ead8;
+    --dk-muted: #b3b9cc;
+    --dk-rule: #2e3a5e;
+    --dk-accent: #ffcc33;
+    --dk-on-accent: #141a2e;
+    --dk-code-bg: #1c2440;
+    --dk-note: #b3c6f2;
+    --dk-tip: #8fd6c1;
+    --dk-warning: #ffcc33;
+    --dk-danger: #f59ab9;
+    --dk-focus: #ffcc33;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper-2: #1c2440;
+  --paper-3: #1a2139;
+  --ink: #f1ead8;
+  --ink-blue: #ffcc33;
+  --red: #f59ab9;
+  --red-rule: rgba(245, 154, 185, 0.45);
+  --muted: #b3b9cc;
+  --rule: rgba(241, 234, 216, 0.06);
+  --rule-strong: rgba(241, 234, 216, 0.22);
+  --shadow: rgba(0, 0, 0, 0.4);
+  --hl: #ffcc33;
+  --hl-ink: #141a2e;
+  --cover-bg: #0c5449;
+  --cover-ink: #f6f0e1;
+
+  --dk-bg: #141a2e;
+  --dk-ink: #f1ead8;
+  --dk-muted: #b3b9cc;
+  --dk-rule: #2e3a5e;
+  --dk-accent: #ffcc33;
+  --dk-on-accent: #141a2e;
+  --dk-code-bg: #1c2440;
+  --dk-note: #b3c6f2;
+  --dk-tip: #8fd6c1;
+  --dk-warning: #ffcc33;
+  --dk-danger: #f59ab9;
+  --dk-focus: #ffcc33;
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------- 10. responsive */
+
+@media (min-width: 760px) {
+  /* The sidebar stays in view while the page scrolls. */
+  .docs-nav--sidebar {
+    position: sticky;
+    top: 1.25rem;
+    max-block-size: calc(100vh - 2.5rem);
+    overflow-y: auto;
+    padding-inline-end: 0.25rem;
+  }
+
+  .docs-nav--sidebar > .docs-nav__list > li:first-child > .docs-nav__label {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .docs-layout--toc .docs-toc {
+    top: 1.25rem;
+  }
+}
+
+/* Tablet: the line about the stack gives way, as the menu needs the room. */
+@media (max-width: 1100px) {
+  .masthead__part {
+    display: none;
+  }
+
+  .masthead__meta > span[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+/* Phone: the front page's four section links stay on the front page; the
+   docs menu below the masthead carries the rest. */
+@media (max-width: 640px) {
+  :root {
+    --dk-gap: 1rem;
+  }
+
+  .masthead__nav a[href*="index.html#"] {
+    display: none;
+  }
+
+  .masthead__meta {
+    display: none;
+  }
+
+  .docs-layout {
+    padding-block-start: 1.25rem;
+  }
+
+  /* No room for a gutter: the button takes a band above the lines instead. */
+  .docs-article pre {
+    font-size: 0.8125rem;
+  }
+
+  .docs-copy > pre {
+    margin-inline-end: 0;
+    padding-block-start: 3.25rem;
+    background-position: 0 0, 0 3.25rem;
+    border-radius: var(--dk-radius);
+  }
+
+  .docs-pager {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .docs-pager__link {
+    max-width: none;
+  }
+}
+
+/* ------------------------------------------- 11. motion (no-preference) */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* The title soaks into the paper like fresh ink, once, as the page lands. */
+  .docs-article h1 {
+    animation: ink-in 0.9s var(--ease-out) 0.05s both;
+  }
+
+  /* The highlighter swipes across where you are. */
+  .masthead__nav a[aria-current="page"] {
+    animation: highlight 0.6s var(--ease-out) 0.35s both;
+  }
+
+  /* The page you are on is ticked present. */
+  .docs-nav a[aria-current="page"]::after {
+    animation: tick-in 0.4s var(--ease-out) 0.5s both;
+  }
+
+  .masthead__brand img {
+    transition: translate 0.35s var(--ease-thump);
+  }
+
+  .masthead__brand:hover img {
+    translate: 0 -3px;
+  }
+
+  /* Stamped buttons lift on hover and press flat, like the front page's. */
+  .docs-pager__link {
+    transition: translate 0.15s, box-shadow 0.15s;
+  }
+
+  .docs-pager__link:hover {
+    translate: -2px -2px;
+    box-shadow: 6px 6px 0 var(--dk-ink);
+  }
+
+  .docs-pager__link:active {
+    translate: 3px 3px;
+    box-shadow: 1px 1px 0 var(--dk-ink);
+  }
+
+  .docs-nav a,
+  .masthead__nav a,
+  .docs-copy__button {
+    transition: background-color 0.15s, color 0.15s, translate 0.12s, box-shadow 0.12s;
+  }
+}
+
+@keyframes ink-in {
+  from { opacity: 0; filter: blur(5px); letter-spacing: 0.06em; }
+  to { opacity: 1; filter: blur(0); letter-spacing: 0.02em; }
+}
+
+@keyframes highlight {
+  from { background-size: 0% 70%; }
+  to { background-size: 100% 70%; }
+}
+
+@keyframes tick-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* -------------------------------------------------------------- 12. print */
+
+@media print {
+  body {
+    background-image: none;
+  }
+
+  body::before,
+  .docs-footer::before {
+    display: none;
+  }
+
+  .masthead__nav,
+  .docs-copy__button {
+    display: none;
+  }
+
+  .docs-copy > pre {
+    margin-inline-end: 0;
+    white-space: pre-wrap;
+  }
+
+  .docs-footer {
+    color: #1c2541;
+    background: none;
+  }
+
+  .docs-footer a {
+    color: #24427e;
+  }
+}
