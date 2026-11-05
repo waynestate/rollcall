@@ -795,6 +795,7 @@ body::before {
 .docs-footer {
   box-sizing: border-box;
   display: grid;
+  justify-content: center;
   justify-items: center;
   gap: 0.45rem;
   max-width: none;
