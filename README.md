@@ -361,6 +361,11 @@ from `php bin/rollcall list --format=json`, and the environment table is scanned
 The pages are committed because the deploy server serves `site/` without building. Every page links back to its
 Markdown, and the footer stamps the version the docs describe. Roll call: the docs answer present too.
 
+The docs pages wear the front page's look: the same masthead and menu, ruled paper, Caslon titles and the green
+back cover. To change it, edit `docs/_header.html` (the masthead, links written as if from `site/`) and
+`docs/theme/rollcall.css` (the front page's tokens mapped onto the kit's `--dk-*`, plus a derived dark mode), then
+run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Squire's kit and a sync overwrites them.
+
 ## Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).

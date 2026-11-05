@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Changed: the docs pages wear the front page's look, so the front page and the docs read as one roll book: the same masthead and main menu (Docs marked current with the highlighter), ruled paper and the red margin rule, Caslon titles, Courier Prime type, carbon-copy code blocks with a stamped Copy button, register-style tables, callouts as stamped index cards, code tabs as ledger tabs, stamped previous and next buttons and the green cloth back cover. Dark mode is derived (an ink-blue night); motion only plays when reduced motion is off. Source: `docs/_header.html` and `docs/theme/rollcall.css`, wired in `docs/docs.json`.
+- Changed: synced Squire's unified docs builder (theme hook, callouts, code tabs, task lists, keyboard-reachable scrolling code blocks, a Copy button that no longer reports a failed copy after a good one). The docs site is rebuilt.
 - Changed: an entry in `ROLLCALL_AUTH_PACKAGES` without a slash is a bare package name and matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash still matches exactly, and the first match in list order wins. The built-in list gains `wayne-cas` and `simplecas` after the existing five, and the report carries the real locked package name, vendor included. The 2026-11-03 proof run over the real fleet found the gap: every app counted as having no auth package, although about half use an in-house CAS client the public-only list missed.
 - Added: the dashboard announces what it shows (a status line) and has a rendered-HTML accessibility test.
 - Changed: the front page has a main menu (sections plus Docs), so the docs site is one click from the front page.
