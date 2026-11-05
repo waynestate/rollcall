@@ -27,11 +27,11 @@ final class DashboardAccessibilityTest extends LaravelTestCase
         // The skip link must point at an id that exists on the page.
         $this->assertTrue(
             (bool) preg_match('/<a\b(?=[^>]*class="wsu-skip-link")[^>]*href="#([\w-]+)"/i', $html, $skip),
-            'the skip link is missing'
+            'the skip link is missing',
         );
         $this->assertTrue(
             (bool) preg_match('/\bid="' . preg_quote($skip[1], '/') . '"/', $html),
-            'the skip link target id is missing'
+            'the skip link target id is missing',
         );
 
         // Every table carries its own caption.
@@ -52,13 +52,13 @@ final class DashboardAccessibilityTest extends LaravelTestCase
         $this->assertStringContainsString('<p id="rc-status" role="status">', $html);
         $this->assertTrue(
             (bool) preg_match('/<p[^>]*id="rc-status"[^>]*>(.*?)<\/p>/is', $html, $status),
-            'the status paragraph is missing'
+            'the status paragraph is missing',
         );
         $statusText = preg_replace('/\s+/', ' ', trim($status[1]));
         $this->assertStringContainsString('Showing', $statusText);
         $this->assertTrue(
             (bool) preg_match('/from the scan of (\d{4}-\d{2}-\d{2})/', $statusText, $scan),
-            'the status line does not name the scan date'
+            'the status line does not name the scan date',
         );
         $this->assertStringNotContainsString('This page lists every app', $statusText);
 
@@ -81,13 +81,13 @@ final class DashboardAccessibilityTest extends LaravelTestCase
         $this->assertStringContainsString('<p id="rc-status" role="status">', $html);
         $this->assertTrue(
             (bool) preg_match('/<p[^>]*id="rc-status"[^>]*>(.*?)<\/p>/is', $html, $status),
-            'the status paragraph is missing'
+            'the status paragraph is missing',
         );
         $statusText = preg_replace('/\s+/', ' ', trim($status[1]));
         $this->assertStringContainsString('Showing', $statusText);
         $this->assertStringContainsString(
             'This page lists every app; keep it inside the signed-in app.',
-            $statusText
+            $statusText,
         );
     }
 }

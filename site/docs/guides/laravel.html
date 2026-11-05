@@ -33,8 +33,9 @@
 dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it
 runs behind <code>rollcall.dashboard.internal_middleware</code> (default <code>web</code> and <code>auth.sesame</code>), so an app with no such
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from <code>ROLLCALL_WAYNEUI_CSS</code>.
-The <code>/metrics</code> route is registered on its own path; if your app already serves <code>/metrics</code> (HELMET does), run Rollcall's
-on a separate app or leave metrics off.</p>
+The page also carries a status line (a <code>role=&quot;status&quot;</code> paragraph) that names the apps shown and the scan date, so
+assistive technology hears what the page displays. The <code>/metrics</code> route is registered on its own path; if your app
+already serves <code>/metrics</code> (HELMET does), run Rollcall's on a separate app or leave metrics off.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/metrics.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Metrics</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/advisor.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Use Rollcall from your coding agent (ADVISOR)</span></a></nav>

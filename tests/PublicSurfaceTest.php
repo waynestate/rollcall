@@ -24,7 +24,7 @@ final class PublicSurfaceTest extends TestCase
         $siteDir = self::ROOT . '/site';
         if (is_dir($siteDir)) {
             $it = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($siteDir, RecursiveDirectoryIterator::SKIP_DOTS)
+                new RecursiveDirectoryIterator($siteDir, RecursiveDirectoryIterator::SKIP_DOTS),
             );
             foreach ($it as $file) {
                 $path = str_replace('\\', '/', $file->getPathname());
@@ -42,7 +42,7 @@ final class PublicSurfaceTest extends TestCase
         $docsDir = self::ROOT . '/docs';
         if (is_dir($docsDir)) {
             $it = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($docsDir, RecursiveDirectoryIterator::SKIP_DOTS)
+                new RecursiveDirectoryIterator($docsDir, RecursiveDirectoryIterator::SKIP_DOTS),
             );
             foreach ($it as $file) {
                 if (in_array($file->getExtension(), ['md', 'json'], true)) {
@@ -77,7 +77,7 @@ final class PublicSurfaceTest extends TestCase
                 $this->assertStringNotContainsString(
                     $project,
                     $text,
-                    $file . ' names the fixture project ' . $project
+                    $file . ' names the fixture project ' . $project,
                 );
             }
         }
@@ -123,7 +123,7 @@ final class PublicSurfaceTest extends TestCase
             foreach (array_unique($m[0] ?? []) as $ip) {
                 $this->assertTrue(
                     in_array($ip, $allowed, true),
-                    $file . ' names the IP address ' . $ip
+                    $file . ' names the IP address ' . $ip,
                 );
             }
         }

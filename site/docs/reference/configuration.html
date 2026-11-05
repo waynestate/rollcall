@@ -18,7 +18,7 @@
   <a class="docs-header__brand" href="../../docs/index.html">Rollcall</a>
   <span><a class="docs-header__home" rel="noopener" href="https://nougat.snu.gs/enterprise-apps/rollcall">Source</a> <a class="docs-header__home" href="../../index.html">Back to Rollcall</a></span>
 </header>
-<div class="docs-layout">
+<div class="docs-layout docs-layout--toc">
   <details class="docs-menu">
     <summary>Menu</summary>
     <nav class="docs-nav" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/quick-start.html">Quick start</a></li><li><a href="../../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../../docs/guides/metrics.html">Metrics</a></li><li><a href="../../docs/guides/laravel.html">Laravel</a></li><li><a href="../../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/configuration.html" aria-current="page">Configuration</a></li></ul></li><li><a href="../../docs/architecture.html">Architecture</a></li><li><a href="../../docs/security.html">Security</a></li><li><a href="../../docs/checks.html">Checks</a></li></ul></nav>
@@ -163,6 +163,13 @@
 </tbody>
 </table></div>
 <!-- /generated -->
+<h3 id="auth-packages">Auth packages<a class="docs-heading-link" aria-label="Link to this section" href="#auth-packages">#</a></h3>
+<p><code>ROLLCALL_AUTH_PACKAGES</code> is checked in list order, and the first entry that matches an app wins. An entry with a
+slash matches that package exactly; an entry without a slash is a bare package name and matches that package under
+any vendor, so <code>wayne-cas</code> matches <code>anyvendor/wayne-cas</code>. The report carries the real locked package name, vendor
+included. The built-in list is <code>waynestate/sesame</code>, <code>waynestate/wayne-cas</code>, <code>apereo/phpcas</code>, <code>jasig/phpcas</code>,
+<code>subfission/cas</code>, <code>wayne-cas</code> and <code>simplecas</code>; the exact <code>waynestate/wayne-cas</code> entry comes first, so it still wins
+over the bare <code>wayne-cas</code> entry.</p>
 <p>To scan GitLab you need the token and either a group or the project allowlist. The narrow way is
 <code>ROLLCALL_GITLAB_PROJECTS</code>: name the exact <code>group/project</code> paths and Rollcall reads only those, never listing a
 group. Otherwise set <code>ROLLCALL_GITLAB_GROUPS</code>. The token is a GitLab bot or personal access token with <code>read_api</code>
@@ -175,6 +182,7 @@ file whose blob id has not changed, follows <code>Link</code> pagination only to
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/commands.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Commands</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/architecture.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Architecture</span></a></nav>
   </div>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item--sub"><a href="#auth-packages">Auth packages</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>0.1.9</span></span>
