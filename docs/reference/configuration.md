@@ -34,6 +34,15 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_WAYNEUI_CSS | Laravel: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 <!-- /generated -->
 
+### Auth packages
+
+`ROLLCALL_AUTH_PACKAGES` is checked in list order, and the first entry that matches an app wins. An entry with a
+slash matches that package exactly; an entry without a slash is a bare package name and matches that package under
+any vendor, so `wayne-cas` matches `anyvendor/wayne-cas`. The report carries the real locked package name, vendor
+included. The built-in list is `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`,
+`subfission/cas`, `wayne-cas` and `simplecas`; the exact `waynestate/wayne-cas` entry comes first, so it still wins
+over the bare `wayne-cas` entry.
+
 To scan GitLab you need the token and either a group or the project allowlist. The narrow way is
 `ROLLCALL_GITLAB_PROJECTS`: name the exact `group/project` paths and Rollcall reads only those, never listing a
 group. Otherwise set `ROLLCALL_GITLAB_GROUPS`. The token is a GitLab bot or personal access token with `read_api`
