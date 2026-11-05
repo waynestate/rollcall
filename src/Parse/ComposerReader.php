@@ -14,13 +14,19 @@ use Waynestate\Rollcall\Model\AppFacts;
  */
 final class ComposerReader
 {
-    /** Packages that count as an app's auth package, in the order they win. */
+    /**
+     * Packages that count as an app's auth package, in the order they win.
+     * An entry with a slash matches exactly; an entry without one is a bare
+     * package name and matches that package under any vendor.
+     */
     public const DEFAULT_AUTH_PACKAGES = [
         'waynestate/sesame',
         'waynestate/wayne-cas',
         'apereo/phpcas',
         'jasig/phpcas',
         'subfission/cas',
+        'wayne-cas',
+        'simplecas',
     ];
 
     /** @param  list<string>  $authPackages */
@@ -48,19 +54,15 @@ final class ComposerReader
         if ($lock !== null) {
             $versions = $this->lockedVersions($lock);
             $laravel = $versions['laravel/framework'] ?? null;
-            foreach ($this->authPackages as $package) {
-                if (array_key_exists($package, $versions)) {
-                    $authPackage = $package;
-                    $authVersion = $versions[$package];
-                    break;
-                }
+            $match = $this->findAuthPackage($versions);
+            if ($match !== null) {
+                $authPackage = $match[0];
+                $authVersion = is_string($match[1]) ? $match[1] : null;
             }
         } else {
-            foreach ($this->authPackages as $package) {
-                if (isset($require[$package])) {
-                    $authPackage = $package;
-                    break;
-                }
+            $match = $this->findAuthPackage($require);
+            if ($match !== null) {
+                $authPackage = $match[0];
             }
             if ($json !== null && ($require['laravel/framework'] ?? null) !== null) {
                 $notes[] = 'Laravel version unknown without composer.lock';
@@ -135,5 +137,49 @@ final class ComposerReader
         }
 
         return $versions;
+    }
+
+    /**
+     * Finds the first auth package in list order among the given names. An
+     * entry with a slash matches exactly; an entry without one is a bare
+     * package name and matches that package under any vendor, so
+     * `wayne-cas` matches `anyvendor/wayne-cas`. The answer carries the real
+     * name found, vendor included, and its value.
+     *
+     * @param  array<array-key, mixed>  $available  package name to version or constraint
+     * @return array{0: string, 1: mixed}|null  the real package name found, and its value
+     */
+    private function findAuthPackage(array $available): ?array
+    {
+        $byName = [];
+        foreach ($available as $name => $value) {
+            if (! is_string($name)) {
+                continue;
+            }
+            $byName[strtolower($name)] = [$name, $value];
+        }
+
+        foreach ($this->authPackages as $entry) {
+            $needle = strtolower(trim($entry));
+            if ($needle === '') {
+                continue;
+            }
+            if (str_contains($needle, '/')) {
+                if (isset($byName[$needle])) {
+                    return $byName[$needle];
+                }
+
+                continue;
+            }
+            foreach ($byName as $name => $found) {
+                $slash = strrchr($name, '/');
+                $last = $slash === false ? $name : substr($slash, 1);
+                if ($last === $needle) {
+                    return $found;
+                }
+            }
+        }
+
+        return null;
     }
 }
