@@ -99,7 +99,7 @@
 <h2 id="the-warning-on-the-scheduled-pipeline">The warning on the scheduled pipeline<a class="docs-heading-link" aria-label="Link to this section" href="#the-warning-on-the-scheduled-pipeline">#</a></h2>
 <p>The pipeline that ran the scan finished green with one warning. It was not the scan: it was the allowed-to-fail PROCTOR job that checks the front page's own deploy layer (<code>deploy/</code>). Run again locally it says:</p>
 <ul>
-<li><code>composer-audit</code> <strong>fail</strong>: the deploy layer's lock held <code>symfony/http-foundation</code> and <code>symfony/yaml</code> 7.4.22, with five security advisories between them. Symfony 7.4.23 fixes them, and the stack is moving every deploy lock to it.</li>
+<li><code>composer-audit</code> <strong>fail</strong>: the deploy layer's lock held <code>symfony/http-foundation</code> and <code>symfony/yaml</code> 7.4.22, with five security advisories between them. Symfony 7.4.23 fixes them, and the deploy lock moved to it the same night.</li>
 <li><code>ci-pipelines</code> <strong>warn</strong>: <code>deploy/</code> has no <code>.gitlab-ci.yml</code>. True and harmless: the pipeline lives at the repository root.</li>
 <li><code>php-floor</code> <strong>warn</strong>: PHP 8.3 is in security-only support until 2027-12-31.</li>
 </ul>

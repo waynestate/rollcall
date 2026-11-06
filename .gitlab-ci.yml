@@ -14,7 +14,8 @@ include:
       image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
   # allow_failure: deploy/ is a subfolder, so PROCTOR always warns that it has no .gitlab-ci.yml (the pipeline is
-  # here at the root). On 2026-11-06 it also failed composer audit on Symfony 7.4.22 in deploy/composer.lock.
+  # here at the root). On 2026-11-06 it also failed composer audit on Symfony 7.4.22 in deploy/composer.lock,
+  # fixed by the move to 7.4.23.
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.1.4
     inputs:
       working_dir: deploy

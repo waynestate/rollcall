@@ -1282,7 +1282,7 @@ The CI job's 23 seconds include installing Rollcall; the scan itself, 26 file re
 
 The pipeline that ran the scan finished green with one warning. It was not the scan: it was the allowed-to-fail PROCTOR job that checks the front page's own deploy layer (`deploy/`). Run again locally it says:
 
-- `composer-audit` **fail**: the deploy layer's lock held `symfony/http-foundation` and `symfony/yaml` 7.4.22, with five security advisories between them. Symfony 7.4.23 fixes them, and the stack is moving every deploy lock to it.
+- `composer-audit` **fail**: the deploy layer's lock held `symfony/http-foundation` and `symfony/yaml` 7.4.22, with five security advisories between them. Symfony 7.4.23 fixes them, and the deploy lock moved to it the same night.
 - `ci-pipelines` **warn**: `deploy/` has no `.gitlab-ci.yml`. True and harmless: the pipeline lives at the repository root.
 - `php-floor` **warn**: PHP 8.3 is in security-only support until 2027-12-31.
 
