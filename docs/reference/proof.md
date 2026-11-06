@@ -26,11 +26,13 @@ A run **passes** when every command exits 0 and every repository with a `compose
 
 ## Results
 
-| Run | Repositories | Rows | Tool errors | Time |
+| Run | Read | Rows | Tool errors | Time |
 |---|---|---|---|---|
-| Scheduled scan on GitLab CI | 13 stack projects | 13 | 0 | 23 s for the job, about 11 s of it the scan over the API |
-| Rerun, stack projects from their committed files | 13 | 13 | 0 | 1.3 s scan |
-| Rerun, proof corpus | 58 with a `composer.json` | 58 | 0 | 1.4 s scan, under 4 s for each report |
+| CI schedule | 13 stack projects | 13 | 0 | 23 s job, 11 s scan |
+| Rerun: stack | 13 stack projects | 13 | 0 | 1.3 s scan |
+| Rerun: corpus | 58 repositories | 58 | 0 | 1.4 s scan |
+
+The CI job's 23 seconds include installing Rollcall; the scan itself, 26 file reads over the GitLab API, took about 11. Each report over the corpus took under 4 seconds.
 
 - **The CI scan read exactly what is committed.** The snapshot records the Git blob id of every file it read, and each id matched `main` of its project. The local rerun of the same 13 projects gave the same answer: every project declares a PHP floor of 8.3, and one of them (WELD) locks Laravel 13 and SESAME as its auth package. That is the fleet the stack wants every app to look like: one row, one floor, no back row.
 - **Every corpus repository answered.** All 58 got a row with its declared PHP floor, Laravel line (18 of them run Laravel, from 5.8 to 13) and auth package. The ones with no PHP constraint at all are counted as unbounded, not guessed.

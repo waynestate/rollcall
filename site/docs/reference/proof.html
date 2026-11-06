@@ -57,7 +57,7 @@
 <thead>
 <tr>
 <th>Run</th>
-<th>Repositories</th>
+<th>Read</th>
 <th>Rows</th>
 <th>Tool errors</th>
 <th>Time</th>
@@ -65,28 +65,29 @@
 </thead>
 <tbody>
 <tr>
-<td>Scheduled scan on GitLab CI</td>
+<td>CI schedule</td>
 <td>13 stack projects</td>
 <td>13</td>
 <td>0</td>
-<td>23 s for the job, about 11 s of it the scan over the API</td>
+<td>23 s job, 11 s scan</td>
 </tr>
 <tr>
-<td>Rerun, stack projects from their committed files</td>
-<td>13</td>
+<td>Rerun: stack</td>
+<td>13 stack projects</td>
 <td>13</td>
 <td>0</td>
 <td>1.3 s scan</td>
 </tr>
 <tr>
-<td>Rerun, proof corpus</td>
-<td>58 with a <code>composer.json</code></td>
+<td>Rerun: corpus</td>
+<td>58 repositories</td>
 <td>58</td>
 <td>0</td>
-<td>1.4 s scan, under 4 s for each report</td>
+<td>1.4 s scan</td>
 </tr>
 </tbody>
 </table></div>
+<p>The CI job's 23 seconds include installing Rollcall; the scan itself, 26 file reads over the GitLab API, took about 11. Each report over the corpus took under 4 seconds.</p>
 <ul>
 <li><strong>The CI scan read exactly what is committed.</strong> The snapshot records the Git blob id of every file it read, and each id matched <code>main</code> of its project. The local rerun of the same 13 projects gave the same answer: every project declares a PHP floor of 8.3, and one of them (WELD) locks Laravel 13 and SESAME as its auth package. That is the fleet the stack wants every app to look like: one row, one floor, no back row.</li>
 <li><strong>Every corpus repository answered.</strong> All 58 got a row with its declared PHP floor, Laravel line (18 of them run Laravel, from 5.8 to 13) and auth package. The ones with no PHP constraint at all are counted as unbounded, not guessed.</li>

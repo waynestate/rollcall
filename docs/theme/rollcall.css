@@ -391,6 +391,29 @@ body::before {
   border-bottom: 1.5px solid var(--dk-ink);
 }
 
+/* The front page's folios: every chapter there opens with a red Caslon
+   "§ 1" in its margin. Here each section of a page is a chapter of the
+   book, numbered the same way, in front of its heading. "Related" is the
+   index, not a chapter, so it goes unnumbered. The empty alt text keeps the
+   mark out of the accessible name: the heading still reads as written. */
+.docs-article {
+  counter-reset: folio;
+}
+
+.docs-article h2:not(#related) {
+  counter-increment: folio;
+}
+
+.docs-article h2:not(#related)::before {
+  content: "\00a7\00a0" counter(folio) / "";
+  display: inline-block;
+  margin-inline-end: 0.5em;
+  font-size: 0.8em;
+  line-height: 1;
+  color: var(--red);
+  white-space: nowrap;
+}
+
 .docs-article h3 {
   margin: 2rem 0 0.5rem;
   font-size: 1.4rem;
@@ -1206,6 +1229,24 @@ body::before {
   .docs-copy__button {
     transition: background-color 0.15s, color 0.15s, translate 0.12s, box-shadow 0.12s;
   }
+}
+
+/* Each folio soaks into the paper as its section scrolls into view, the
+   same fresh-ink entrance as the title. Browsers without scroll-driven
+   animations show the folio as printed; nothing moves the layout. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .docs-article h2:not(#related)::before {
+      animation: folio-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+@keyframes folio-in {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
 }
 
 @keyframes ink-in {
