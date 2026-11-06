@@ -596,14 +596,181 @@ body::before {
   background: none;
 }
 
-/* An id or command keeps its shape in a cell: the column sizes to it, and
-   it only breaks if it would spill out of the table. */
+/* An id, path or flag keeps its shape in a cell: the column sizes to it,
+   and it only breaks if it would spill out of the table. */
+.docs-article td,
 .docs-article td code {
   overflow-wrap: break-word;
 }
 
 .docs-article tbody tr:last-child td {
   border-bottom: 0;
+}
+
+/* Narrow columns (a phone, or a tablet beside the sidebar) go by the width
+   the table actually has, not the window: each table's frame is a size
+   container, so the same rule holds wherever the column ends up. */
+.docs-table {
+  container: docs-table / inline-size;
+}
+
+/* Below 30rem a row of cells side by side is too narrow to read, so every
+   table stacks each row: the name typed across the top, then the other
+   cells side by side under it, lined up under their own column heads, which
+   stack the same way. A two column table reads as a term over what it
+   means. The columns still size to their content across every row (a
+   subgrid). Text and the name across the top may break anywhere, so a long
+   name never pushes the table wider than its column; an id in a side by
+   side cell keeps its shape while it fits. Cells stay cells, in the same
+   order, under the same heads. */
+@container docs-table (max-width: 30rem) {
+  .docs-article th {
+    white-space: normal;
+  }
+
+  .docs-article td,
+  .docs-article td:first-child code {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* The smallest phones: an id in a side by side cell may break too. */
+@container docs-table (max-width: 20rem) {
+  .docs-article td code {
+    overflow-wrap: anywhere;
+  }
+}
+
+@container docs-table (max-width: 30rem) {
+  .docs-article table:has(> thead > tr > th:nth-child(2)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    &:has(> thead > tr > th:nth-child(3)) {
+      grid-template-columns: repeat(2, auto);
+    }
+
+    &:has(> thead > tr > th:nth-child(4)) {
+      grid-template-columns: repeat(3, auto);
+    }
+
+    & > thead,
+    & > tbody,
+    & tr {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+    }
+
+    & tr > :first-child {
+      grid-column: 1 / -1;
+    }
+
+    & th:first-child {
+      padding-bottom: 0.15rem;
+      border-bottom: 0;
+    }
+
+    & td:first-child {
+      padding-bottom: 0.2rem;
+      border-bottom: 0;
+    }
+
+    & td:nth-child(2) {
+      border-left: 0;
+    }
+  }
+}
+/* Wide enough for the settings table: only its Meaning column, prose that
+   names other variables, may break a long name to keep the table in its
+   column. */
+:root:has(link[rel="alternate"][href="configuration.md"]) .docs-article table:has(> thead > tr > th:nth-child(4)) td:nth-child(2),
+:root:has(link[rel="alternate"][href="configuration.md"]) .docs-article table:has(> thead > tr > th:nth-child(4)) td:nth-child(2) code {
+  overflow-wrap: anywhere;
+}
+
+/* The settings table (docs/reference/configuration.md) has four columns and
+   names up to thirty characters long, so a narrow column cannot hold it.
+   There each row becomes an index card: the variable typed across the top
+   over the red double rule, then Meaning, Default and Read in, each with its
+   column head written in the margin. The labels are the builder's own
+   column heads for the generated env block (bin/docs-site.php writes
+   "Variable | Meaning | Default | Read in"), so they cannot drift from it;
+   the selector only matches a four column table on that page.
+
+   Screen readers keep the table: the column heads stay in the markup,
+   visually hidden rather than display: none, and the cells keep their table
+   roles in Chromium and Firefox. The margin labels are read too, which only
+   repeats a column head, never loses one. */
+@container docs-table (max-width: 42rem) {
+  :root:has(link[rel="alternate"][href="configuration.md"]) .docs-article table:has(> thead > tr > th:nth-child(4)) {
+    display: block;
+
+    & > tbody {
+      display: block;
+    }
+
+    & > thead {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    & > tbody > tr {
+      display: block;
+      padding: 0.7rem 0.85rem 0.6rem;
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    & > tbody > tr:last-child {
+      border-bottom: 0;
+    }
+
+    & td {
+      position: relative;
+      display: block;
+      padding: 0.2rem 0 0.2rem 5.5rem;
+      border: 0;
+    }
+
+    & td:first-child {
+      padding-left: 0;
+      margin-bottom: 0.35rem;
+      padding-bottom: 0.4rem;
+      overflow-wrap: anywhere;
+      border-bottom: 3px double var(--red-rule);
+    }
+
+    & td:not(:first-child)::before {
+      position: absolute;
+      top: 0.2rem;
+      left: 0;
+      inline-size: 4.75rem;
+      padding-top: 0.2rem;
+      font-family: var(--f-type);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    & td:nth-child(2)::before {
+      content: "Meaning";
+    }
+
+    & td:nth-child(3)::before {
+      content: "Default";
+    }
+
+    & td:nth-child(4)::before {
+      content: "Read in";
+    }
+  }
 }
 
 /* A note is an index card: fresh stock with a red top line. */
