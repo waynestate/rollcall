@@ -170,6 +170,20 @@ final class ReportTest extends TestCase
         $this->assertStringNotContainsString('demo/', $text);
     }
 
+    public function test_text_output_calls_unconfigured_sources_notes_not_problems(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [new AppFacts('g/a', phpImage: '8.4')], [
+            'No image source configured; PHP images are unknown.',
+            'No PROCTOR report source configured; check results are unknown.',
+        ]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY), false);
+
+        $text = (new TextRenderer())->render($report);
+
+        $this->assertStringContainsString('Apps present: 1 (scan notes: 2)', $text);
+        $this->assertStringNotContainsString('problem', $text);
+    }
+
     public function test_prometheus_text_is_low_cardinality_and_has_no_identity(): void
     {
         $text = (new PrometheusRenderer())->render($this->report());

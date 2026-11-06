@@ -37,6 +37,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [Install | Rollcall docs](https://rollcall.apps.wayne.edu/docs/install.md): Install Rollcall from Packagist with one Composer line.
 - [Commands | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/commands.md): The rollcall commands, generated from the CLI, with the exit codes and what each one prints.
 - [Configuration | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/configuration.md): Every Rollcall setting is an environment variable; the table is generated and the GitLab setup follows it.
+- [Proof | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/proof.md): Rollcall's first scheduled scan of the stack on GitLab CI, and a rerun over 58 Wayne State applications on 2026-11-06: what ran, what held, what it caught in Rollcall, and what it does not prove yet.
 - [Security notes | Rollcall docs](https://rollcall.apps.wayne.edu/docs/security.md): Rollcall is read-only toward every source, keeps the GitLab token out of git and output, and treats scanned files as data.
 
 ## Prompts

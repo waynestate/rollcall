@@ -152,6 +152,9 @@ does not gate anything.
 
 ## What the report says
 
+- **Apps present and scan notes**: the apps the scan read, then the notes it printed and carried on past
+  (`totals.scan_errors` in JSON). Today a note means a source is not configured (no image export, no PROCTOR
+  reports). A note is not a failed scan: a source that refuses stops the scan instead.
 - **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`,
   `eol`, `unknown`), the date security support ends and the days left (negative once past).
 - **Auth package and PROCTOR**: apps per auth package, and per PROCTOR result (`pass`, `fail`, `none`).
@@ -160,7 +163,8 @@ does not gate anything.
   `proctor_failing`, `override_expired`.
 - **Progress**: apps that moved since the previous scan and apps that went from an EOL image to a supported one. In
   the internal view each upgraded app carries the day it landed.
-- **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day.
+- **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day. It reads the image, not the
+  declared floor, so it stays `unknown` until an image export is configured.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
@@ -347,6 +351,12 @@ empty store each one says so in plain words and names `rollcall scan`.
 The tools take no path, command or URL, make no network call, and answer public counts only: the same fields
 `/report.json` serves. The per-app list stays internal and never leaves through a tool. Each answer names its source
 and its dates.
+
+## Proof
+
+Rollcall's first scheduled scan of the stack on GitLab CI and a rerun over 58 Wayne State applications
+(2026-11-06): what ran, what held, what it caught in Rollcall and what it does not prove yet, on the
+[Proof](docs/reference/proof.md) docs page.
 
 ## Docs
 

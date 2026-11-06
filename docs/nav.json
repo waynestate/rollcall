@@ -53,6 +53,10 @@
         {
           "title": "Configuration",
           "path": "reference/configuration"
+        },
+        {
+          "title": "Proof",
+          "path": "reference/proof"
         }
       ]
     },

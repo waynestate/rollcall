@@ -23,7 +23,9 @@ final class TextRenderer
             self::cell($report['visibility'] ?? ''),
         );
         $totals = self::arr($report['totals'] ?? []);
-        $out[] = sprintf('Apps present: %s (scan problems: %s)', self::cell($totals['apps'] ?? 0), self::cell($totals['scan_errors'] ?? 0));
+        // scan_errors counts notes the scan printed and carried on past (today: a source that is not configured).
+        // "Notes", not "problems": a fleet with no image export yet is not a broken scan.
+        $out[] = sprintf('Apps present: %s (scan notes: %s)', self::cell($totals['apps'] ?? 0), self::cell($totals['scan_errors'] ?? 0));
         $out[] = '';
 
         foreach (['php_image' => 'PHP image', 'php_floor' => 'Declared PHP floor', 'laravel' => 'Laravel'] as $key => $title) {
