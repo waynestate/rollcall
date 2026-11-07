@@ -383,8 +383,11 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, a check that the front page
-versions table still matches CREED's policy, and a check that the docs site is current. PHP is not needed on the host:
+`composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
+check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
+The contract itself is JSON Schema in [`contract/`](contract/README.md): the report, the stored snapshot and the
+image list export. `tests/ContractTest.php` runs the real commands on the fixtures and validates their output
+against it, so a field cannot appear or vanish without the contract changing in the same commit. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"

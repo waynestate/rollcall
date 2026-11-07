@@ -379,8 +379,11 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/HEAD/MAINTAINING.md).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, a check that the front page
-versions table still matches CREED's policy, and a check that the docs site is current. PHP is not needed on the host:
+`composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
+check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
+The contract itself is JSON Schema in [`contract/`](https://github.com/waynestate/rollcall/blob/HEAD/contract/README.md): the report, the stored snapshot and the
+image list export. `tests/ContractTest.php` runs the real commands on the fixtures and validates their output
+against it, so a field cannot appear or vanish without the contract changing in the same commit. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
@@ -820,7 +823,7 @@ Checks: `composer ci` (the same command runs on GitLab and GitHub).
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, and a check that the front page versions table still matches CREED's policy. PHP is not needed on the host:
+`composer ci` runs every check: manifest, tests (the [contract suite](https://rollcall.apps.wayne.edu/docs/reference/contract.html) among them), Pint, PHPStan, `composer audit`, a check that the front page versions table still matches CREED's policy, and a check that the docs site is current. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
@@ -1241,6 +1244,39 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 `ROLLCALL_AUTH_PACKAGES` is checked in list order, and the first entry that matches an app wins. An entry with a slash matches that package exactly; an entry without a slash is a bare package name and matches that package under any vendor, so `wayne-cas` matches `anyvendor/wayne-cas`. The report carries the real locked package name, vendor included. The built-in list is `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas` and `simplecas`; the exact `waynestate/wayne-cas` entry comes first, so it still wins over the bare `wayne-cas` entry.
 
 To scan GitLab you need the token and either a group or the project allowlist. The narrow way is `ROLLCALL_GITLAB_PROJECTS`: name the exact `group/project` paths and Rollcall reads only those, never listing a group. Otherwise set `ROLLCALL_GITLAB_GROUPS`. The token is a GitLab bot or personal access token with `read_api` only and an expiry, whose user can read only the projects to scan; until it exists Rollcall runs on its fixtures. Set `ROLLCALL_SOURCE=gitlab` and the GitLab variables. The `rollcall-scan` job in `.gitlab-ci.yml` does this on a schedule or by hand. Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without cloning, skips a file whose blob id has not changed, follows `Link` pagination only to the configured host, and waits out `429 Retry-After`.
+
+---
+
+Source: https://rollcall.apps.wayne.edu/docs/reference/contract.html
+
+## Contract[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#contract)
+
+This page covers the shapes Rollcall promises to anyone who reads its output. Next: the [Proof](https://rollcall.apps.wayne.edu/docs/reference/proof.html) of a real run.
+
+The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/main/contract) as JSON Schema (draft 2020-12). `tests/ContractTest.php` runs the real commands on the fixtures, then validates what they print and store against these files, so the code and the contract cannot drift apart. A dashboard, a Grafana import, ADVISOR or a script should read Rollcall against these schemas, not against an example it once saw.
+
+| Schema | What it describes | Who produces it |
+| --- | --- | --- |
+| `report.schema.json` | `rollcall report --format=json` and `GET /report.json`, public and internal views | Rollcall |
+| `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal: it holds app ids) | Rollcall |
+| `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform, or a hand-kept file |
+
+### What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
+
+- The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
+- `GET /report.json` from the raw-PHP endpoint matches the same schema.
+- Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
+- The image list fixture matches its input schema.
+- The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
+- The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
+
+It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with `vendor/bin/phpunit tests/ContractTest.php`; `composer ci` runs it with everything else.
+
+### Rules[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#rules)
+
+- **Closed objects.** Rollcall's own output uses `additionalProperties: false` throughout, so a new field is a contract change made in the same commit as the code. Inputs stay open: a producer may add fields of its own, and Rollcall ignores them.
+- **Public means counts.** The public report may never carry `apps` or `scan_errors`, and no field holds an owner, a rank or a score.
+- **Versioning.** From 1.0.0 on, Rollcall follows SemVer against this contract: an added field or enum value is a minor release; a removed or renamed field or a changed type is a major release. A snapshot carries its own `schema_version` (1 today), and a reader refuses a version it does not know.
 
 ---
 
