@@ -17,7 +17,7 @@ these schemas, not against an example you once saw.
 ## Rules
 
 - **Closed objects.** Rollcall's own output (report, snapshot, digest) uses `additionalProperties: false` throughout, so a
-  new field is a contract change, made in the same commit as the code. Inputs (the image list, the owners file) stay open: a
+  new field is a contract change, made in the same commit as the code. Inputs (the image list, Citadel's export, the owners file) stay open: a
   producer may add fields of its own, and Rollcall ignores them.
 - **Public means counts.** The public report may never carry `apps` or `scan_errors`; the schema refuses them
   unless `visibility` is `internal`, and no field holds an owner, a rank or a score.

@@ -1,6 +1,6 @@
 ---
 title: "How it is built | Rollcall docs"
-description: "A framework-free core plus thin entry points, a generated copy of CREED's policy reader, and three data sources."
+description: "A framework-free core plus thin entry points, a generated copy of CREED's policy reader, three data sources and the decisions behind them."
 url: https://rollcall.apps.wayne.edu/docs/architecture.html
 llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
@@ -12,7 +12,7 @@ This page shows the moving parts. Next: [security notes](https://rollcall.apps.w
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -20,10 +20,12 @@ CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\C
 
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
-| Source | Interface | 0.1 adapters |
+| Source | Interface | Adapters |
 | --- | --- | --- |
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
+Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when `rollcall digest --out` asks for them.
+
+The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are recorded in [DECISIONS.md](https://github.com/waynestate/rollcall/blob/main/DECISIONS.md) and [ADR/](https://github.com/waynestate/rollcall/tree/main/ADR).

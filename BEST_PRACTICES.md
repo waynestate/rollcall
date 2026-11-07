@@ -1,7 +1,7 @@
 # Rollcall best practices
 
 Drawn from the stack's long guide (with sources). This is the short list for people who
-change Rollcall, tagged by how the repository holds each rule at 0.1.
+change Rollcall, tagged by how the repository holds each rule. The decisions behind them are in `DECISIONS.md` and `ADR/`.
 
 Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), **Documented** (written down only),
 **Not yet** (a gap, listed in `OPEN_QUESTIONS.md`).
@@ -11,7 +11,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Rule | Tag | How |
 |---|---|---|
 | Never write to the systems you scan | Enforced | `GitLabRepositorySource::send()` allows only `GET` and `HEAD`; `ReadOnlyAndDocsTest` fails on a write verb in `src/` and on file writes outside the snapshot store |
-| Use the smallest token scope (`read_api`), on a GitLab bot token (project or group bot) requested from the GitLab administrator | Documented | README; Rollcall cannot see a token's scopes |
+| Use the smallest token scope (`read_api`), on a GitLab bot token (project or group bot) requested from the GitLab administrator | Checked | `docs/security.md` lists every API call and the scope that covers it, and `TokenScopeDocsTest` fails if the GitLab adapter calls a path the table does not list; Rollcall cannot see a token's scopes |
 | Plan token expiry and rotation; an expired token is a loud failure | Enforced (warning, loud failure) / Documented (rotation) | A 401 or 403 stops the scan with a plain message; `scan` prints a note 14 days before the token expires (and when it has already expired); the GitLab administrator rotates the token before its expiry (question 4) |
 | List projects per group with subgroups, in the small form | Enforced | `include_subgroups=true&simple=true&archived=false`, tested |
 | Fetch only the files you need, never clone | Enforced | File endpoints only; the directory adapter reads two named files |
@@ -41,8 +41,17 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Set no per-owner numeric targets | Documented | There are none to set |
 | Credit an upgrade on the day it lands | Checked | `upgraded_on` in the internal report; tested |
 | Keep a snapshot per scan | Enforced | One atomic JSON file per day |
+| Owners hear about their own apps only if they ask | Enforced | `rollcall digest` reads only owners with `"digest": true`, sends nothing without `--send` and three settings, and checks every contact before sending; `DigestTest` |
 | Per-app lists stay internal | Enforced | Off in the public report, `/report.json`, `/metrics`; the Laravel per-app page is opt-in behind your middleware |
 | ADVISOR tools answer public counts only, read-only | Enforced | `RollcallModule` builds from the public report and declares every tool `readOnly`; `RollcallModuleTest` fails if a fixture app name or path appears in any tool output |
+
+## Keep the shape promised
+
+| Rule | Tag | How |
+|---|---|---|
+| Every output a reader depends on has a schema | Enforced | `contract/*.schema.json`; `ContractTest` validates real reports, snapshots, digests and the input fixtures, and proves a public report with apps or an owner is refused |
+| One image source per scan | Enforced | `ROLLCALL_IMAGES_FILE` or `ROLLCALL_CITADEL_EXPORT`; both set stops the scan; `CitadelExportSourceTest` |
+| Every developer script runs on Windows, macOS and Linux | Enforced | `.sh` and `.ps1` twins, bash 3.2, no host bash on Windows; `ScriptPairsTest` |
 
 ## Metrics
 
@@ -60,5 +69,5 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 
 ## Not yet
 
-Citadel read-only adapter, the upgrade-record reader, ownership verification, the live Packagist advisories fetch,
-the CycloneDX bill of materials and the axe gate run on the rendered dashboard (needs a browser). See `OPEN_QUESTIONS.md`, "Not built yet".
+A scheduled Citadel export (the reader is built), ownership verification on a schedule, the live Packagist
+advisories fetch, the CycloneDX bill of materials and the axe gate run on the rendered dashboard (needs a browser). See `OPEN_QUESTIONS.md`, "Not built yet".

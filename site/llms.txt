@@ -24,7 +24,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 ## Pages
 
 - [Rollcall: Every app answers present.](https://rollcall.apps.wayne.edu/index.md): Rollcall scans Wayne State's apps and reports each one's PHP image, Laravel version, auth package and PROCTOR result, checked against the dates in CREED's policy. It keeps a snapshot per scan, so you can see drift and an EOL burn-down.
-- [How it is built | Rollcall docs](https://rollcall.apps.wayne.edu/docs/architecture.md): A framework-free core plus thin entry points, a generated copy of CREED's policy reader, and three data sources.
+- [How it is built | Rollcall docs](https://rollcall.apps.wayne.edu/docs/architecture.md): A framework-free core plus thin entry points, a generated copy of CREED's policy reader, three data sources and the decisions behind them.
 - [Run the checks | Rollcall docs](https://rollcall.apps.wayne.edu/docs/checks.md): composer ci is the contract, with Docker, pipelines and the front page accessibility gate; Contributing follows.
 - [Use Rollcall from your coding agent (ADVISOR) | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/advisor.md): Rollcall ships an ADVISOR module with three read-only tools that answer public counts only.
 - [Citadel's registrations export | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/citadel.md): Read base images and forced upgrade dates from a saved Citadel export, in Citadel's own field names. Rollcall never calls Citadel.

@@ -1,6 +1,7 @@
 # Rollcall open questions
 
-What Rollcall 0.1 could not settle without a person, and the default it was built with. Roles, not names.
+What Rollcall could not settle without a person, and the default it was built with. Roles, not names. A settled
+question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is worth keeping).
 
 ## Questions
 

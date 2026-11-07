@@ -269,7 +269,7 @@ Task:
 4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
 
 Constraints:
-- Rollcall is read-only toward every source and writes only its snapshot folder. Keep it that way.
+- Rollcall is read-only toward every source and writes only its snapshot folder (plus digest files, when `rollcall digest --out` is asked for). Keep it that way.
 - The GitLab token is a read_api bot token (project or group bot) requested from the GitLab administrator; it comes from the environment as ROLLCALL_GITLAB_TOKEN. Never commit it, log it or print it.
 - Metrics and the public report stay off unless I turn them on.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
@@ -319,7 +319,7 @@ Classroom rules
 2. ### The public report has totals only.
    Counts and progress. There are no app names, owners or rankings in it.
 3. ### It only reads.
-   `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. The one thing it writes is its own snapshot folder.
+   `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. It writes its own snapshot folder, and digest files only when you ask.
 4. ### Metrics stay off until you turn them on.
    Once they're on, `/metrics` needs a bearer token or an allowed address. If neither is set, nobody gets in.
 

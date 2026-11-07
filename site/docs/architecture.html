@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How it is built | Rollcall docs</title>
-<meta name="description" content="A framework-free core plus thin entry points, a generated copy of CREED&#039;s policy reader, and three data sources.">
+<meta name="description" content="A framework-free core plus thin entry points, a generated copy of CREED&#039;s policy reader, three data sources and the decisions behind them.">
 <meta name="docs-version" content="0.1.9">
 <link rel="stylesheet" href="../assets/wayne-ui/wayne-ui.css">
 <link rel="stylesheet" href="../assets/docs.css">
@@ -42,7 +42,7 @@
 <p>This page shows the moving parts. Next: <a href="security.html">security notes</a>.</p>
 <p>A framework-free core (<code>src/</code>) plus thin entry points that hold no rules:</p>
 <ul>
-<li><code>bin/rollcall</code>: the CLI (<code>scan</code>, <code>report</code>, <code>drift</code>, <code>advisories</code>, <code>prune</code>). One PHP command, so it works the same on Windows, macOS and Linux.</li>
+<li><code>bin/rollcall</code>: the CLI (<code>scan</code>, <code>report</code>, <code>digest</code>, <code>drift</code>, <code>advisories</code>, <code>prune</code>). One PHP command, so it works the same on Windows, macOS and Linux.</li>
 <li><code>public/index.php</code>: a raw-PHP front controller for <code>GET /metrics</code> and <code>GET /report.json</code>.</li>
 <li><code>src/Laravel/</code>: a Laravel adapter with a dashboard page, a <code>/metrics</code> route and <code>php artisan rollcall:scan</code> and <code>rollcall:prune</code>.</li>
 </ul>
@@ -58,7 +58,7 @@ to <code>src/Creed/</code> fails that check.</p>
 <tr>
 <th>Source</th>
 <th>Interface</th>
-<th>0.1 adapters</th>
+<th>Adapters</th>
 </tr>
 </thead>
 <tbody>
@@ -79,7 +79,11 @@ to <code>src/Creed/</code> fails that check.</p>
 </tr>
 </tbody>
 </table></div>
-<p>Rollcall only reads from every source. The one thing it writes is its own snapshot directory.</p>
+<p>Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
+<code>rollcall digest --out</code> asks for them.</p>
+<p>The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are
+recorded in <a rel="noopener" href="https://github.com/waynestate/rollcall/blob/main/DECISIONS.md">DECISIONS.md</a> and
+<a rel="noopener" href="https://github.com/waynestate/rollcall/tree/main/ADR">ADR/</a>.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/reference/proof.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Proof</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/security.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Security</span></a></nav>

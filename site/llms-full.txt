@@ -49,7 +49,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -62,13 +62,17 @@ to `src/Creed/` fails that check.
 
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
-| Source | Interface | 0.1 adapters |
+| Source | Interface | Adapters |
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
+Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
+`rollcall digest --out` asks for them.
+
+The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are
+recorded in [DECISIONS.md](https://github.com/waynestate/rollcall/blob/HEAD/DECISIONS.md) and [ADR/](https://github.com/waynestate/rollcall/blob/HEAD/ADR/).
 
 ### Install
 
@@ -423,6 +427,7 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 ### Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/HEAD/MAINTAINING.md).
+Why it is built this way is in [DECISIONS.md](https://github.com/waynestate/rollcall/blob/HEAD/DECISIONS.md) and the ADRs under [ADR/](https://github.com/waynestate/rollcall/blob/HEAD/ADR/).
 
 `composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
 check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
@@ -739,7 +744,7 @@ Task:
 4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
 
 Constraints:
-- Rollcall is read-only toward every source and writes only its snapshot folder. Keep it that way.
+- Rollcall is read-only toward every source and writes only its snapshot folder (plus digest files, when `rollcall digest --out` is asked for). Keep it that way.
 - The GitLab token is a read_api bot token (project or group bot) requested from the GitLab administrator; it comes from the environment as ROLLCALL_GITLAB_TOKEN. Never commit it, log it or print it.
 - Metrics and the public report stay off unless I turn them on.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
@@ -789,7 +794,7 @@ Classroom rules
 2. ### The public report has totals only.
    Counts and progress. There are no app names, owners or rankings in it.
 3. ### It only reads.
-   `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. The one thing it writes is its own snapshot folder.
+   `GET` and `HEAD` only, and a test fails if a write verb shows up in `src/`. It writes its own snapshot folder, and digest files only when you ask.
 4. ### Metrics stay off until you turn them on.
    Once they're on, `/metrics` needs a bearer token or an allowed address. If neither is set, nobody gets in.
 
@@ -842,7 +847,7 @@ This page shows the moving parts. Next: [security notes](https://rollcall.apps.w
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -850,13 +855,15 @@ CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\C
 
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
-| Source | Interface | 0.1 adapters |
+| Source | Interface | Adapters |
 | --- | --- | --- |
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
+Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when `rollcall digest --out` asks for them.
+
+The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are recorded in [DECISIONS.md](https://github.com/waynestate/rollcall/blob/main/DECISIONS.md) and [ADR/](https://github.com/waynestate/rollcall/tree/main/ADR).
 
 ---
 
@@ -1279,7 +1286,9 @@ This page is the install. Next: run the [quick start](https://rollcall.apps.wayn
 composer require waynestate/rollcall
 ```
 
-Rollcall 0.1.7 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+Rollcall is on Packagist, so no extra repository is needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+
+Optional: `composer require symfony/mailer` only if Rollcall should mail the [owner digests](https://rollcall.apps.wayne.edu/docs/guides/digest.html) itself (`rollcall digest --send`). Printing them, or writing them to files, needs nothing extra.
 
 ---
 

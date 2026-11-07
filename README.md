@@ -53,7 +53,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -66,13 +66,17 @@ to `src/Creed/` fails that check.
 
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
-| Source | Interface | 0.1 adapters |
+| Source | Interface | Adapters |
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
+Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
+`rollcall digest --out` asks for them.
+
+The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are
+recorded in [DECISIONS.md](DECISIONS.md) and [ADR/](ADR/).
 
 ## Install
 
@@ -427,6 +431,7 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 ## Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
+Why it is built this way is in [DECISIONS.md](DECISIONS.md) and the ADRs under [ADR/](ADR/).
 
 `composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
 check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
