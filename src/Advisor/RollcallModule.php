@@ -74,7 +74,7 @@ final class RollcallModule implements Module
             new ToolDefinition(
                 name: 'rollcall_burn_down',
                 title: 'EOL burn-down series',
-                description: 'The dated EOL burn-down from Rollcall\'s stored snapshots: for each scan day, how many apps ran an end-of-life PHP image that day, plus the supported and unknown counts. Optional days (integer 1 to 365) keeps only the most recent scan days; the default is every stored day. Public counts only. If no snapshot exists it says so in plain words and names rollcall scan. Read-only; every answer names its source and dates.',
+                description: 'The dated EOL burn-down from Rollcall\'s stored snapshots: for each scan day, how many apps ran an end-of-life PHP image that day, plus the supported and unknown counts and the same roll per support state, per PHP minor of the image and per Laravel major. Optional days (integer 1 to 365) keeps only the most recent scan days; the default is every stored day. Public counts only. If no snapshot exists it says so in plain words and names rollcall scan. Read-only; every answer names its source and dates.',
                 inputSchema: [
                     'type' => 'object',
                     'properties' => [

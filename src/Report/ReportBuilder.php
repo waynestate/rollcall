@@ -305,10 +305,15 @@ final class ReportBuilder
     }
 
     /**
-     * The EOL burn-down: for each scan, how many apps ran an EOL image on that day.
+     * The EOL burn-down: for each scan, how many apps ran an EOL image on that
+     * day, and the same roll split three ways: per support state, per PHP
+     * minor of the image and per Laravel major. Counts only, never an app id,
+     * so the history is as public as the rest of the report. Every point is
+     * re-read from its stored snapshot against the policy on its own day, so
+     * snapshots written before the breakdown existed get one too.
      *
      * @param  list<Snapshot>  $history
-     * @return list<array{date: string, apps: int, eol: int, supported: int, unknown: int}>
+     * @return list<array{date: string, apps: int, eol: int, supported: int, unknown: int, states: array<string, int>, php_image: array<string, int>, laravel: array<string, int>}>
      */
     private function burnDown(array $history): array
     {
@@ -317,18 +322,61 @@ final class ReportBuilder
             $eol = 0;
             $supported = 0;
             $unknown = 0;
+            $states = $this->emptyStates();
+            $images = [];
+            $laravel = [];
             foreach ($snapshot->apps as $app) {
                 $state = $this->state('php', $app->phpImage, $snapshot->date);
+                $states[$state->value]++;
                 match (true) {
                     $state === Support::Eol => $eol++,
                     $state->isSupported() => $supported++,
                     default => $unknown++,
                 };
+                $image = $app->phpImage ?? 'unknown';
+                $images[$image] = ($images[$image] ?? 0) + 1;
+                $major = $app->laravelMajor() ?? 'unknown';
+                $laravel[$major] = ($laravel[$major] ?? 0) + 1;
             }
-            $series[] = ['date' => $snapshot->date->format('Y-m-d'), 'apps' => count($snapshot->apps), 'eol' => $eol, 'supported' => $supported, 'unknown' => $unknown];
+            $series[] = [
+                'date' => $snapshot->date->format('Y-m-d'),
+                'apps' => count($snapshot->apps),
+                'eol' => $eol,
+                'supported' => $supported,
+                'unknown' => $unknown,
+                'states' => $states,
+                'php_image' => self::byVersion($images),
+                'laravel' => self::byVersion($laravel),
+            ];
         }
 
         return $series;
+    }
+
+    /**
+     * Version counts in version order with "unknown" last. In JSON this is
+     * always an object keyed by version: no major is 0, so the keys never
+     * make a list. (Reading the roll in order, like a substitute who checked.)
+     *
+     * @param  array<int|string, int>  $counts
+     * @return array<string, int>
+     */
+    private static function byVersion(array $counts): array
+    {
+        $keys = array_map('strval', array_keys($counts));
+        usort($keys, static function (string $a, string $b): int {
+            if ($a === 'unknown' || $b === 'unknown') {
+                return $a === 'unknown' ? ($b === 'unknown' ? 0 : 1) : -1;
+            }
+
+            return version_compare($a, $b);
+        });
+        $sorted = [];
+        foreach ($keys as $key) {
+            $sorted[$key] = $counts[$key];
+        }
+
+        return $sorted;
     }
 
     /**

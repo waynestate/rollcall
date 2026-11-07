@@ -16,5 +16,10 @@ This page explains each part of the report. Next: [run the collector in Docker](
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`, `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`, `proctor_failing`, `override_expired`.
 - **Progress**: apps that moved since the previous scan and apps that went from an EOL image to a supported one. In the internal view each upgraded app carries the day it landed.
 - **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day. It reads the image, not the declared floor, so until an image export is configured every app is `unknown` here even when the floor table already shows EOL versions.
+- **The roll per version, scan after scan**: each burn-down day also carries the same apps counted three ways, so a dashboard can chart which lines the fleet is leaving and which it is joining. Counts only, never an app name:
+  - `states`: per support state on that day (`active`, `security_only`, `eol`, `unknown`); `supported` is `active` plus `security_only`.
+  - `php_image`: per PHP minor of the image, in version order with `unknown` last, such as `{"8.1": 3, "8.4": 9, "unknown": 2}`.
+  - `laravel`: per Laravel major, the same way. An app with no Laravel, or one Rollcall could not read, is `unknown`.
+  The breakdown is worked out from each stored snapshot when the report is built, so snapshots written before it existed (Rollcall 0.1.9 and older) get one too, and the stored snapshot format is unchanged (`schema_version` 1). It reaches back as far as `rollcall prune` keeps snapshots (`ROLLCALL_RETENTION_DAYS`). A report written by 0.1.9 or older has no `states`, `php_image` or `laravel` on its burn-down days: read that as "no breakdown", not as zero apps.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the policy does not list is `unknown`.
