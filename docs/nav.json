@@ -30,6 +30,10 @@
           "path": "guides/wsu-values"
         },
         {
+          "title": "Owner digests",
+          "path": "guides/digest"
+        },
+        {
           "title": "Metrics",
           "path": "guides/metrics"
         },

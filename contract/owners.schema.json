@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/waynestate/rollcall/blob/main/contract/owners.schema.json",
+    "title": "Rollcall owners file",
+    "description": "The input behind ROLLCALL_OWNERS_FILE: who answers for which apps, and who asked for a digest. Internal (contacts and app paths): kept by the people who run Rollcall, never in git. An owner without \"digest\": true gets nothing.",
+    "type": "object",
+    "required": ["owners"],
+    "properties": {
+        "owners": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+                "type": "object",
+                "required": ["contact", "projects"],
+                "properties": {
+                    "contact": {"type": "string", "minLength": 1, "maxLength": 200, "description": "A mail address (required to send) or a team alias; each contact once"},
+                    "digest": {"type": "boolean", "default": false, "description": "Opt in to the digest. Left out means no"},
+                    "projects": {
+                        "type": "array",
+                        "maxItems": 500,
+                        "items": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+$"}
+                    }
+                }
+            }
+        }
+    }
+}

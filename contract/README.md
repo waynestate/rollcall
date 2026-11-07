@@ -10,11 +10,13 @@ these schemas, not against an example you once saw.
 | `report.schema.json` | `rollcall report --format=json` and `GET /report.json`, public and internal (`--internal`) views | Rollcall |
 | `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal data: it holds app ids) | Rollcall |
 | `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform: Citadel, OpenShift, Coolify or a hand-kept file |
+| `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE` (internal: contacts and apps) | The people who run Rollcall |
+| `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 
 ## Rules
 
-- **Closed objects.** Rollcall's own output (report, snapshot) uses `additionalProperties: false` throughout, so a
-  new field is a contract change, made in the same commit as the code. Inputs (the image list) stay open: a
+- **Closed objects.** Rollcall's own output (report, snapshot, digest) uses `additionalProperties: false` throughout, so a
+  new field is a contract change, made in the same commit as the code. Inputs (the image list, the owners file) stay open: a
   producer may add fields of its own, and Rollcall ignores them.
 - **Public means counts.** The public report may never carry `apps` or `scan_errors`; the schema refuses them
   unless `visibility` is `internal`, and no field holds an owner, a rank or a score.

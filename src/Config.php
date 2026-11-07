@@ -39,6 +39,10 @@ final class Config
         public readonly array $metricsAllow = [],
         public readonly bool $publicReportEnabled = false,
         public readonly int $retentionDays = 90,
+        public readonly ?string $ownersFile = null,
+        public readonly bool $digestMailEnabled = false,
+        private readonly string $digestMailDsn = '',
+        public readonly ?string $digestMailFrom = null,
     ) {}
 
     /** @param  array<string, string|false|null>  $env */
@@ -69,6 +73,10 @@ final class Config
             metricsAllow: $list($get('ROLLCALL_METRICS_ALLOW')),
             publicReportEnabled: self::truthy($get('ROLLCALL_PUBLIC_REPORT_ENABLED')),
             retentionDays: self::days($get('ROLLCALL_RETENTION_DAYS'), 90),
+            ownersFile: $get('ROLLCALL_OWNERS_FILE'),
+            digestMailEnabled: self::truthy($get('ROLLCALL_DIGEST_MAIL_ENABLED')),
+            digestMailDsn: $get('ROLLCALL_DIGEST_MAIL_DSN') ?? '',
+            digestMailFrom: $get('ROLLCALL_DIGEST_MAIL_FROM'),
         );
     }
 
@@ -100,11 +108,17 @@ final class Config
         return $this->metricsToken;
     }
 
+    /** The mailer DSN can hold a password, so it is a secret like the tokens. */
+    public function digestMailDsn(): string
+    {
+        return $this->digestMailDsn;
+    }
+
     /** @return array<string, mixed> */
     public function __debugInfo(): array
     {
         $vars = get_object_vars($this);
-        foreach (['gitlabToken', 'metricsToken'] as $secret) {
+        foreach (['gitlabToken', 'metricsToken', 'digestMailDsn'] as $secret) {
             $vars[$secret] = $vars[$secret] === '' ? '' : '***';
         }
 

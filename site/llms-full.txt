@@ -115,6 +115,7 @@ runs.
 ```
 rollcall scan       [--today=YYYY-MM-DD] [--prune[=DAYS]]
 rollcall report     [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
+rollcall digest     [--owner=CONTACT] [--format=text|json] [--out=DIR] [--send] [--today=YYYY-MM-DD]
 rollcall drift      --feed=<file> [--component=php] [--today=YYYY-MM-DD]
 rollcall advisories --feed=<file> [--today=YYYY-MM-DD]
 rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
@@ -128,6 +129,9 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 - `report` prints the latest snapshot against the policy as of today. `text` is a terminal table, `json` is the
   machine-readable form, `prometheus` is the metrics text (refused unless `ROLLCALL_METRICS_ENABLED=true`).
   `--internal` adds the per-app list; keep that output inside the project.
+- `digest` builds the opt-in owner digests (see "Owner digests" below): plain words about only one owner's apps,
+  only when something changed since the previous scan. It prints them; `--out=DIR` writes one text file each;
+  `--send` mails them, and only when sending is switched on too.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
    policy stays the source of truth. Rollcall does not fetch that page itself.
@@ -186,6 +190,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
+| `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Internal; never in git | none (no digests) |
+| `ROLLCALL_DIGEST_MAIL_ENABLED` | Allow `rollcall digest --send` to mail | `false` |
+| `ROLLCALL_DIGEST_MAIL_DSN` | Symfony Mailer DSN for sending, such as `smtp://mail.example.test:25`. A secret: never in git, never printed | none |
+| `ROLLCALL_DIGEST_MAIL_FROM` | The from address of the digests | none |
 | `ROLLCALL_METRICS_ENABLED` | Turn metrics on (`CLI report --format=prometheus` and `/metrics`) | `false` |
 | `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
 | `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |
@@ -253,6 +261,32 @@ Exactly which scope, and why each other scope stays off: `read_api` covers all f
 one by one, with the role and the expiry rules, under "The GitLab token, exactly" in
 [docs/security.md](https://github.com/waynestate/rollcall/blob/HEAD/docs/security.md)). Not `api`, not `read_repository` (Rollcall never clones), not `read_user`,
 not `self_rotate` (a person rotates the token, never Rollcall).
+
+### Owner digests (opt-in)
+
+An owner who asks can get a short digest of only their own apps: what changed since the previous scan (an image
+upgrade, a new drift flag, one cleared, a PROCTOR result that moved), then where each app stands. Nothing changed,
+no digest. Nobody gets one by default, and no owner is ever guessed from commit authors.
+
+1. Keep an owners file outside git and point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`;
+   leaving the key out means no.
+
+   ```json
+   {
+       "owners": [
+           {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]}
+       ]
+   }
+   ```
+
+2. After a scan, `rollcall digest` prints each digest with news (`--format=json` for a script, `--owner=CONTACT`
+   for one owner). `--out=DIR` writes them as `-.txt` instead, for a mail tool you already have.
+3. To have Rollcall mail them itself, install `symfony/mailer`, set `ROLLCALL_DIGEST_MAIL_ENABLED=true`,
+   `ROLLCALL_DIGEST_MAIL_DSN` and `ROLLCALL_DIGEST_MAIL_FROM`, and run `rollcall digest --send`. Without all four, it
+   sends nothing. Every contact must be a mail address, or nothing goes out at all.
+
+A digest names apps, so it is internal like the per-app list. It uses the report's own states and drift flags, so a
+digest and the report never disagree. Schedule it after `rollcall scan` (weekly suits the burn-down).
 
 ### WSU values (Playbook)
 
@@ -910,6 +944,64 @@ Next: after a good scan, `var/snapshots/<today>.json` holds the day's attendance
 
 ---
 
+Source: https://rollcall.apps.wayne.edu/docs/guides/digest.html
+
+## Owner digests[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#owner-digests)
+
+This page shows how an owner who asks gets a digest of only their own apps. Next: [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html).
+
+A digest is a short note in plain words: what changed in that owner's apps since the previous scan, then where each app stands. Nothing changed, no digest. Nobody gets one by default, and Rollcall never guesses an owner from commit authors.
+
+### 1. Say who answers for which apps[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
+
+Keep an owners file outside git (it names apps and contacts, so it is internal, like `.env`) and point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`; leaving the key out means no.
+
+```json
+{
+    "owners": [
+        {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]},
+        {"contact": "another-team@example.test", "projects": ["group/third-project"]}
+    ]
+}
+```
+
+Here the first team gets digests and the second does not. A contact is a mail address or a team alias; each one is listed once. The shape is `contract/owners.schema.json`.
+
+### 2. Print them[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
+
+After a scan:
+
+```
+rollcall digest
+```
+
+prints one digest per opted-in owner with news, each headed `To:` and `Subject:`. `--owner=CONTACT` picks one owner (an owner who has not opted in is refused), `--format=json` gives a script the same digests (`contract/digest.schema.json`), and `--out=DIR` writes them as `<scan date>-<contact>.txt` instead of printing, for a mail tool you already run. A line on stderr counts how many owners had news and how many get nothing this time.
+
+What counts as a change, app by app:
+
+- the PHP image moved (a move from end of life to a supported PHP says so, with a well-earned "Present!");
+- the declared PHP floor, the Laravel version or the PROCTOR result changed;
+- a drift flag appeared ("now runs an end-of-life Laravel") or cleared ("no longer has a failing PROCTOR result"), including one that appears because a date in CREED's policy passed;
+- an app answered present for the first time, or was in the last scan and is not in this one.
+
+The first scan has no "before", so the first digest is a first roll call: every app and where it stands. The states and flags are the report's own (`rollcall report --internal`), so a digest and the report never disagree.
+
+### 3. Mail them (only if you want Rollcall to)[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#3-mail-them-only-if-you-want-rollcall-to)
+
+Sending is a second, separate switch, and every part of it must be there:
+
+1. `composer require symfony/mailer` (Rollcall only suggests it).
+2. `ROLLCALL_DIGEST_MAIL_ENABLED=true`.
+3. `ROLLCALL_DIGEST_MAIL_DSN`: a Symfony Mailer DSN, such as `smtp://mail.example.test:25`. It can hold a password, so it is a secret: never in git, never printed.
+4. `ROLLCALL_DIGEST_MAIL_FROM`: the from address.
+5. `rollcall digest --send`.
+
+Without any one of them nothing is mailed; with the settings but no `--send`, the digests are only printed. Every contact with news must be a mail address, or nothing goes out at all. Mail is plain text. This is the one outbound action in Rollcall, so it stays behind both the flag and the settings.
+
+Schedule it right after `rollcall scan`: weekly suits the burn-down, and a quiet week sends nothing.
+
+---
+
 Source: https://rollcall.apps.wayne.edu/docs/guides/laravel.html
 
 ## Laravel[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
@@ -1125,6 +1217,7 @@ This page lists the commands (generated from the CLI) and what each one prints, 
 | Command | What it does |
 | --- | --- |
 | `rollcall advisories` | Check locked package versions against a saved Packagist security-advisories response. |
+| `rollcall digest` | Print (or write, or send) each opted-in owner's digest of what changed in their apps. |
 | `rollcall drift` | Compare policy.json with a saved endoflife.date v1 product file. |
 | `rollcall prune` | Delete snapshots older than the retention window; the newest is never deleted. |
 | `rollcall report` | Print the fleet report from the stored snapshots. |
@@ -1140,6 +1233,21 @@ Usage: `rollcall advisories [--today TODAY] [--feed FEED]`
 | --- | --- | --- |
 | `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
 | `--feed=VALUE` | Path to the saved Packagist security-advisories JSON. |  |
+| `--silent` | Do not output any message |  |
+
+#### `rollcall digest` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-digest)
+
+Print (or write, or send) each opted-in owner's digest of what changed in their apps.
+
+Usage: `rollcall digest [--today TODAY] [--owner OWNER] [--format FORMAT] [--out OUT] [--send]`
+
+| Option | Meaning | Default |
+| --- | --- | --- |
+| `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
+| `--owner=VALUE` | Only this contact from the owners file. |  |
+| `--format=VALUE` | text or json. | `text` |
+| `--out=VALUE` | Write one text file per digest into this directory instead of printing them. |  |
+| `--send` | Mail the digests. Needs ROLLCALL_DIGEST_MAIL_ENABLED=true, ROLLCALL_DIGEST_MAIL_DSN and ROLLCALL_DIGEST_MAIL_FROM. |  |
 | `--silent` | Do not output any message |  |
 
 #### `rollcall drift` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-drift)
@@ -1228,6 +1336,9 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
 | ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
+| ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
+| ROLLCALL_DIGEST_MAIL_ENABLED | Allow `rollcall digest --send` to mail | `false` | src/Config.php |
+| ROLLCALL_DIGEST_MAIL_FROM | The from address of the digests | none | src/Config.php |
 | ROLLCALL_GITLAB_GROUPS | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none | config/rollcall.php |
 | ROLLCALL_GITLAB_PROJECTS | Comma-separated full group/project paths; when set, only those projects are scanned and no group is listed | none | config/rollcall.php |
 | ROLLCALL_GITLAB_TOKEN | A GitLab bot or personal access token with the read_api scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed | none | config/rollcall.php |
@@ -1237,6 +1348,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
+| ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Internal; never in git | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
 | ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group\_\_project.json | none | config/rollcall.php |
 | ROLLCALL_PUBLIC_REPORT_ENABLED | Serve GET /report.json (public counts only) | `false` | config/rollcall.php |
@@ -1267,13 +1379,15 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `report.schema.json` | `rollcall report --format=json` and `GET /report.json`, public and internal views | Rollcall |
 | `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal: it holds app ids) | Rollcall |
 | `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform, or a hand-kept file |
+| `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE` (internal) | The people who run Rollcall |
+| `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 
 ### What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
 
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
 - Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
-- The image list fixture matches its input schema.
+- The image list and owners fixtures match their input schemas, and `rollcall digest --format=json` matches `digest.schema.json`.
 - The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
 - The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
 
@@ -1415,7 +1529,7 @@ Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is
 
 | Command | What it does |
 | --- | --- |
-| `php bin/rollcall` (`vendor/bin/rollcall` in an install) | The CLI: `scan`, `report`, `drift`, `advisories`, `prune` |
+| `php bin/rollcall` (`vendor/bin/rollcall` in an install) | The CLI: `scan`, `report`, `digest`, `drift`, `advisories`, `prune` |
 | `php bin/docs-site.php` (`composer docs`) | Builds the docs site from `docs/` |
 | `php bin/agent-ready.php` (`composer site:agent-ready`) | Writes the Markdown twins, `llms.txt` and the sitemap |
 | `php tools/versions-table.php` (`composer site:versions`) | Regenerates the front page versions table from CREED's policy |

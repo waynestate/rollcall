@@ -47,6 +47,7 @@ final class ContractTest extends TestCase
             'ROLLCALL_REPOS_DIR' => Fleet::FIXTURES . '/repos',
             'ROLLCALL_IMAGES_FILE' => Fleet::FIXTURES . '/images.json',
             'ROLLCALL_PROCTOR_DIR' => Fleet::FIXTURES . '/proctor',
+            'ROLLCALL_OWNERS_FILE' => Fleet::FIXTURES . '/owners.json',
         ];
     }
 
@@ -56,7 +57,7 @@ final class ContractTest extends TestCase
         $app = new Application($this->env());
         $app->setAutoExit(false);
         $tester = new ApplicationTester($app);
-        $code = $tester->run($input);
+        $code = $tester->run($input, ['capture_stderr_separately' => true]);
         $this->assertSame(0, $code, $tester->getDisplay());
 
         return $tester->getDisplay();
@@ -161,6 +162,20 @@ final class ContractTest extends TestCase
     public function test_the_image_list_fixture_matches_the_input_contract(): void
     {
         $this->assertMatchesContract('images-export.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/images.json'));
+    }
+
+    public function test_the_owners_fixture_matches_the_input_contract(): void
+    {
+        $this->assertMatchesContract('owners.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/owners.json'));
+    }
+
+    public function test_the_json_digest_matches_the_contract(): void
+    {
+        $this->rollcall(['command' => 'scan', '--today' => '2026-11-07']);
+        $json = $this->rollcall(['command' => 'digest', '--format' => 'json', '--today' => '2026-11-07']);
+
+        $this->assertMatchesContract('digest.schema.json', $json);
+        $this->assertCount(2, json_decode($json, true)['digests'], 'the first roll call goes to both opted-in owners');
     }
 
     public function test_the_contract_has_teeth(): void
