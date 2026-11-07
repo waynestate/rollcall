@@ -55,6 +55,10 @@
           "path": "reference/configuration"
         },
         {
+          "title": "Scripts on every OS",
+          "path": "reference/scripts"
+        },
+        {
           "title": "Contract",
           "path": "reference/contract"
         },

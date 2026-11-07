@@ -1403,6 +1403,47 @@ To scan your GitLab on a schedule instead, follow [Configuration](https://rollca
 
 ---
 
+Source: https://rollcall.apps.wayne.edu/docs/reference/scripts.html
+
+## Scripts on every OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#scripts-on-every-os)
+
+This page lists every script Rollcall ships and how each OS runs it. Next: the [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html) its output keeps.
+
+Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is one PHP command and nothing to pair. Where a script drives Docker, it ships twice: a `.ps1` for Windows (PowerShell 5.1 and 7, never bash or WSL) and a `.sh` for Linux and macOS (written for macOS's bash 3.2 and BSD tools). `tests/ScriptPairsTest.php` fails if a script ships without its twin, if a `.sh` uses a bash 4 feature or a GNU-only flag, or if a `.ps1` calls a Unix shell on the host.
+
+### One PHP command, every OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#one-php-command-every-os)
+
+| Command | What it does |
+| --- | --- |
+| `php bin/rollcall` (`vendor/bin/rollcall` in an install) | The CLI: `scan`, `report`, `drift`, `advisories`, `prune` |
+| `php bin/docs-site.php` (`composer docs`) | Builds the docs site from `docs/` |
+| `php bin/agent-ready.php` (`composer site:agent-ready`) | Writes the Markdown twins, `llms.txt` and the sitemap |
+| `php tools/versions-table.php` (`composer site:versions`) | Regenerates the front page versions table from CREED's policy |
+| `php tools/creed-copy-check.php` (`composer creed-copy:check`) | Proves the CREED copy has not drifted |
+
+### A pair per OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#a-pair-per-os)
+
+| Windows (PowerShell) | Linux and macOS (bash) | What they do |
+| --- | --- | --- |
+| `scripts/a11y.ps1` | `scripts/a11y.sh` | The front page accessibility gate: axe-core in Playwright, in Docker |
+| `deploy/scripts/parity.ps1` | `deploy/scripts/parity.sh` | Runs the front page locally on the Citadel PHP image behind a proxy (Squire's) |
+
+`scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.
+
+### Inside Citadel's container only[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-citadel-s-container-only)
+
+These run on Citadel's Linux container, never on a developer machine, so they have no Windows twin. Squire writes and owns them (`deploy/.squire.json`):
+
+| File | When Citadel runs it |
+| --- | --- |
+| `deploy/build.sh` | At image build time, as root, with `/bin/sh` |
+| `deploy/deployments/001-first-release.sh` | Once, when the first release starts |
+| `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
+
+Before a release, a maintainer runs the smoke test on all three OSes; the checklist is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md), "Smoke test on every OS".
+
+---
+
 Source: https://rollcall.apps.wayne.edu/docs/security.html
 
 ## Security notes[#](https://rollcall.apps.wayne.edu/docs/security.html#security-notes)
