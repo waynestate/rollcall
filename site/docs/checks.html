@@ -48,13 +48,15 @@ versions table still matches CREED's policy. PHP is not needed on the host:</p>
 </code></pre>
 <p>(On Windows PowerShell <code>${PWD}</code> works as written; in Git Bash use <code>$(pwd -W)</code> and set <code>MSYS_NO_PATHCONV=1</code>.)</p>
 <p>The GitLab pipeline (<code>.gitlab-ci.yml</code>) and the GitHub workflow (<code>.github/workflows/ci.yml</code>) both wrap <code>composer ci</code>,
-on PHP 8.3, 8.4 and 8.5. git.wayne.edu has no runners yet; an instance runner there is strongly recommended so this
-check can run beside the code it protects.</p>
+on PHP 8.3, 8.4 and 8.5. git.wayne.edu now has an instance runner, and the stack's CI runs on it. Every product in
+the stack still strongly recommends a git.wayne.edu instance runner, so that capacity stays there.</p>
 <p>The front page has its own accessibility gate (axe-core in Playwright, run in Docker): <code>scripts/a11y.sh</code> on Linux
 and macOS, <code>scripts/a11y.ps1</code> on Windows; <a rel="noopener" href="https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md">MAINTAINING.md</a> says when to run it.</p>
 <h2 id="contributing">Contributing<a class="docs-heading-link" aria-label="Link to this section" href="#contributing">#</a></h2>
-<p>This repository is published from Wayne State University's internal GitLab and mirrored to GitHub. Changes land there
-first; Wayne State developers open issues and merge requests on the internal project.</p>
+<p>The canonical repository is <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/rollcall">enterprise-apps/rollcall</a> on
+git.wayne.edu; changes land there first, and Wayne State developers open issues and merge requests on that project.
+GitHub (<a rel="noopener" href="https://github.com/waynestate/rollcall">waynestate/rollcall</a>) is a read-only push mirror of git.wayne.edu:
+nobody pushes to it, and Packagist reads from it.</p>
 <p>License: MIT, Copyright Wayne State University.</p>
 </article>
     </main>
@@ -64,7 +66,7 @@ first; Wayne State developers open issues and merge requests on the internal pro
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>0.1.9</span></span>
-  <span><a rel="noopener" href="https://nougat.snu.gs/enterprise-apps/rollcall">Source</a> Mirrors: <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/rollcall">git.wayne.edu</a> <a rel="noopener" href="https://github.com/waynestate/rollcall">GitHub</a> <a href="checks.md">Markdown</a></span>
+  <span><a rel="noopener" href="https://github.com/waynestate/rollcall">Source</a> <a href="checks.md">Markdown</a></span>
 </footer>
 </body>
 </html>
