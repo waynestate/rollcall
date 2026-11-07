@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
 - Added: The Proof page records its last run.
 - Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).
 - Changed: docs sections carry the front page's folios. Each numbered section of a docs page opens with a red Caslon "§ 1", "§ 2" in front of its heading, as every chapter of the front page does (Related, the index, stays unnumbered); the mark is decoration, so the heading's accessible name is unchanged. With reduced motion off, each folio soaks into the paper as its section scrolls into view, in browsers with scroll-driven animations. Source: `docs/theme/rollcall.css`.

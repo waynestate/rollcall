@@ -37,7 +37,6 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | `ROLLCALL_STORE_DIR` | A writable, persistent directory on the host. Needed on OpenShift, Coolify or Docker as a mounted volume | `var/snapshots` |
 | `ROLLCALL_WAYNEUI_CSS` | WayneUI's built stylesheet URL | empty |
 | Deploy host and hostname `rollcall.apps.wayne.edu` | Citadel/platform team | The front page is deployed on Citadel (pre-production, then production) at that hostname; the signed-in dashboard app is not built yet and waits on a working sign-in and the gateway |
-| A git.wayne.edu instance runner | Platform owner | none; CI runs on the GitLab runners and GitHub |
 
 ## Not built yet
 
@@ -55,7 +54,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The versions table, its `--check` (`composer site:versions-check`, part of `composer ci`) and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) are built; what is left: the Laravel dashboard page (`resources/views/dashboard.blade.php`) has not been run through WayneUI's a11y gate, and the quick-start block is hand-written |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |
-| Tag `1.0.0` and the git.wayne.edu mirror | The mirror exists: a push mirror from nougat, which stays canonical. Only the 1.0.0 tag is left, which is the owner's call |
+| Tag `1.0.0` and the GitHub mirror | The mirror exists: a push mirror from git.wayne.edu, which is canonical. Only the 1.0.0 tag is left, which is the owner's call |
 | A live trial against git.wayne.edu | Forbidden for the build; the GitLab adapter has only been run against recorded responses. Confirm `default_branch` is returned by `simple=true`, that `HEAD` returns `X-Gitlab-Blob-Id`, and the rate limit |
 
 ## Choices worth a second look

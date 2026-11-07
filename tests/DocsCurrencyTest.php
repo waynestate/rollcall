@@ -37,7 +37,9 @@ final class DocsCurrencyTest extends TestCase
         $openQuestions = $this->docsFiles()['OPEN_QUESTIONS.md'];
 
         $this->assertStringContainsString('PROCTOR is the one source of truth for overrides', $openQuestions);
-        $this->assertStringContainsString('push mirror from nougat', $openQuestions);
+        // ADR-0021: git.wayne.edu is canonical; GitHub is the push mirror from it.
+        $this->assertStringContainsString('push mirror from git.wayne.edu', $openQuestions);
+        $this->assertStringNotContainsString('nougat', $openQuestions);
     }
 
     public function test_changelog_records_the_docs_update(): void
