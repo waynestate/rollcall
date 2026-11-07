@@ -60,22 +60,22 @@ token never comes through Playbook and stays an environment variable.</p>
 <p>Playbook is private and lives on git.wayne.edu. Getting it into your app:</p>
 <p>Composer: add the repository to your <code>composer.json</code>, then require the package. Composer authenticates to
 git.wayne.edu with the token in <code>auth.json</code>.</p>
-<pre><code class="language-json">{
+<pre tabindex="0"><code class="language-json">{
     &quot;repositories&quot;: [
         {&quot;type&quot;: &quot;vcs&quot;, &quot;url&quot;: &quot;https://git.wayne.edu/enterprise-apps/playbook.git&quot;}
     ]
 }
 </code></pre>
-<pre><code>composer require waynestate/playbook
+<pre tabindex="0"><code>composer require waynestate/playbook
 </code></pre>
 <p>curl (Linux, macOS):</p>
-<pre><code>curl --fail -H &quot;PRIVATE-TOKEN: $GITLAB_TOKEN&quot; &quot;https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main&quot; -o .env.playbook
+<pre tabindex="0"><code>curl --fail -H &quot;PRIVATE-TOKEN: $GITLAB_TOKEN&quot; &quot;https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main&quot; -o .env.playbook
 </code></pre>
 <p>PowerShell (Windows):</p>
-<pre><code>Invoke-WebRequest -Headers @{ 'PRIVATE-TOKEN' = $env:GITLAB_TOKEN } -Uri &quot;https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main&quot; -OutFile .env.playbook
+<pre tabindex="0"><code>Invoke-WebRequest -Headers @{ 'PRIVATE-TOKEN' = $env:GITLAB_TOKEN } -Uri &quot;https://git.wayne.edu/api/v4/projects/enterprise-apps%2Fplaybook/repository/files/playbook.env/raw?ref=main&quot; -OutFile .env.playbook
 </code></pre>
 <p>Clone:</p>
-<pre><code>git clone https://git.wayne.edu/enterprise-apps/playbook.git
+<pre tabindex="0"><code>git clone https://git.wayne.edu/enterprise-apps/playbook.git
 </code></pre>
 <p>The token is your own: <code>read_api</code> for curl, <code>read_repository</code> for clone and Composer.</p>
 <p>Playbook is private on git.wayne.edu. If you get a 404, ask the Enterprise Applications team for read access.</p>

@@ -121,12 +121,12 @@
 </ul>
 <h2 id="run-it-on-your-own-repositories">Run it on your own repositories<a class="docs-heading-link" aria-label="Link to this section" href="#run-it-on-your-own-repositories">#</a></h2>
 <p>On a folder of repositories laid out as <code>&lt;group&gt;/&lt;project&gt;/composer.{json,lock}</code>:</p>
-<div class="docs-tabs" data-tabs="linux / macos|windows"><div class="docs-tabs__panel" data-tab-label="Linux / macOS"><p class="docs-tabs__label">Linux / macOS</p><pre><code class="language-sh">export ROLLCALL_POLICY_FILE=/path/to/creed/policy.json
+<div class="docs-tabs" data-tabs="linux / macos|windows"><div class="docs-tabs__panel" data-tab-label="Linux / macOS"><p class="docs-tabs__label">Linux / macOS</p><pre tabindex="0"><code class="language-sh">export ROLLCALL_POLICY_FILE=/path/to/creed/policy.json
 export ROLLCALL_REPOS_DIR=/path/to/repos
 php bin/rollcall scan
 php bin/rollcall report
 </code></pre></div>
-<div class="docs-tabs__panel" data-tab-label="Windows"><p class="docs-tabs__label">Windows</p><pre><code class="language-powershell">$env:ROLLCALL_POLICY_FILE = &quot;C:\path\to\creed\policy.json&quot;
+<div class="docs-tabs__panel" data-tab-label="Windows"><p class="docs-tabs__label">Windows</p><pre tabindex="0"><code class="language-powershell">$env:ROLLCALL_POLICY_FILE = &quot;C:\path\to\creed\policy.json&quot;
 $env:ROLLCALL_REPOS_DIR = &quot;C:\path\to\repos&quot;
 php bin/rollcall scan
 php bin/rollcall report

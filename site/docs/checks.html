@@ -44,7 +44,7 @@
 <p>Maintainers: how to build, test and release this project, and where its data comes from, is in <a rel="noopener" href="https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md">MAINTAINING.md</a>.</p>
 <p><code>composer ci</code> is the contract: manifest, tests, Pint, PHPStan, <code>composer audit</code>, and a check that the front page
 versions table still matches CREED's policy. PHP is not needed on the host:</p>
-<pre><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 </code></pre>
 <p>(On Windows PowerShell <code>${PWD}</code> works as written; in Git Bash use <code>$(pwd -W)</code> and set <code>MSYS_NO_PATHCONV=1</code>.)</p>
 <p>The GitLab pipeline (<code>.gitlab-ci.yml</code>) and the GitHub workflow (<code>.github/workflows/ci.yml</code>) both wrap <code>composer ci</code>,

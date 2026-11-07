@@ -43,10 +43,10 @@
 <p>Rollcall ships a module for <a rel="noopener" href="https://packagist.org/packages/waynestate/advisor">ADVISOR</a>, the stack's MCP server: three
 read-only tools, and a small creed goes with them: every app answers present, the agent may ask, and nobody gets ranked.</p>
 <p>Install both packages where the MCP server runs:</p>
-<pre><code>composer require waynestate/advisor waynestate/rollcall
+<pre tabindex="0"><code>composer require waynestate/advisor waynestate/rollcall
 </code></pre>
 <p>Then name the module in your own manifest file. Rollcall ships none on purpose, so nothing loads by accident:</p>
-<pre><code class="language-json">{
+<pre tabindex="0"><code class="language-json">{
     &quot;modules&quot;: [
         &quot;Waynestate\\Rollcall\\Advisor\\RollcallModule&quot;
     ]

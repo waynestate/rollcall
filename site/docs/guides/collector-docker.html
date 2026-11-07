@@ -45,13 +45,13 @@ non-root user, writes only to its snapshot folder, and takes every setting from 
 Never put a token in the image: the build stays clean, and the token travels with <code>-e</code> (or <code>--env-file</code>) each
 time you run. Two lines, and every app answers present.</p>
 <p>Build it, from the repo root (again whenever the code changes):</p>
-<pre><code>docker build -t rollcall-collector .
+<pre tabindex="0"><code>docker build -t rollcall-collector .
 </code></pre>
 <p>That reads the <code>Dockerfile</code> next to it and tags the result <code>rollcall-collector</code>. Then run a scan. Each <code>-e</code>
 flag is a setting from <a href="../reference/configuration.html">the configuration table</a>; for the narrow scan add
 <code>-e ROLLCALL_GITLAB_PROJECTS=group/project,other-group/other-project</code> and only those projects are read, no group
 is listed. The two <code>-v</code> flags mount your policy file and snapshot folder so the answer survives the container:</p>
-<pre><code>docker run --rm -e ROLLCALL_SOURCE=gitlab -e ROLLCALL_GITLAB_URL=https://gitlab.example.test -e ROLLCALL_GITLAB_TOKEN=&quot;$ROLLCALL_GITLAB_TOKEN&quot; -e ROLLCALL_GITLAB_GROUPS=your-group -e ROLLCALL_POLICY_FILE=/app/policy.json -v &quot;$PWD/policy.json:/app/policy.json&quot; -v &quot;$PWD/var:/app/var&quot; rollcall-collector scan
+<pre tabindex="0"><code>docker run --rm -e ROLLCALL_SOURCE=gitlab -e ROLLCALL_GITLAB_URL=https://gitlab.example.test -e ROLLCALL_GITLAB_TOKEN=&quot;$ROLLCALL_GITLAB_TOKEN&quot; -e ROLLCALL_GITLAB_GROUPS=your-group -e ROLLCALL_POLICY_FILE=/app/policy.json -v &quot;$PWD/policy.json:/app/policy.json&quot; -v &quot;$PWD/var:/app/var&quot; rollcall-collector scan
 </code></pre>
 <p>Next: after a good scan, <code>var/snapshots/&lt;today&gt;.json</code> holds the day's attendance, and the same run with
 <code>report</code> instead of <code>scan</code> prints it. On Windows PowerShell, set <code>$env:ROLLCALL_GITLAB_TOKEN</code> first and use

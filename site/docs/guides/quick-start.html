@@ -43,7 +43,7 @@
 <p>This runs on the fixtures in the repo, so you need no network and no token. Run <code>composer install</code> once
 (or the Docker line under <a href="../checks.html">Run the checks</a>), then the commands below.</p>
 <p>Linux and macOS (bash):</p>
-<pre><code>export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
+<pre tabindex="0"><code>export ROLLCALL_POLICY_FILE=tests/fixtures/policy.json
 export ROLLCALL_REPOS_DIR=tests/fixtures/repos
 export ROLLCALL_IMAGES_FILE=tests/fixtures/images.json
 export ROLLCALL_PROCTOR_DIR=tests/fixtures/proctor
@@ -52,7 +52,7 @@ php bin/rollcall scan
 php bin/rollcall report
 </code></pre>
 <p>Windows (PowerShell, no bash or WSL needed):</p>
-<pre><code>$env:ROLLCALL_POLICY_FILE = &quot;tests/fixtures/policy.json&quot;
+<pre tabindex="0"><code>$env:ROLLCALL_POLICY_FILE = &quot;tests/fixtures/policy.json&quot;
 $env:ROLLCALL_REPOS_DIR = &quot;tests/fixtures/repos&quot;
 $env:ROLLCALL_IMAGES_FILE = &quot;tests/fixtures/images.json&quot;
 $env:ROLLCALL_PROCTOR_DIR = &quot;tests/fixtures/proctor&quot;
