@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: The Proof page records its last run.
 - Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).
 - Changed: docs sections carry the front page's folios. Each numbered section of a docs page opens with a red Caslon "§ 1", "§ 2" in front of its heading, as every chapter of the front page does (Related, the index, stays unnumbered); the mark is decoration, so the heading's accessible name is unchanged. With reduced motion off, each folio soaks into the paper as its section scrolls into view, in browsers with scroll-driven animations. Source: `docs/theme/rollcall.css`.
 - Added: a Proof docs page (Reference > Proof). The first scheduled `rollcall-scan` on GitLab CI read the 13 stack projects (13 rows, blob ids matching `main`, 23 s job), and a rerun over 58 Wayne State applications from the stack's proof corpus gave every repository a row with 0 tool errors; it confirms the in-house auth package fix, explains the pipeline's one warning (PROCTOR on `deploy/`), and lists what is not proven yet (no image export, no PROCTOR reports, one snapshot).

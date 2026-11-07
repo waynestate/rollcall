@@ -41,6 +41,91 @@
       <article class="docs-article"><h1 id="proof">Proof<a class="docs-heading-link" aria-label="Link to this section" href="#proof">#</a></h1>
 <p>This page says how Rollcall was proven on real repositories: what ran, what held, what the runs caught in Rollcall itself, and what they do not prove yet. Next, see <a href="../guides/what-the-report-says.html">What the report says</a> for how to read the output quoted here.</p>
 <p>A register is only worth something on a day with real students in the room. Rollcall had two such days on 2026-11-06.</p>
+<h2 id="last-run">Last run<a class="docs-heading-link" aria-label="Link to this section" href="#last-run">#</a></h2>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Date</th>
+<th>Commit</th>
+<th>Result</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>composer ci</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: manifest, 199 tests / 1220 assertions, style, generated files, static analysis, audit</td>
+<td>181.3 s</td>
+</tr>
+<tr>
+<td><code>rollcall scan</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: 4 fixture apps present, 2 notes (no image source, no PROCTOR reports)</td>
+<td>1.1 s</td>
+</tr>
+<tr>
+<td><code>rollcall report</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: text report, 4 apps</td>
+<td>1.0 s</td>
+</tr>
+<tr>
+<td><code>rollcall report --format=json</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: JSON report, 4 apps</td>
+<td>1.0 s</td>
+</tr>
+<tr>
+<td><code>rollcall report --format=json --internal</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: internal JSON, 4 apps</td>
+<td>1.0 s</td>
+</tr>
+<tr>
+<td><code>rollcall report --format=prometheus</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: Prometheus text, 4 apps</td>
+<td>1.2 s</td>
+</tr>
+<tr>
+<td><code>rollcall advisories</code> (saved feed)</td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: 4 package versions answered, 1 affected, 1 no data</td>
+<td>1.8 s</td>
+</tr>
+<tr>
+<td><code>rollcall drift --component=php</code> (saved feed)</td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: 1 PHP date compared, 1 difference between the feeds</td>
+<td>1.5 s</td>
+</tr>
+<tr>
+<td><code>rollcall prune --dry-run</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: nothing to prune</td>
+<td>1.2 s</td>
+</tr>
+<tr>
+<td>PROCTOR check on <code>deploy/</code></td>
+<td>2026-11-07</td>
+<td><code>aed8dd9</code></td>
+<td>pass: 14 checks, 12 pass, 2 warn (php-floor, ci-pipelines)</td>
+<td>2.2 s</td>
+</tr>
+</tbody>
+</table></div>
+<p>The rollcall rows ran against the fixtures bundled under <code>tests/fixtures/</code> in one <code>composer:2.10.3</code> container, with no credentials; the PROCTOR row installed the deploy layer's committed lock first. To refresh this table, re-run <code>composer ci</code> and the commands above and rewrite the rows with the new date, commit and durations. The two runs the page describes, the scheduled GitLab CI scan and the 58-repository corpus rerun, need a live service account and the stack's proof corpus, so they are not repeated here; their results stand as recorded below.</p>
 <h2 id="what-ran">What ran<a class="docs-heading-link" aria-label="Link to this section" href="#what-ran">#</a></h2>
 <p><strong>1. The scheduled scan on GitLab CI.</strong> The weekly <code>rollcall-scan</code> job (see <a href="configuration.html">Configuration</a>) ran on its schedule for the first time, on the canonical GitLab, against the 13 stack projects. It used a read-only service account that can see those 13 projects and nothing else, with a <code>read_api</code> token held in a masked CI variable. Rollcall 0.1.9 from <code>main</code>, <code>composer:2.10.3</code>, no image export and no PROCTOR reports configured.</p>
 <p><strong>2. A rerun over the stack's proof corpus.</strong> The shared corpus is every PHP repository in the stack's census of Wayne State applications: 95 repositories, of which 58 have a <code>composer.json</code> (54 with a <code>composer.lock</code>). Rollcall's directory source reads exactly those two files, so only those two files were copied out of a Linux checkout of each repository. The rerun used the same Rollcall commit plus the change described below, CREED's released <code>policy.json</code>, and <code>--today=2026-11-06</code>, in one <code>composer:2.10.3</code> container with no network:</p>
@@ -143,7 +228,7 @@ php bin/rollcall report
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/configuration.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Configuration</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/architecture.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Architecture</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#what-ran">What ran</a></li><li class="docs-toc__item"><a href="#results">Results</a></li><li class="docs-toc__item"><a href="#the-warning-on-the-scheduled-pipeline">The warning on the scheduled pipeline</a></li><li class="docs-toc__item"><a href="#what-it-caught-in-rollcall">What it caught in Rollcall</a></li><li class="docs-toc__item"><a href="#what-this-does-not-prove">What this does not prove</a></li><li class="docs-toc__item"><a href="#run-it-on-your-own-repositories">Run it on your own repositories</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#last-run">Last run</a></li><li class="docs-toc__item"><a href="#what-ran">What ran</a></li><li class="docs-toc__item"><a href="#results">Results</a></li><li class="docs-toc__item"><a href="#the-warning-on-the-scheduled-pipeline">The warning on the scheduled pipeline</a></li><li class="docs-toc__item"><a href="#what-it-caught-in-rollcall">What it caught in Rollcall</a></li><li class="docs-toc__item"><a href="#what-this-does-not-prove">What this does not prove</a></li><li class="docs-toc__item"><a href="#run-it-on-your-own-repositories">Run it on your own repositories</a></li><li class="docs-toc__item"><a href="#related">Related</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>0.1.9</span></span>

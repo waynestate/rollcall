@@ -1246,6 +1246,23 @@ This page says how Rollcall was proven on real repositories: what ran, what held
 
 A register is only worth something on a day with real students in the room. Rollcall had two such days on 2026-11-06.
 
+### Last run[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#last-run)
+
+| Check | Date | Commit | Result | Duration |
+| --- | --- | --- | --- | --- |
+| `composer ci` | 2026-11-07 | `aed8dd9` | pass: manifest, 199 tests / 1220 assertions, style, generated files, static analysis, audit | 181.3 s |
+| `rollcall scan` | 2026-11-07 | `aed8dd9` | pass: 4 fixture apps present, 2 notes (no image source, no PROCTOR reports) | 1.1 s |
+| `rollcall report` | 2026-11-07 | `aed8dd9` | pass: text report, 4 apps | 1.0 s |
+| `rollcall report --format=json` | 2026-11-07 | `aed8dd9` | pass: JSON report, 4 apps | 1.0 s |
+| `rollcall report --format=json --internal` | 2026-11-07 | `aed8dd9` | pass: internal JSON, 4 apps | 1.0 s |
+| `rollcall report --format=prometheus` | 2026-11-07 | `aed8dd9` | pass: Prometheus text, 4 apps | 1.2 s |
+| `rollcall advisories` (saved feed) | 2026-11-07 | `aed8dd9` | pass: 4 package versions answered, 1 affected, 1 no data | 1.8 s |
+| `rollcall drift --component=php` (saved feed) | 2026-11-07 | `aed8dd9` | pass: 1 PHP date compared, 1 difference between the feeds | 1.5 s |
+| `rollcall prune --dry-run` | 2026-11-07 | `aed8dd9` | pass: nothing to prune | 1.2 s |
+| PROCTOR check on `deploy/` | 2026-11-07 | `aed8dd9` | pass: 14 checks, 12 pass, 2 warn (php-floor, ci-pipelines) | 2.2 s |
+
+The rollcall rows ran against the fixtures bundled under `tests/fixtures/` in one `composer:2.10.3` container, with no credentials; the PROCTOR row installed the deploy layer's committed lock first. To refresh this table, re-run `composer ci` and the commands above and rewrite the rows with the new date, commit and durations. The two runs the page describes, the scheduled GitLab CI scan and the 58-repository corpus rerun, need a live service account and the stack's proof corpus, so they are not repeated here; their results stand as recorded below.
+
 ### What ran[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-ran)
 
 **1. The scheduled scan on GitLab CI.** The weekly `rollcall-scan` job (see [Configuration](https://rollcall.apps.wayne.edu/docs/reference/configuration.html)) ran on its schedule for the first time, on the canonical GitLab, against the 13 stack projects. It used a read-only service account that can see those 13 projects and nothing else, with a `read_api` token held in a masked CI variable. Rollcall 0.1.9 from `main`, `composer:2.10.3`, no image export and no PROCTOR reports configured.
