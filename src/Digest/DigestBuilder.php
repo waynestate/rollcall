@@ -119,6 +119,13 @@ final class DigestBuilder
         if ($this->str($old, 'proctor') !== $this->str($new, 'proctor')) {
             $changes[] = sprintf('%s: PROCTOR result %s to %s', $project, $this->str($old, 'proctor') ?? 'none', $this->str($new, 'proctor') ?? 'none');
         }
+        $dueBefore = $this->str($old, 'upgrade_due');
+        $dueAfter = $this->str($new, 'upgrade_due');
+        if ($dueBefore !== $dueAfter) {
+            $changes[] = $dueAfter === null
+                ? sprintf('%s: no forced image upgrade is pending any more', $project)
+                : sprintf('%s: a forced image upgrade is scheduled, due %s', $project, $dueAfter);
+        }
         $before = $this->drift($old);
         $after = $this->drift($new);
         foreach (array_diff($after, $before) as $kind) {
@@ -137,7 +144,7 @@ final class DigestBuilder
         $open = array_map(static fn(string $kind): string => self::DRIFT_WORDS[$kind] ?? $kind, $this->drift($row));
 
         return $this->clean(sprintf(
-            '%s: PHP image %s (%s), PHP floor %s (%s), Laravel %s (%s), PROCTOR %s. Open items: %s.',
+            '%s: PHP image %s (%s), PHP floor %s (%s), Laravel %s (%s), PROCTOR %s.%s Open items: %s.',
             $project,
             $this->show($row, 'php_image'),
             $this->state($row, 'image_state'),
@@ -146,6 +153,7 @@ final class DigestBuilder
             $this->str($row, 'laravel') ?? 'none',
             $this->str($row, 'laravel') === null ? 'not a Laravel app' : $this->state($row, 'laravel_state'),
             $this->str($row, 'proctor') ?? 'none',
+            $this->str($row, 'upgrade_due') === null ? '' : ' Forced image upgrade due ' . $this->str($row, 'upgrade_due') . '.',
             $open === [] ? 'none' : implode('; ', $open),
         ));
     }

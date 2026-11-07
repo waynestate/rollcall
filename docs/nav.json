@@ -22,6 +22,10 @@
           "path": "guides/what-the-report-says"
         },
         {
+          "title": "Citadel's registrations export",
+          "path": "guides/citadel"
+        },
+        {
           "title": "Run the collector in Docker",
           "path": "guides/collector-docker"
         },

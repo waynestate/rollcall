@@ -65,7 +65,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Source | Interface | 0.1 adapters |
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
-| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
 Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
@@ -169,6 +169,11 @@ does not gate anything.
   `{"8.1": 3, "8.4": 9}`) and per Laravel major (`laravel`). Every stored snapshot gets the breakdown, including the
   ones written before it existed, so the history reaches back as far as `rollcall prune` keeps snapshots.
 
+- **Forced image upgrades**: with Citadel's export as the image source, how many apps have a forced base-image
+  upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The internal per-app
+  list carries each app's `upgrade_due`. Zero with any other image source. See
+  [docs/guides/citadel.md](https://github.com/waynestate/rollcall/blob/HEAD/docs/guides/citadel.md).
+
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
 
@@ -187,6 +192,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
 | `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
+| `ROLLCALL_CITADEL_EXPORT` | Citadel's saved registrations export, used instead of `ROLLCALL_IMAGES_FILE` (not both): base images plus forced upgrade dates. See [docs/guides/citadel.md](https://github.com/waynestate/rollcall/blob/HEAD/docs/guides/citadel.md) | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
@@ -847,7 +853,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Source | Interface | 0.1 adapters |
 | --- | --- | --- |
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
-| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
 Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
@@ -917,6 +923,74 @@ and point `ADVISOR_MODULES_FILE` at that file. The tools read the snapshot store
 | `rollcall_supported_versions` | Every version in CREED's policy, grouped by what it says today: active, security only, or end of life |
 
 The tools take no path, command or URL, make no network call, and answer public counts only: the same fields `/report.json` serves. The per-app list stays internal and never leaves through a tool. Each answer names its source and its dates.
+
+---
+
+Source: https://rollcall.apps.wayne.edu/docs/guides/citadel.html
+
+## Citadel's registrations export[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#citadel-s-registrations-export)
+
+This page shows how Rollcall reads the runtime image of each app, and any forced upgrade date, from a file Citadel produces. Next: [run the collector in Docker](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html).
+
+Citadel is one source among others. On OpenShift, Coolify or plain Docker, keep using the image list (`ROLLCALL_IMAGES_FILE`), which any platform can produce. Nothing in Rollcall needs Citadel.
+
+### 1. Rollcall never calls Citadel[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#1-rollcall-never-calls-citadel)
+
+Rollcall reads a saved file. It holds no Citadel account, opens no connection to Citadel, and sends nothing back. A person or a scheduled job saves the export, and `rollcall scan` reads it, the same way it reads PROCTOR's reports and the endoflife.date page. If Citadel offers a read-only endpoint that answers with this JSON, save its answer to the file: the shape is the same.
+
+### 2. The shape[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#2-the-shape)
+
+The export uses Citadel's own field names, so the people who keep Citadel can produce it without a mapping table. The schema is `contract/citadel-export.schema.json`; extra fields are ignored, so an export may carry more.
+
+```json
+{
+    "applications": [
+        {"repository": "group/project", "base_image": "citadel/php-apache:8.4r5"},
+        {"repository": "group/old-project", "base_image": "citadel/php-apache:8.1r2"}
+    ],
+    "base_image_upgrades": [
+        {"old_image": "citadel/php-apache:8.1r2", "new_image": "citadel/php-apache:8.4r5", "due_date": "2026-12-15", "completed": false}
+    ]
+}
+```
+
+| Field | What it is in Citadel | What Rollcall does with it |
+| --- | --- | --- |
+| `applications[].repository` | The GitLab `group/project` an application deploys from | Joins the app to the repository the scan read |
+| `applications[].base_image` | The base image of the application's active deployment | Reads the PHP version (`8.4r5` is PHP 8.4) |
+| `base_image_upgrades[].old_image` | The image being retired | Every app on that image gets the due date |
+| `base_image_upgrades[].due_date` | The day Citadel forces the upgrade, `YYYY-MM-DD` | The earliest pending date per image counts |
+| `base_image_upgrades[].completed` | Whether that upgrade is done | Only `false` counts; a done upgrade is ignored |
+
+Entries Rollcall cannot trust are skipped, never guessed: an application with no repository, an upgrade with no real date (`"soon"`, `2026-02-30`) or without `"completed": false`. An app registered on Citadel but not in the scan is not invented either: the census starts from the repositories.
+
+### 3. Point Rollcall at it[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#3-point-rollcall-at-it)
+
+macOS and Linux
+
+```sh
+export ROLLCALL_CITADEL_EXPORT=/path/to/citadel-export.json
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+Windows
+
+```powershell
+$env:ROLLCALL_CITADEL_EXPORT = "C:\path\to\citadel-export.json"
+php bin/rollcall scan
+php bin/rollcall report
+```
+
+Set `ROLLCALL_CITADEL_EXPORT` or `ROLLCALL_IMAGES_FILE`, not both: each is a complete image source, and the scan stops with a plain message if both are set. In Laravel, the setting is `rollcall.citadel_export`.
+
+### 4. What the report gains[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#4-what-the-report-gains)
+
+- **Forced image upgrades**: the text report prints `Forced image upgrades pending: 2 (1 due today or earlier), next due 2026-12-15.` and the JSON report carries `forced_upgrades` with `pending`, `overdue` (due today or earlier) and `next_due` (the next future date, or `null`). Counts only, so it is public. With the image list, or no image source, all three are zero.
+- **Per app, internally**: the internal report's per-app list carries `upgrade_due`, and the stored snapshot keeps it. Snapshots written before it existed load as `null`.
+- **Owner digests**: a new forced upgrade date is news, and so is one that went away. See [owner digests](https://rollcall.apps.wayne.edu/docs/guides/digest.html).
+
+The export names applications, so keep it where you keep the snapshots: on the host, outside git.
 
 ---
 
@@ -1068,7 +1142,7 @@ Source: https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html
 
 ## What the report says[#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
 
-This page explains each part of the report. Next: [run the collector in Docker](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html) if you scan a real GitLab.
+This page explains each part of the report. Next: [Citadel's registrations export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) if your apps run on Citadel.
 
 - **Apps present and scan notes**: the first line counts the apps the scan read, then the notes it printed and carried on past (`totals.scan_errors` in JSON, `rollcall_scan_errors` in metrics). Today a note means a source is not configured: with no image export the PHP image column is `unknown`, with no PROCTOR reports every app is `none`. `scan` prints each note as it saves the snapshot, and `report --format=json --internal` lists them. A note is not a failed scan; a source that refuses (a bad token) stops the scan instead.
 - **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`, `eol`, `unknown`), the date security support ends and the days left (negative once past).
@@ -1081,6 +1155,7 @@ This page explains each part of the report. Next: [run the collector in Docker](
   - `php_image`: per PHP minor of the image, in version order with `unknown` last, such as `{"8.1": 3, "8.4": 9, "unknown": 2}`.
   - `laravel`: per Laravel major, the same way. An app with no Laravel, or one Rollcall could not read, is `unknown`.
   The breakdown is worked out from each stored snapshot when the report is built, so snapshots written before it existed (Rollcall 0.1.9 and older) get one too, and the stored snapshot format is unchanged (`schema_version` 1). It reaches back as far as `rollcall prune` keeps snapshots (`ROLLCALL_RETENTION_DAYS`). A report written by 0.1.9 or older has no `states`, `php_image` or `laravel` on its burn-down days: read that as "no breakdown", not as zero apps.
+- **Forced image upgrades**: with [Citadel's export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) as the image source, how many apps have a forced base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only). The internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the policy does not list is `unknown`.
 
@@ -1334,6 +1409,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | Variable | Meaning | Default | Read in |
 | --- | --- | --- | --- |
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
+| ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
 | ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
 | ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
@@ -1379,6 +1455,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `report.schema.json` | `rollcall report --format=json` and `GET /report.json`, public and internal views | Rollcall |
 | `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal: it holds app ids) | Rollcall |
 | `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform, or a hand-kept file |
+| `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` | A person or a job, from Citadel |
 | `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE` (internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 
@@ -1387,7 +1464,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
 - Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
-- The image list and owners fixtures match their input schemas, and `rollcall digest --format=json` matches `digest.schema.json`.
+- The image list, Citadel export and owners fixtures match their input schemas, a report and snapshot built from the Citadel export match theirs, and `rollcall digest --format=json` matches `digest.schema.json`.
 - The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
 - The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
 

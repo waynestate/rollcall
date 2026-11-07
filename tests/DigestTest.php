@@ -125,6 +125,19 @@ final class DigestTest extends TestCase
         $this->assertStringContainsString('1 of 2 opted-in owners had news; the other 1 get nothing this time.', $tester->getErrorOutput());
     }
 
+    public function test_a_forced_upgrade_date_from_citadel_is_news(): void
+    {
+        $now = Fleet::snapshot('2026-11-07');
+        $this->save(new Snapshot(new DateTimeImmutable('2026-10-01'), $now->apps, $now->errors));
+        $apps = array_map(static fn($app) => $app->id === 'demo/relic' ? $app->with(upgradeDue: '2026-12-15') : $app, $now->apps);
+        $this->save(new Snapshot($now->date, $apps, $now->errors));
+        $out = $this->digest()->getDisplay();
+
+        $this->assertStringContainsString('demo/relic: a forced image upgrade is scheduled, due 2026-12-15', $out);
+        $this->assertStringContainsString('PROCTOR none. Forced image upgrade due 2026-12-15. Open items:', $out);
+        $this->assertStringNotContainsString('ledger-team', $out);
+    }
+
     public function test_nothing_changed_means_no_digest_at_all(): void
     {
         $this->save(Fleet::snapshot('2026-10-01'));

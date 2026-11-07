@@ -1,0 +1,16 @@
+{
+    "exported_on": "2026-11-07",
+    "applications": [
+        {"repository": "demo/ledger", "base_image": "citadel/php-apache:8.4r5", "subdomain": "ledger"},
+        {"repository": "demo/atlas", "base_image": "citadel/php-apache:8.1r2", "subdomain": "atlas"},
+        {"repository": "demo/broken", "base_image": "citadel/php-apache:8.3r1"},
+        {"repository": "demo/relic", "base_image": "citadel/static:latest"},
+        {"repository": "demo/only-on-citadel", "base_image": "citadel/php-apache:8.5r2"}
+    ],
+    "base_image_upgrades": [
+        {"old_image": "citadel/php-apache:8.1r2", "new_image": "citadel/php-apache:8.4r5", "notes": "Move to 8.4", "due_date": "2027-01-15", "completed": false},
+        {"old_image": "citadel/php-apache:8.1r2", "new_image": "citadel/php-apache:8.5r2", "notes": "Earlier date wins", "due_date": "2026-12-15", "completed": false},
+        {"old_image": "citadel/php-apache:8.3r1", "new_image": "citadel/php-apache:8.4r5", "notes": "Already past due", "due_date": "2026-11-01", "completed": false},
+        {"old_image": "citadel/php-apache:8.4r5", "new_image": "citadel/php-apache:8.4r6", "notes": "Done", "due_date": "2026-10-01", "completed": true}
+    ]
+}

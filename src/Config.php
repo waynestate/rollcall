@@ -43,6 +43,7 @@ final class Config
         public readonly bool $digestMailEnabled = false,
         private readonly string $digestMailDsn = '',
         public readonly ?string $digestMailFrom = null,
+        public readonly ?string $citadelExport = null,
     ) {}
 
     /** @param  array<string, string|false|null>  $env */
@@ -77,6 +78,7 @@ final class Config
             digestMailEnabled: self::truthy($get('ROLLCALL_DIGEST_MAIL_ENABLED')),
             digestMailDsn: $get('ROLLCALL_DIGEST_MAIL_DSN') ?? '',
             digestMailFrom: $get('ROLLCALL_DIGEST_MAIL_FROM'),
+            citadelExport: $get('ROLLCALL_CITADEL_EXPORT'),
         );
     }
 

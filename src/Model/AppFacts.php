@@ -10,7 +10,8 @@ namespace Waynestate\Rollcall\Model;
  * an old snapshot can be re-read against the dates that applied then.
  *
  * The id is the repository path (for example "group/project"). It is internal:
- * public reports never carry it.
+ * public reports never carry it. upgradeDue is the due date of a pending
+ * forced image upgrade, when the image source can say (a Citadel export).
  */
 final class AppFacts
 {
@@ -33,6 +34,7 @@ final class AppFacts
         public readonly array $overrides = [],
         public readonly array $blobs = [],
         public readonly array $notes = [],
+        public readonly ?string $upgradeDue = null,
     ) {}
 
     /** The Laravel major, such as "12", or null. */
@@ -52,6 +54,7 @@ final class AppFacts
         ?string $proctorResult = null,
         ?string $proctorVersion = null,
         ?array $overrides = null,
+        ?string $upgradeDue = null,
     ): self {
         return new self(
             $this->id,
@@ -67,6 +70,7 @@ final class AppFacts
             $overrides ?? $this->overrides,
             $this->blobs,
             $this->notes,
+            $upgradeDue ?? $this->upgradeDue,
         );
     }
 
@@ -87,6 +91,7 @@ final class AppFacts
             'overrides' => array_map(static fn(OverrideNote $o): array => $o->toArray(), $this->overrides),
             'blobs' => $this->blobs,
             'notes' => $this->notes,
+            'upgrade_due' => $this->upgradeDue,
         ];
     }
 
@@ -128,6 +133,7 @@ final class AppFacts
             $overrides,
             $blobs,
             $notes,
+            $str('upgrade_due'),
         );
     }
 }

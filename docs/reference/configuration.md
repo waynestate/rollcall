@@ -13,6 +13,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | Variable | Meaning | Default | Read in |
 | --- | --- | --- | --- |
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
+| ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
 | ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
 | ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |

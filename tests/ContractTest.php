@@ -164,6 +164,27 @@ final class ContractTest extends TestCase
         $this->assertMatchesContract('images-export.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/images.json'));
     }
 
+    public function test_the_citadel_export_fixture_matches_the_input_contract(): void
+    {
+        $this->assertMatchesContract('citadel-export.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/citadel-export.json'));
+    }
+
+    public function test_a_report_and_snapshot_from_the_citadel_export_match_the_contract(): void
+    {
+        $env = [...$this->env(), 'ROLLCALL_CITADEL_EXPORT' => Fleet::FIXTURES . '/citadel-export.json'];
+        unset($env['ROLLCALL_IMAGES_FILE']);
+        $app = new Application($env);
+        $app->setAutoExit(false);
+        $tester = new ApplicationTester($app);
+        $this->assertSame(0, $tester->run(['command' => 'scan', '--today' => '2026-11-07']));
+        $tester->run(['command' => 'report', '--format' => 'json', '--internal' => true, '--today' => '2026-11-07'], ['capture_stderr_separately' => true]);
+        $json = $tester->getDisplay();
+
+        $this->assertMatchesContract('report.schema.json', $json);
+        $this->assertSame(2, json_decode($json, true)['forced_upgrades']['pending']);
+        $this->assertMatchesContract('snapshot.schema.json', (string) file_get_contents($this->store . '/2026-11-07.json'));
+    }
+
     public function test_the_owners_fixture_matches_the_input_contract(): void
     {
         $this->assertMatchesContract('owners.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/owners.json'));

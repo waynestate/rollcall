@@ -1,6 +1,6 @@
 ---
 title: "What the report says | Rollcall docs"
-description: "The sections of a Rollcall report: versions, states, drift kinds, progress and the EOL burn-down."
+description: "The sections of a Rollcall report: versions, states, drift kinds, progress, the EOL burn-down and forced upgrades."
 url: https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html
 llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
@@ -8,7 +8,7 @@ generator: Squire agent-ready
 
 # What the report says[#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
 
-This page explains each part of the report. Next: [run the collector in Docker](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html) if you scan a real GitLab.
+This page explains each part of the report. Next: [Citadel's registrations export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) if your apps run on Citadel.
 
 - **Apps present and scan notes**: the first line counts the apps the scan read, then the notes it printed and carried on past (`totals.scan_errors` in JSON, `rollcall_scan_errors` in metrics). Today a note means a source is not configured: with no image export the PHP image column is `unknown`, with no PROCTOR reports every app is `none`. `scan` prints each note as it saves the snapshot, and `report --format=json --internal` lists them. A note is not a failed scan; a source that refuses (a bad token) stops the scan instead.
 - **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`, `eol`, `unknown`), the date security support ends and the days left (negative once past).
@@ -21,5 +21,6 @@ This page explains each part of the report. Next: [run the collector in Docker](
   - `php_image`: per PHP minor of the image, in version order with `unknown` last, such as `{"8.1": 3, "8.4": 9, "unknown": 2}`.
   - `laravel`: per Laravel major, the same way. An app with no Laravel, or one Rollcall could not read, is `unknown`.
   The breakdown is worked out from each stored snapshot when the report is built, so snapshots written before it existed (Rollcall 0.1.9 and older) get one too, and the stored snapshot format is unchanged (`schema_version` 1). It reaches back as far as `rollcall prune` keeps snapshots (`ROLLCALL_RETENTION_DAYS`). A report written by 0.1.9 or older has no `states`, `php_image` or `laravel` on its burn-down days: read that as "no breakdown", not as zero apps.
+- **Forced image upgrades**: with [Citadel's export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) as the image source, how many apps have a forced base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only). The internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the policy does not list is `unknown`.

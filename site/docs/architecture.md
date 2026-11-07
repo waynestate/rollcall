@@ -23,7 +23,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Source | Interface | 0.1 adapters |
 | --- | --- | --- |
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
-| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
 Rollcall only reads from every source. The one thing it writes is its own snapshot directory.

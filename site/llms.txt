@@ -27,12 +27,13 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [How it is built | Rollcall docs](https://rollcall.apps.wayne.edu/docs/architecture.md): A framework-free core plus thin entry points, a generated copy of CREED's policy reader, and three data sources.
 - [Run the checks | Rollcall docs](https://rollcall.apps.wayne.edu/docs/checks.md): composer ci is the contract, with Docker, pipelines and the front page accessibility gate; Contributing follows.
 - [Use Rollcall from your coding agent (ADVISOR) | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/advisor.md): Rollcall ships an ADVISOR module with three read-only tools that answer public counts only.
+- [Citadel's registrations export | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/citadel.md): Read base images and forced upgrade dates from a saved Citadel export, in Citadel's own field names. Rollcall never calls Citadel.
 - [Run the collector in Docker | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.md): Build the collector image and run a scan with docker run, with no PHP on the machine.
 - [Owner digests | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/digest.md): An opt-in digest per owner, about only their apps and only when something changed; printed by default, mailed only behind a flag and three settings.
 - [Laravel | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/laravel.md): Register the package, publish the config, schedule the scan, and enable the dashboard routes.
 - [Metrics | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/metrics.md): Metrics are off by default; with ROLLCALL_METRICS_ENABLED=true, /metrics serves Prometheus text from the latest snapshot.
 - [Quick start | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/quick-start.md): Scan and report on the fixtures in the repo, with no network and no token.
-- [What the report says | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.md): The sections of a Rollcall report: versions, states, drift kinds, progress and the EOL burn-down.
+- [What the report says | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.md): The sections of a Rollcall report: versions, states, drift kinds, progress, the EOL burn-down and forced upgrades.
 - [WSU values (Playbook) | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.md): ROLLCALL_GITLAB_URL may come from Playbook when the environment has none; the token never does.
 - [Rollcall | Rollcall docs](https://rollcall.apps.wayne.edu/docs/index.md): Rollcall is the fleet scanner for the Wayne State application stack.
 - [Install | Rollcall docs](https://rollcall.apps.wayne.edu/docs/install.md): Install Rollcall from Packagist with one Composer line.

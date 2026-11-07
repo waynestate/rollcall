@@ -55,6 +55,10 @@
                     "Export of the app list: {\"apps\": [{\"project\": \"group/project\", \"image\": \"php:8.4-apache\"}]}",
                     "none"
                 ],
+                "ROLLCALL_CITADEL_EXPORT": [
+                    "Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide",
+                    "none"
+                ],
                 "ROLLCALL_PROCTOR_DIR": [
                     "PROCTOR JSON reports, one per app: group/project is read from group__project.json",
                     "none"

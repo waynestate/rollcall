@@ -43,6 +43,7 @@ class RollcallServiceProvider extends ServiceProvider
                 'ROLLCALL_GITLAB_GROUPS' => $str('gitlab_groups'),
                 'ROLLCALL_GITLAB_PROJECTS' => $str('gitlab_projects'),
                 'ROLLCALL_IMAGES_FILE' => $str('images_file'),
+                'ROLLCALL_CITADEL_EXPORT' => $str('citadel_export'),
                 'ROLLCALL_PROCTOR_DIR' => $str('proctor_dir'),
                 'ROLLCALL_AUTH_PACKAGES' => $str('auth_packages'),
                 'ROLLCALL_RETENTION_DAYS' => $str('retention_days'),

@@ -17,6 +17,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `report.schema.json` | `rollcall report --format=json` and `GET /report.json`, public and internal views | Rollcall |
 | `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal: it holds app ids) | Rollcall |
 | `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform, or a hand-kept file |
+| `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` | A person or a job, from Citadel |
 | `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE` (internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 
@@ -25,7 +26,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
 - Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
-- The image list and owners fixtures match their input schemas, and `rollcall digest --format=json` matches `digest.schema.json`.
+- The image list, Citadel export and owners fixtures match their input schemas, a report and snapshot built from the Citadel export match theirs, and `rollcall digest --format=json` matches `digest.schema.json`.
 - The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
 - The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
 

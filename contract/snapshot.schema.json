@@ -49,7 +49,11 @@
                     "type": "object",
                     "additionalProperties": {"type": "string"}
                 },
-                "notes": {"type": "array", "items": {"type": "string"}}
+                "notes": {"type": "array", "items": {"type": "string"}},
+                "upgrade_due": {
+                    "description": "Due date of a pending forced image upgrade (Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]
+                }
             }
         }
     }

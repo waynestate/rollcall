@@ -69,7 +69,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Source | Interface | 0.1 adapters |
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
-| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
 Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
@@ -173,6 +173,11 @@ does not gate anything.
   `{"8.1": 3, "8.4": 9}`) and per Laravel major (`laravel`). Every stored snapshot gets the breakdown, including the
   ones written before it existed, so the history reaches back as far as `rollcall prune` keeps snapshots.
 
+- **Forced image upgrades**: with Citadel's export as the image source, how many apps have a forced base-image
+  upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The internal per-app
+  list carries each app's `upgrade_due`. Zero with any other image source. See
+  [docs/guides/citadel.md](docs/guides/citadel.md).
+
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
 
@@ -191,6 +196,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
 | `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
+| `ROLLCALL_CITADEL_EXPORT` | Citadel's saved registrations export, used instead of `ROLLCALL_IMAGES_FILE` (not both): base images plus forced upgrade dates. See [docs/guides/citadel.md](docs/guides/citadel.md) | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |

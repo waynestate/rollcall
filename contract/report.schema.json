@@ -4,7 +4,7 @@
     "title": "Rollcall report",
     "description": "What `rollcall report --format=json` prints and `GET /report.json` serves. The public view is counts and progress only; the internal view (`--internal`) adds the per-app list and the scan notes. Every object is closed (additionalProperties false), so a new field is a contract change made in the same commit.",
     "type": "object",
-    "required": ["tool", "version", "scan_date", "as_of", "visibility", "totals", "image_states", "php_image", "php_floor", "laravel", "auth_package", "proctor", "drift", "progress", "burn_down"],
+    "required": ["tool", "version", "scan_date", "as_of", "visibility", "totals", "image_states", "php_image", "php_floor", "laravel", "auth_package", "proctor", "drift", "progress", "forced_upgrades", "burn_down"],
     "additionalProperties": false,
     "properties": {
         "tool": {"const": "rollcall"},
@@ -69,6 +69,17 @@
                 "upgraded_to_supported": {"$ref": "#/$defs/count"},
                 "new_apps": {"$ref": "#/$defs/count"},
                 "gone_apps": {"$ref": "#/$defs/count"}
+            }
+        },
+        "forced_upgrades": {
+            "description": "Pending forced image upgrades from a Citadel export, counted: apps with one, apps whose date is today or earlier, and the next date still ahead. Zeros and null when the image source cannot say.",
+            "type": "object",
+            "required": ["pending", "overdue", "next_due"],
+            "additionalProperties": false,
+            "properties": {
+                "pending": {"$ref": "#/$defs/count"},
+                "overdue": {"$ref": "#/$defs/count"},
+                "next_due": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]}
             }
         },
         "burn_down": {
@@ -160,7 +171,7 @@
         "app": {
             "description": "One app in the internal view. The id is the repository path; it never appears in the public view.",
             "type": "object",
-            "required": ["id", "php_image", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "overrides", "drift", "upgraded_on", "notes"],
+            "required": ["id", "php_image", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
             "additionalProperties": false,
             "properties": {
                 "id": {"type": "string", "minLength": 1},
@@ -176,6 +187,10 @@
                 "overrides": {"type": "array", "items": {"$ref": "#/$defs/override"}},
                 "drift": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/driftKind"}},
                 "upgraded_on": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                "upgrade_due": {
+                    "description": "The due date of the app's pending forced image upgrade from a Citadel export, or null.",
+                    "oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]
+                },
                 "notes": {"type": "array", "items": {"type": "string"}}
             }
         }

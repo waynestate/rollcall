@@ -108,6 +108,7 @@ final class ReportBuilder
                     'overrides' => array_map(static fn($o): array => $o->toArray(), $app->overrides),
                     'drift' => $flags,
                     'upgraded_on' => $upgradedOn[$app->id] ?? null,
+                    'upgrade_due' => $app->upgradeDue,
                     'notes' => $app->notes,
                 ];
             }
@@ -129,6 +130,7 @@ final class ReportBuilder
             'proctor' => $proctor,
             'drift' => $drift,
             'progress' => $this->progress($current, $previous, $today),
+            'forced_upgrades' => $this->forcedUpgrades($apps, $today),
             'burn_down' => $this->burnDown($history),
         ];
         if ($internal) {
@@ -246,6 +248,35 @@ final class ReportBuilder
         }
 
         return $rows;
+    }
+
+    /**
+     * Pending forced image upgrades (from a Citadel export), counted: how many
+     * apps have one, how many are due today or earlier, and the next date
+     * still ahead. Zeros and null when the image source cannot say.
+     *
+     * @param  list<AppFacts>  $apps
+     * @return array{pending: int, overdue: int, next_due: ?string}
+     */
+    private function forcedUpgrades(array $apps, DateTimeImmutable $today): array
+    {
+        $day = $today->format('Y-m-d');
+        $pending = 0;
+        $overdue = 0;
+        $next = null;
+        foreach ($apps as $app) {
+            if ($app->upgradeDue === null) {
+                continue;
+            }
+            $pending++;
+            if ($app->upgradeDue <= $day) {
+                $overdue++;
+            } elseif ($next === null || $app->upgradeDue < $next) {
+                $next = $app->upgradeDue;
+            }
+        }
+
+        return ['pending' => $pending, 'overdue' => $overdue, 'next_due' => $next];
     }
 
     /**
