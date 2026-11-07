@@ -133,7 +133,7 @@ Rollcall keeps one snapshot per scan day. Count the apps on an EOL image in each
 
 Apps on an EOL PHP image, one scan a week Sample data
 
-Grafana draws the same line from `/metrics` with the bundled dashboard, `grafana/rollcall-burn-down.json`.
+Grafana draws the same line from `/metrics` with the bundled dashboard, `grafana/rollcall-burn-down.json`. Each scan day also counts the roll per PHP minor, Laravel major and support state, so the JSON report shows which lines the fleet is leaving and which it is joining.
 
 ### Drift, counted per kind
 

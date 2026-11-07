@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: per-version history. Each point of the report's `burn_down` carries the same roll three ways, counts only: `states` (per support state that day: `active`, `security_only`, `eol`, `unknown`), `php_image` (per PHP minor of the image, such as `{"8.1": 3, "8.4": 9}`) and `laravel` (per Laravel major), each in version order with `unknown` last. The existing `date`, `apps`, `eol`, `supported` and `unknown` fields are unchanged, so the change is additive. The breakdown is worked out from each stored snapshot when the report is built, so snapshots written by 0.1.9 and older get one too and the stored snapshot format stays at `schema_version` 1; it reaches back as far as `rollcall prune` keeps snapshots. ADVISOR's `rollcall_burn_down` tool returns the new fields. A reader of a 0.1.9 report should treat burn-down points without these keys as having no breakdown.
+
 - Changed: The canonical repository is git.wayne.edu (ADR-0021); docs, links and package metadata no longer point at the archived nougat copy.
 - Added: The Proof page records its last run.
 - Security: the front-page deploy layer moves to Symfony 7.4.23 (symfony/http-foundation and symfony/yaml advisories, including CVE-2026-118514).

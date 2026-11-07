@@ -164,7 +164,10 @@ does not gate anything.
 - **Progress**: apps that moved since the previous scan and apps that went from an EOL image to a supported one. In
   the internal view each upgraded app carries the day it landed.
 - **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day. It reads the image, not the
-  declared floor, so it stays `unknown` until an image export is configured.
+  declared floor, so it stays `unknown` until an image export is configured. Each day also carries the same roll
+  three ways, counts only: per support state (`states`), per PHP minor of the image (`php_image`, such as
+  `{"8.1": 3, "8.4": 9}`) and per Laravel major (`laravel`). Every stored snapshot gets the breakdown, including the
+  ones written before it existed, so the history reaches back as far as `rollcall prune` keeps snapshots.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
@@ -345,7 +348,7 @@ empty store each one says so in plain words and names `rollcall scan`.
 | Tool | What it answers |
 |---|---|
 | `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, and the snapshot date |
-| `rollcall_burn_down` | The dated EOL series, one point per scan day; optional `days` (an integer, 1 to 365) keeps only the most recent days |
+| `rollcall_burn_down` | The dated EOL series, one point per scan day, each with its counts per support state, PHP minor and Laravel major; optional `days` (an integer, 1 to 365) keeps only the most recent days |
 | `rollcall_supported_versions` | Every version in CREED's policy, grouped by what it says today: active, security only, or end of life |
 
 The tools take no path, command or URL, make no network call, and answer public counts only: the same fields

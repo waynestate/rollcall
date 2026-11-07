@@ -132,6 +132,9 @@ final class RollcallModuleTest extends TestCase
             $this->assertSame(1, $point['eol']);
             $this->assertSame(2, $point['supported']);
             $this->assertSame(1, $point['unknown']);
+            $this->assertSame(4, array_sum($point['states']), 'each point carries its roll per support state');
+            $this->assertSame(4, array_sum($point['php_image']), 'per PHP minor');
+            $this->assertSame(4, array_sum($point['laravel']), 'and per Laravel major');
         }
 
         $one = $this->call($tool, ['days' => 1]);

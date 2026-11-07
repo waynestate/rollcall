@@ -130,8 +130,62 @@ final class ReportTest extends TestCase
 
         $series = $this->builder()->build($second, [$first, $second], new DateTimeImmutable('2026-01-15'))['burn_down'];
 
-        $this->assertSame(['date' => '2025-12-01', 'apps' => 2, 'eol' => 0, 'supported' => 2, 'unknown' => 0], $series[0]);
-        $this->assertSame(['date' => '2026-01-15', 'apps' => 2, 'eol' => 1, 'supported' => 1, 'unknown' => 0], $series[1]);
+        $this->assertSame(['date' => '2025-12-01', 'apps' => 2, 'eol' => 0, 'supported' => 2, 'unknown' => 0], array_slice($series[0], 0, 5));
+        $this->assertSame(['date' => '2026-01-15', 'apps' => 2, 'eol' => 1, 'supported' => 1, 'unknown' => 0], array_slice($series[1], 0, 5));
+        $this->assertSame(['active' => 1, 'security_only' => 1, 'eol' => 0, 'unknown' => 0], $series[0]['states']);
+        $this->assertSame(['active' => 1, 'security_only' => 0, 'eol' => 1, 'unknown' => 0], $series[1]['states']);
+    }
+
+    public function test_each_burn_down_point_breaks_the_roll_down_by_php_minor_laravel_major_and_state(): void
+    {
+        $first = new Snapshot(new DateTimeImmutable('2026-09-01'), [
+            new AppFacts('g/a', phpImage: '8.1', laravel: '10.48.2'),
+            new AppFacts('g/b', phpImage: '8.1', laravel: '9.52.0'),
+            new AppFacts('g/c', phpImage: '8.10', laravel: '12.1.0'),
+            new AppFacts('g/d'),
+        ]);
+        $second = new Snapshot(new DateTimeImmutable('2026-10-01'), [
+            new AppFacts('g/a', phpImage: '8.4', laravel: '12.3.0'),
+            new AppFacts('g/b', phpImage: '8.1', laravel: '9.52.0'),
+            new AppFacts('g/c', phpImage: '8.10', laravel: '12.1.0'),
+            new AppFacts('g/d', phpImage: '8.3'),
+        ]);
+
+        $series = $this->builder()->build($second, [$first, $second], new DateTimeImmutable('2026-10-28'))['burn_down'];
+
+        $this->assertSame(['date', 'apps', 'eol', 'supported', 'unknown', 'states', 'php_image', 'laravel'], array_keys($series[0]));
+        $this->assertSame(['8.1' => 2, '8.10' => 1, 'unknown' => 1], $series[0]['php_image'], 'version order, not string order; unknown last');
+        $this->assertSame(['8.1' => 1, '8.3' => 1, '8.4' => 1, '8.10' => 1], $series[1]['php_image']);
+        $this->assertSame(['9' => 1, '10' => 1, '12' => 1, 'unknown' => 1], $series[0]['laravel']);
+        $this->assertSame(['9' => 1, '12' => 2, 'unknown' => 1], $series[1]['laravel']);
+        foreach ($series as $point) {
+            $this->assertSame($point['apps'], array_sum($point['states']));
+            $this->assertSame($point['apps'], array_sum($point['php_image']));
+            $this->assertSame($point['apps'], array_sum($point['laravel']));
+            $this->assertSame($point['supported'], $point['states']['active'] + $point['states']['security_only']);
+        }
+
+        $json = (new JsonRenderer())->render(['burn_down' => $series]);
+        $this->assertStringContainsString('"laravel": {', $json, 'a breakdown is a JSON object keyed by version, never a list');
+        $this->assertStringNotContainsString('g/', $json, 'the breakdown is counts only');
+    }
+
+    public function test_a_snapshot_stored_before_the_breakdown_existed_still_gets_one(): void
+    {
+        // The shape every 0.1.x scan wrote: schema_version 1, facts per app, no counts.
+        $old = Snapshot::fromArray([
+            'schema_version' => 1,
+            'date' => '2026-09-01',
+            'errors' => [],
+            'apps' => [['id' => 'g/a', 'php_image' => '8.2', 'laravel' => '11.0.0'], ['id' => 'g/b']],
+        ]);
+        $today = Fleet::snapshot(self::TODAY);
+
+        $series = $this->builder()->build($today, [$old, $today], new DateTimeImmutable(self::TODAY))['burn_down'];
+
+        $this->assertSame(['8.2' => 1, 'unknown' => 1], $series[0]['php_image']);
+        $this->assertSame(['11' => 1, 'unknown' => 1], $series[0]['laravel']);
+        $this->assertSame(['active' => 0, 'security_only' => 1, 'eol' => 0, 'unknown' => 1], $series[0]['states']);
     }
 
     public function test_the_first_report_has_no_previous_scan(): void
