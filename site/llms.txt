@@ -39,7 +39,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [Configuration | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/configuration.md): Every Rollcall setting is an environment variable; the table is generated and the GitLab setup follows it.
 - [Contract | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/contract.md): The JSON Schemas Rollcall's report, snapshots and inputs must match, and the suite that checks real output against them.
 - [Proof | Rollcall docs](https://rollcall.apps.wayne.edu/docs/reference/proof.md): Rollcall's first scheduled scan of the stack on GitLab CI, and a rerun over 58 Wayne State applications on 2026-11-06: what ran, what held, what it caught in Rollcall, and what it does not prove yet.
-- [Security notes | Rollcall docs](https://rollcall.apps.wayne.edu/docs/security.md): Rollcall is read-only toward every source, keeps the GitLab token out of git and output, and treats scanned files as data.
+- [Security notes | Rollcall docs](https://rollcall.apps.wayne.edu/docs/security.md): Rollcall is read-only toward every source, needs one read_api token and says exactly why, keeps that token out of git and output, and treats scanned files as data.
 
 ## Prompts
 

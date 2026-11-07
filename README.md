@@ -253,6 +253,11 @@ not read. The allowlist `ROLLCALL_GITLAB_PROJECTS` limits what Rollcall asks for
 never asks for another project), but it does not limit what the token can read; only the token's membership does.
 So the token's user must be a member of just those projects.
 
+Exactly which scope, and why each other scope stays off: `read_api` covers all five calls Rollcall makes (listed
+one by one, with the role and the expiry rules, under "The GitLab token, exactly" in
+[docs/security.md](docs/security.md)). Not `api`, not `read_repository` (Rollcall never clones), not `read_user`,
+not `self_rotate` (a person rotates the token, never Rollcall).
+
 ## WSU values (Playbook)
 
 `ROLLCALL_GITLAB_URL` is a Wayne State value, so it may come from Playbook (`waynestate/playbook`) when the
@@ -418,6 +423,8 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.
+- Every GitLab call, the scope that covers it, and the scopes the token must not have are tabled in
+  [docs/security.md](docs/security.md); a test fails if the adapter calls a path that table does not list.
 
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
