@@ -51,7 +51,11 @@ final class PublicSurfaceTest extends TestCase
             }
         }
 
-        foreach (['README.md', 'CHANGELOG.md', 'OPEN_QUESTIONS.md', 'BEST_PRACTICES.md'] as $name) {
+        foreach (glob(self::ROOT . '/ADR/*.md') ?: [] as $adr) {
+            $files[] = $adr;
+        }
+
+        foreach (['README.md', 'CHANGELOG.md', 'OPEN_QUESTIONS.md', 'BEST_PRACTICES.md', 'DECISIONS.md'] as $name) {
             $path = self::ROOT . '/' . $name;
             if (is_file($path)) {
                 $files[] = $path;

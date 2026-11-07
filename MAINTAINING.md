@@ -140,6 +140,10 @@ clean clone.
 
 When the list is done, record the date, the OS and the result of each item in the release merge request.
 
+Which script runs where (one PHP command, a `.ps1` and `.sh` pair, or only inside Citadel's container) is on the
+docs page Reference > Scripts on every OS (`docs/reference/scripts.md`). `tests/ScriptPairsTest.php` fails if a
+developer script ships without its twin.
+
 ## Releasing
 
 1. Move the lines under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog) to a new `## [X.Y.Z] - YYYY-MM-DD`

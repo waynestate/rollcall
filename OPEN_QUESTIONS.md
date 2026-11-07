@@ -1,23 +1,24 @@
 # Rollcall open questions
 
-What Rollcall 0.1 could not settle without a person, and the default it was built with. Roles, not names.
+What Rollcall could not settle without a person, and the default it was built with. Roles, not names. A settled
+question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is worth keeping).
 
 ## Questions
 
 | # | Question | Who can answer | What it blocks | Default built |
 |---|---|---|---|---|
 | 1 | Where are PROCTOR JSON reports stored (CI artifacts, a shared directory, an object store)? | PROCTOR/Preflight maintainer | Reading real results | A directory of reports, one file per app named `group__project.json`. `ProctorReportSource` is an interface, so an artifact or bucket reader drops in |
-| 2 | How do we get the Citadel app list, image tag and any forced-upgrade date: a read-only account or an export? And how does an app in that list map to a GitLab project? | Citadel platform team | Real image data; apps that are not in GitLab | A JSON export `{"apps":[{"project":"group/project","image":"..."}]}` joined on the repository path. Rollcall never calls Citadel |
+| 2 | How do we get the Citadel app list, image tag and any forced-upgrade date: a read-only account or an export? And how does an app in that list map to a GitLab project? | Citadel platform team | Real image data; apps that are not in GitLab | Two saved files, never a call: the portable image list `{"apps":[{"project":"group/project","image":"..."}]}`, or Citadel's own registrations export (`ROLLCALL_CITADEL_EXPORT`: each application's `repository` and `base_image`, plus `base_image_upgrades` with `due_date` and `completed`), joined on the repository path. What is left for the Citadel team: whether they can save that export on a schedule, or answer it from a read-only endpoint |
 | 3 | Which GitLab tier and version does git.wayne.edu run? | GitLab administrator | Leaked-token response, whether `HEAD` blob ids and `simple=true` behave as documented | Assumes the documented API on any tier; nothing needs Premium or Ultimate. The token-expiry warning uses `personal_access_tokens/self`, which exists on the 19.x series |
-| 4 | Who owns and rotates the `read_api` scanner token, and how long does it live? | Owner decided: a bot token requested from the GitLab administrator; rotation stays open | Scanning the real fleet | The token is a GitLab bot token (project or group bot, `read_api` only, with an expiry) requested from the GitLab administrator; it goes in the environment as `ROLLCALL_GITLAB_TOKEN`, never in git, and until it exists Rollcall runs on its fixtures. A 401/403 stops the scan loudly. `scan` prints a note 14 days before the token expires (and when it has already expired); the administrator rotates it before its expiry |
-| 5 | What is the lowest project role that can read the two Composer files with `read_api`? | GitLab administrator | Choosing the bot's role | Not tested on the instance; documented as an open check |
+| 4 | Who owns and rotates the `read_api` scanner token, and how long does it live? | Owner decided: a bot token requested from the GitLab administrator. Rotation is documented by role (the maintainer of the project that runs the scan); a named person stays the project owner's call | Scanning the real fleet | The token is a GitLab bot token (project or group bot, `read_api` only, with an expiry) requested from the GitLab administrator; it goes in the environment as `ROLLCALL_GITLAB_TOKEN`, never in git, and until it exists Rollcall runs on its fixtures. A 401/403 stops the scan loudly. `scan` prints a note 14 days before the token expires (and when it has already expired); the administrator rotates it before its expiry |
+| 5 | What is the lowest project role that can read the two Composer files with `read_api`? | Answered from GitLab's permissions: Reporter (Guest cannot read a private project's files) | Choosing the bot's role | Reporter on each scanned project, documented with every API call and its scope in `docs/security.md`. The first scheduled scan (2026-11-06) ran on a read-only service account with a `read_api` token; a Guest-role trial was not run |
 | 6 | Which Composer packages count as an "auth package" (the old CAS client, the CAS wrapper, SESAME)? | Auth/SESAME maintainer | Correct auth counts | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, plus the bare names `wayne-cas` and `simplecas`, which match that package under any vendor; first match in list order wins, so the exact `waynestate/wayne-cas` entry still beats the bare one; `ROLLCALL_AUTH_PACKAGES` overrides. The names other than SESAME are guesses. The 2026-11-03 proof run over the real fleet found the gap: every app counted as having no auth package, although about half use an in-house CAS client the public-only list missed |
 | 7 | Who may see the per-app list, and how is that decided? | Project owner / security owner | Turning on the internal page | Off. The Laravel per-app route needs `ROLLCALL_INTERNAL_ENABLED=true` and runs behind `auth.sesame`; no per-app access control beyond that |
 | 8 | May the public counts (`/report.json`, the dashboard) be published, and to whom? | Project owner | Serving them | `/report.json` is off by default; the Laravel dashboard is off by default and sends `noindex` |
 | 9 | How long are snapshots and per-app detail kept? | Project owner / records owner | Disk growth, privacy | Pruning is built: `ROLLCALL_RETENTION_DAYS` (default 90; 0 keeps forever), `rollcall scan --prune` and `rollcall prune [--dry-run]`. The newest snapshot is never deleted. The default window is still the owner's call |
 | 10 | CycloneDX or SPDX for a bill of materials, and is Dependency-Track wanted? | Security owner | The BOM feature | CycloneDX where a BOM is produced (lead decision); none is produced in 0.1 |
 | 11 | Should Rollcall fetch endoflife.date itself? | Project owner | Automatic drift flags | No. `rollcall drift` reads a saved page, so no unattended outbound call exists |
-| 12 | Who confirms an app's owner, and where is that recorded? | Project owner | "Owner unknown" tracking | Not built; the report carries no owner field at all |
+| 12 | Who confirms an app's owner, and where is that recorded? | Project owner | "Owner unknown" tracking and a people source | An owners file kept by the people who run Rollcall (`ROLLCALL_OWNERS_FILE`, internal), read only by `rollcall digest`. The report still carries no owner field, and no owner is guessed from commit authors. A people source (Rolodex) or a scheduled confirmation can replace the file later |
 | 13 | Does the dashboard need WayneUI's `app-shell` (public or internal template)? | WayneUI maintainer | Matching WayneUI exactly and the a11y gate | The Laravel page is plain HTML with WayneUI class names (`wsu-table`, `wsu-stat`, skip link) and links `ROLLCALL_WAYNEUI_CSS`. Swap to `<x-wsu::app-shell>` once WayneUI installs as a Composer dependency |
 | 14 | Who runs a Prometheus server for `/metrics`, and whether the Grafana instance imports the bundled dashboard as is | Grafana owner | Live burn-down | Dashboard JSON and endpoint are built and tested; nothing depends on a server |
 | 15 | Does the snapshot-per-day cadence suit the burn-down, and who schedules `rollcall scan`? | Project owner | Burn-down resolution | One snapshot per day; scheduling is the deployer's (cron, a Laravel schedule or a CI schedule) |
@@ -31,7 +32,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 | `ROLLCALL_GITLAB_TOKEN` | A GitLab bot token (project or group bot, `read_api` only, with an expiry), requested from the GitLab administrator; until it exists Rollcall runs on its fixtures | `replace-with-a-read-api-token` |
 | `ROLLCALL_GITLAB_GROUPS` | The groups that hold the fleet, from the platform owner | `group-or-path` |
 | `ROLLCALL_POLICY_FILE` | The released CREED `policy.json` | `./policy.json`; a snapshot copy sits in `tests/fixtures/` for tests only |
-| `ROLLCALL_IMAGES_FILE` | The Citadel team's app-list export | `tests/fixtures/images.json` (demo data) |
+| `ROLLCALL_IMAGES_FILE` or `ROLLCALL_CITADEL_EXPORT` | Any platform's app list, or the Citadel team's registrations export | `tests/fixtures/images.json` or `tests/fixtures/citadel-export.json` (demo data) |
 | `ROLLCALL_PROCTOR_DIR` | Wherever PROCTOR reports land | `tests/fixtures/proctor` (demo data) |
 | `ROLLCALL_METRICS_TOKEN` or `ROLLCALL_METRICS_ALLOW` | The Prometheus operator: a token for the scrape job, or its addresses | empty (metrics stay off) |
 | `ROLLCALL_STORE_DIR` | A writable, persistent directory on the host. Needed on OpenShift, Coolify or Docker as a mounted volume | `var/snapshots` |
@@ -42,7 +43,7 @@ What Rollcall 0.1 could not settle without a person, and the default it was buil
 
 | Item | Why it is left for 0.2+ |
 |---|---|
-| Citadel read-only adapter and the forced-upgrade date | No access path yet (question 2); `ImageSource` is ready for it |
+| A scheduled Citadel export | The reader and the forced-upgrade date are built (`ROLLCALL_CITADEL_EXPORT`); producing the file on a schedule is the Citadel team's (question 2) |
 | PROCTOR reports from CI artifacts | Storage not decided (question 1); the reader and interface exist |
 | Host census importer for apps not in GitLab | Needs the Citadel export format (question 2) |
 | endoflife.date client | Only the saved-file drift check is built (question 11) |

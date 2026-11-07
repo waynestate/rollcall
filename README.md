@@ -53,7 +53,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
@@ -66,13 +66,17 @@ to `src/Creed/` fails that check.
 
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
-| Source | Interface | 0.1 adapters |
+| Source | Interface | Adapters |
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
-| Runtime image per app | `ImageSource` | a JSON export of the app list |
+| Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
-Rollcall only reads from every source. The one thing it writes is its own snapshot directory.
+Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
+`rollcall digest --out` asks for them.
+
+The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are
+recorded in [DECISIONS.md](DECISIONS.md) and [ADR/](ADR/).
 
 ## Install
 
@@ -119,6 +123,7 @@ runs.
 ```
 rollcall scan       [--today=YYYY-MM-DD] [--prune[=DAYS]]
 rollcall report     [--format=text|json|prometheus] [--internal] [--today=YYYY-MM-DD]
+rollcall digest     [--owner=CONTACT] [--format=text|json] [--out=DIR] [--send] [--today=YYYY-MM-DD]
 rollcall drift      --feed=<file> [--component=php] [--today=YYYY-MM-DD]
 rollcall advisories --feed=<file> [--today=YYYY-MM-DD]
 rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
@@ -132,6 +137,9 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
 - `report` prints the latest snapshot against the policy as of today. `text` is a terminal table, `json` is the
   machine-readable form, `prometheus` is the metrics text (refused unless `ROLLCALL_METRICS_ENABLED=true`).
   `--internal` adds the per-app list; keep that output inside the project.
+- `digest` builds the opt-in owner digests (see "Owner digests" below): plain words about only one owner's apps,
+  only when something changed since the previous scan. It prints them; `--out=DIR` writes one text file each;
+  `--send` mails them, and only when sending is switched on too.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
    policy stays the source of truth. Rollcall does not fetch that page itself.
@@ -169,6 +177,11 @@ does not gate anything.
   `{"8.1": 3, "8.4": 9}`) and per Laravel major (`laravel`). Every stored snapshot gets the breakdown, including the
   ones written before it existed, so the history reaches back as far as `rollcall prune` keeps snapshots.
 
+- **Forced image upgrades**: with Citadel's export as the image source, how many apps have a forced base-image
+  upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The internal per-app
+  list carries each app's `upgrade_due`. Zero with any other image source. See
+  [docs/guides/citadel.md](docs/guides/citadel.md).
+
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
 
@@ -187,9 +200,14 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
 | `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
+| `ROLLCALL_CITADEL_EXPORT` | Citadel's saved registrations export, used instead of `ROLLCALL_IMAGES_FILE` (not both): base images plus forced upgrade dates. See [docs/guides/citadel.md](docs/guides/citadel.md) | none |
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
+| `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Internal; never in git | none (no digests) |
+| `ROLLCALL_DIGEST_MAIL_ENABLED` | Allow `rollcall digest --send` to mail | `false` |
+| `ROLLCALL_DIGEST_MAIL_DSN` | Symfony Mailer DSN for sending, such as `smtp://mail.example.test:25`. A secret: never in git, never printed | none |
+| `ROLLCALL_DIGEST_MAIL_FROM` | The from address of the digests | none |
 | `ROLLCALL_METRICS_ENABLED` | Turn metrics on (`CLI report --format=prometheus` and `/metrics`) | `false` |
 | `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
 | `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |
@@ -252,6 +270,37 @@ Why a per-project token: a group token on enterprise-apps would see other teams'
 not read. The allowlist `ROLLCALL_GITLAB_PROJECTS` limits what Rollcall asks for (it never lists the group and
 never asks for another project), but it does not limit what the token can read; only the token's membership does.
 So the token's user must be a member of just those projects.
+
+Exactly which scope, and why each other scope stays off: `read_api` covers all five calls Rollcall makes (listed
+one by one, with the role and the expiry rules, under "The GitLab token, exactly" in
+[docs/security.md](docs/security.md)). Not `api`, not `read_repository` (Rollcall never clones), not `read_user`,
+not `self_rotate` (a person rotates the token, never Rollcall).
+
+## Owner digests (opt-in)
+
+An owner who asks can get a short digest of only their own apps: what changed since the previous scan (an image
+upgrade, a new drift flag, one cleared, a PROCTOR result that moved), then where each app stands. Nothing changed,
+no digest. Nobody gets one by default, and no owner is ever guessed from commit authors.
+
+1. Keep an owners file outside git and point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`;
+   leaving the key out means no.
+
+   ```json
+   {
+       "owners": [
+           {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]}
+       ]
+   }
+   ```
+
+2. After a scan, `rollcall digest` prints each digest with news (`--format=json` for a script, `--owner=CONTACT`
+   for one owner). `--out=DIR` writes them as `<date>-<contact>.txt` instead, for a mail tool you already have.
+3. To have Rollcall mail them itself, install `symfony/mailer`, set `ROLLCALL_DIGEST_MAIL_ENABLED=true`,
+   `ROLLCALL_DIGEST_MAIL_DSN` and `ROLLCALL_DIGEST_MAIL_FROM`, and run `rollcall digest --send`. Without all four, it
+   sends nothing. Every contact must be a mail address, or nothing goes out at all.
+
+A digest names apps, so it is internal like the per-app list. It uses the report's own states and drift flags, so a
+digest and the report never disagree. Schedule it after `rollcall scan` (weekly suits the burn-down).
 
 ## WSU values (Playbook)
 
@@ -382,9 +431,13 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 ## Run the checks
 
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
+Why it is built this way is in [DECISIONS.md](DECISIONS.md) and the ADRs under [ADR/](ADR/).
 
-`composer ci` is the contract: manifest, tests, Pint, PHPStan, `composer audit`, a check that the front page
-versions table still matches CREED's policy, and a check that the docs site is current. PHP is not needed on the host:
+`composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
+check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
+The contract itself is JSON Schema in [`contract/`](contract/README.md): the report, the stored snapshot and the
+image list export. `tests/ContractTest.php` runs the real commands on the fixtures and validates their output
+against it, so a field cannot appear or vanish without the contract changing in the same commit. PHP is not needed on the host:
 
 ```
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
@@ -415,6 +468,8 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.
+- Every GitLab call, the scope that covers it, and the scopes the token must not have are tabled in
+  [docs/security.md](docs/security.md); a test fails if the adapter calls a path that table does not list.
 
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>

@@ -16,6 +16,7 @@ use Waynestate\Rollcall\Metrics\MetricsGuard;
 use Waynestate\Rollcall\Parse\ComposerReader;
 use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\Scan\Scanner;
+use Waynestate\Rollcall\Source\CitadelExportSource;
 use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
 use Waynestate\Rollcall\Source\DirectoryRepositorySource;
 use Waynestate\Rollcall\Source\GitLab\GitLabRepositorySource;
@@ -100,8 +101,21 @@ final class Factory
         return new DirectoryRepositorySource($this->config->reposDir);
     }
 
+    /**
+     * One image source or none. The Citadel export is one platform's source
+     * among others; the plain image list serves every other platform. Both
+     * at once would leave two answers for one app, so that is refused.
+     */
     private function images(): ?ImageSource
     {
+        if ($this->config->citadelExport !== null) {
+            if ($this->config->imagesFile !== null) {
+                throw new RollcallException('Set ROLLCALL_IMAGES_FILE or ROLLCALL_CITADEL_EXPORT, not both: each is a complete image source.');
+            }
+
+            return CitadelExportSource::fromFile($this->config->citadelExport);
+        }
+
         return $this->config->imagesFile === null ? null : JsonFileImageSource::fromFile($this->config->imagesFile);
     }
 

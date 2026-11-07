@@ -14,6 +14,7 @@ use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Source\ImageSource;
 use Waynestate\Rollcall\Source\ProctorReportSource;
 use Waynestate\Rollcall\Source\RepositorySource;
+use Waynestate\Rollcall\Source\UpgradeDueSource;
 
 /**
  * Calls the roll. For each repository it reads the two Composer files, then
@@ -115,12 +116,13 @@ final class Scanner
         if ($tag === null) {
             return $facts;
         }
+        $due = $this->images instanceof UpgradeDueSource ? $this->images->upgradeDue($facts->id) : null;
         $php = ImageTag::phpVersion($tag);
         if ($php === null) {
-            return $this->note($facts->with(imageTag: substr($tag, 0, 200)), 'image tag does not name a PHP version');
+            return $this->note($facts->with(imageTag: substr($tag, 0, 200), upgradeDue: $due), 'image tag does not name a PHP version');
         }
 
-        return $facts->with(imageTag: substr($tag, 0, 200), phpImage: $php);
+        return $facts->with(imageTag: substr($tag, 0, 200), phpImage: $php, upgradeDue: $due);
     }
 
     /** Drops stale per-scan fields carried over from the last snapshot. */
@@ -140,6 +142,7 @@ final class Scanner
             [],
             $facts->blobs,
             array_values(array_filter($facts->notes, static fn(string $n): bool => ! str_starts_with($n, 'PROCTOR report') && ! str_starts_with($n, 'image tag'))),
+            null,
         );
     }
 
@@ -159,6 +162,7 @@ final class Scanner
             $facts->overrides,
             $facts->blobs,
             [...$facts->notes, $note],
+            $facts->upgradeDue,
         );
     }
 }

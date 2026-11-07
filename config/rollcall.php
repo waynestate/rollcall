@@ -17,6 +17,8 @@ return [
     'gitlab_groups' => env('ROLLCALL_GITLAB_GROUPS'),
     'gitlab_projects' => env('ROLLCALL_GITLAB_PROJECTS'),
     'images_file' => env('ROLLCALL_IMAGES_FILE'),
+    // Or Citadel's own registrations export (base images and forced upgrade dates). One image source, not both.
+    'citadel_export' => env('ROLLCALL_CITADEL_EXPORT'),
     'proctor_dir' => env('ROLLCALL_PROCTOR_DIR'),
     'auth_packages' => env('ROLLCALL_AUTH_PACKAGES'),
     'retention_days' => env('ROLLCALL_RETENTION_DAYS', 90),

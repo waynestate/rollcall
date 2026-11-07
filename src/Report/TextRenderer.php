@@ -60,6 +60,17 @@ final class TextRenderer
         );
         $out[] = '';
 
+        $forced = self::arr($report['forced_upgrades'] ?? []);
+        if (($forced['pending'] ?? 0) > 0) {
+            $out[] = sprintf(
+                'Forced image upgrades pending: %s (%s due today or earlier), next due %s.',
+                self::cell($forced['pending']),
+                self::cell($forced['overdue'] ?? 0),
+                self::cell($forced['next_due'] ?? 'none ahead'),
+            );
+            $out[] = '';
+        }
+
         $burn = [];
         foreach (self::arr($report['burn_down'] ?? []) as $point) {
             $point = self::arr($point);

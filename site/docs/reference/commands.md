@@ -13,6 +13,7 @@ This page lists the commands (generated from the CLI) and what each one prints, 
 | Command | What it does |
 | --- | --- |
 | `rollcall advisories` | Check locked package versions against a saved Packagist security-advisories response. |
+| `rollcall digest` | Print (or write, or send) each opted-in owner's digest of what changed in their apps. |
 | `rollcall drift` | Compare policy.json with a saved endoflife.date v1 product file. |
 | `rollcall prune` | Delete snapshots older than the retention window; the newest is never deleted. |
 | `rollcall report` | Print the fleet report from the stored snapshots. |
@@ -28,6 +29,21 @@ Usage: `rollcall advisories [--today TODAY] [--feed FEED]`
 | --- | --- | --- |
 | `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
 | `--feed=VALUE` | Path to the saved Packagist security-advisories JSON. |  |
+| `--silent` | Do not output any message |  |
+
+### `rollcall digest` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-digest)
+
+Print (or write, or send) each opted-in owner's digest of what changed in their apps.
+
+Usage: `rollcall digest [--today TODAY] [--owner OWNER] [--format FORMAT] [--out OUT] [--send]`
+
+| Option | Meaning | Default |
+| --- | --- | --- |
+| `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
+| `--owner=VALUE` | Only this contact from the owners file. |  |
+| `--format=VALUE` | text or json. | `text` |
+| `--out=VALUE` | Write one text file per digest into this directory instead of printing them. |  |
+| `--send` | Mail the digests. Needs ROLLCALL_DIGEST_MAIL_ENABLED=true, ROLLCALL_DIGEST_MAIL_DSN and ROLLCALL_DIGEST_MAIL_FROM. |  |
 | `--silent` | Do not output any message |  |
 
 ### `rollcall drift` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-drift)

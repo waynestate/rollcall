@@ -1,0 +1,198 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/waynestate/rollcall/blob/main/contract/report.schema.json",
+    "title": "Rollcall report",
+    "description": "What `rollcall report --format=json` prints and `GET /report.json` serves. The public view is counts and progress only; the internal view (`--internal`) adds the per-app list and the scan notes. Every object is closed (additionalProperties false), so a new field is a contract change made in the same commit.",
+    "type": "object",
+    "required": ["tool", "version", "scan_date", "as_of", "visibility", "totals", "image_states", "php_image", "php_floor", "laravel", "auth_package", "proctor", "drift", "progress", "forced_upgrades", "burn_down"],
+    "additionalProperties": false,
+    "properties": {
+        "tool": {"const": "rollcall"},
+        "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"},
+        "scan_date": {"$ref": "#/$defs/date"},
+        "as_of": {"$ref": "#/$defs/date"},
+        "visibility": {"enum": ["public", "internal"]},
+        "totals": {
+            "type": "object",
+            "required": ["apps", "scan_errors"],
+            "additionalProperties": false,
+            "properties": {
+                "apps": {"$ref": "#/$defs/count"},
+                "scan_errors": {"$ref": "#/$defs/count"}
+            }
+        },
+        "image_states": {"$ref": "#/$defs/stateCounts"},
+        "php_image": {"$ref": "#/$defs/tally"},
+        "php_floor": {"$ref": "#/$defs/tally"},
+        "laravel": {"$ref": "#/$defs/tally"},
+        "auth_package": {
+            "description": "Apps per auth package: a Composer package name, or \"none\".",
+            "type": "object",
+            "propertyNames": {"pattern": "^(none|[a-z0-9]([_.-]?[a-z0-9]+)*/[a-z0-9](([_.]|-{1,2})?[a-z0-9]+)*)$"},
+            "additionalProperties": {"$ref": "#/$defs/count"}
+        },
+        "proctor": {
+            "type": "object",
+            "required": ["pass", "fail", "none"],
+            "additionalProperties": false,
+            "properties": {
+                "pass": {"$ref": "#/$defs/count"},
+                "fail": {"$ref": "#/$defs/count"},
+                "none": {"$ref": "#/$defs/count"}
+            }
+        },
+        "drift": {
+            "description": "Apps per drift kind. Every kind is always present, zeros included.",
+            "type": "object",
+            "required": ["image_eol", "image_unknown", "image_below_floor", "floor_allows_eol", "floor_unbounded", "eol_past_grace", "laravel_eol", "proctor_missing", "proctor_failing", "override_expired"],
+            "additionalProperties": false,
+            "properties": {
+                "image_eol": {"$ref": "#/$defs/count"},
+                "image_unknown": {"$ref": "#/$defs/count"},
+                "image_below_floor": {"$ref": "#/$defs/count"},
+                "floor_allows_eol": {"$ref": "#/$defs/count"},
+                "floor_unbounded": {"$ref": "#/$defs/count"},
+                "eol_past_grace": {"$ref": "#/$defs/count"},
+                "laravel_eol": {"$ref": "#/$defs/count"},
+                "proctor_missing": {"$ref": "#/$defs/count"},
+                "proctor_failing": {"$ref": "#/$defs/count"},
+                "override_expired": {"$ref": "#/$defs/count"}
+            }
+        },
+        "progress": {
+            "type": "object",
+            "required": ["since", "moved", "upgraded_to_supported", "new_apps", "gone_apps"],
+            "additionalProperties": false,
+            "properties": {
+                "since": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                "moved": {"$ref": "#/$defs/count"},
+                "upgraded_to_supported": {"$ref": "#/$defs/count"},
+                "new_apps": {"$ref": "#/$defs/count"},
+                "gone_apps": {"$ref": "#/$defs/count"}
+            }
+        },
+        "forced_upgrades": {
+            "description": "Pending forced image upgrades from a Citadel export, counted: apps with one, apps whose date is today or earlier, and the next date still ahead. Zeros and null when the image source cannot say.",
+            "type": "object",
+            "required": ["pending", "overdue", "next_due"],
+            "additionalProperties": false,
+            "properties": {
+                "pending": {"$ref": "#/$defs/count"},
+                "overdue": {"$ref": "#/$defs/count"},
+                "next_due": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]}
+            }
+        },
+        "burn_down": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/burnDownPoint"}
+        },
+        "apps": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/app"}
+        },
+        "scan_errors": {
+            "type": "array",
+            "items": {"type": "string"}
+        }
+    },
+    "if": {"properties": {"visibility": {"const": "internal"}}},
+    "then": {"required": ["apps", "scan_errors"]},
+    "else": {"not": {"anyOf": [{"required": ["apps"]}, {"required": ["scan_errors"]}]}},
+    "$defs": {
+        "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+        "count": {"type": "integer", "minimum": 0},
+        "version": {"type": "string", "pattern": "^\\d+(\\.\\d+)?$"},
+        "state": {
+            "description": "CREED's answer for a version on the report day, in Rollcall's words.",
+            "enum": ["active", "security_only", "eol", "unknown", "newer than CREED's policy; treated as current"]
+        },
+        "driftKind": {
+            "enum": ["image_eol", "image_unknown", "image_below_floor", "floor_allows_eol", "floor_unbounded", "eol_past_grace", "laravel_eol", "proctor_missing", "proctor_failing", "override_expired"]
+        },
+        "stateCounts": {
+            "type": "object",
+            "required": ["active", "security_only", "eol", "unknown"],
+            "additionalProperties": false,
+            "properties": {
+                "active": {"$ref": "#/$defs/count"},
+                "security_only": {"$ref": "#/$defs/count"},
+                "eol": {"$ref": "#/$defs/count"},
+                "unknown": {"$ref": "#/$defs/count"}
+            }
+        },
+        "versionCounts": {
+            "description": "Apps per version, keyed by version, with \"unknown\" for an app whose version is not known.",
+            "type": "object",
+            "propertyNames": {"pattern": "^(unknown|\\d+(\\.\\d+)?)$"},
+            "additionalProperties": {"$ref": "#/$defs/count"}
+        },
+        "tally": {
+            "description": "One row per version in version order, \"unknown\" last.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["version", "apps", "state", "security_until", "days_to_eol"],
+                "additionalProperties": false,
+                "properties": {
+                    "version": {"oneOf": [{"$ref": "#/$defs/version"}, {"const": "unknown"}]},
+                    "apps": {"type": "integer", "minimum": 1},
+                    "state": {"$ref": "#/$defs/state"},
+                    "security_until": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                    "days_to_eol": {"type": ["integer", "null"]}
+                }
+            }
+        },
+        "burnDownPoint": {
+            "type": "object",
+            "required": ["date", "apps", "eol", "supported", "unknown", "states", "php_image", "laravel"],
+            "additionalProperties": false,
+            "properties": {
+                "date": {"$ref": "#/$defs/date"},
+                "apps": {"$ref": "#/$defs/count"},
+                "eol": {"$ref": "#/$defs/count"},
+                "supported": {"$ref": "#/$defs/count"},
+                "unknown": {"$ref": "#/$defs/count"},
+                "states": {"$ref": "#/$defs/stateCounts"},
+                "php_image": {"$ref": "#/$defs/versionCounts"},
+                "laravel": {"$ref": "#/$defs/versionCounts"}
+            }
+        },
+        "override": {
+            "type": "object",
+            "required": ["check", "reason", "expires", "expired"],
+            "additionalProperties": false,
+            "properties": {
+                "check": {"type": "string"},
+                "reason": {"type": "string"},
+                "expires": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                "expired": {"type": "boolean"}
+            }
+        },
+        "app": {
+            "description": "One app in the internal view. The id is the repository path; it never appears in the public view.",
+            "type": "object",
+            "required": ["id", "php_image", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
+            "additionalProperties": false,
+            "properties": {
+                "id": {"type": "string", "minLength": 1},
+                "php_image": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
+                "image_state": {"$ref": "#/$defs/state"},
+                "php_floor": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
+                "floor_state": {"$ref": "#/$defs/state"},
+                "laravel": {"type": ["string", "null"]},
+                "laravel_state": {"$ref": "#/$defs/state"},
+                "auth_package": {"type": ["string", "null"]},
+                "auth_version": {"type": ["string", "null"]},
+                "proctor": {"enum": ["pass", "fail", null]},
+                "overrides": {"type": "array", "items": {"$ref": "#/$defs/override"}},
+                "drift": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/driftKind"}},
+                "upgraded_on": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                "upgrade_due": {
+                    "description": "The due date of the app's pending forced image upgrade from a Citadel export, or null.",
+                    "oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]
+                },
+                "notes": {"type": "array", "items": {"type": "string"}}
+            }
+        }
+    }
+}

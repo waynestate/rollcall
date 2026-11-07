@@ -55,6 +55,10 @@
                     "Export of the app list: {\"apps\": [{\"project\": \"group/project\", \"image\": \"php:8.4-apache\"}]}",
                     "none"
                 ],
+                "ROLLCALL_CITADEL_EXPORT": [
+                    "Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide",
+                    "none"
+                ],
                 "ROLLCALL_PROCTOR_DIR": [
                     "PROCTOR JSON reports, one per app: group/project is read from group__project.json",
                     "none"
@@ -66,6 +70,22 @@
                 "ROLLCALL_RETENTION_DAYS": [
                     "How many days of snapshots to keep; the newest is never deleted",
                     "`90` (0 keeps everything)"
+                ],
+                "ROLLCALL_OWNERS_FILE": [
+                    "Owners file for the digests: who answers for which apps, and who opted in with \"digest\": true. Internal; never in git",
+                    "none (no digests)"
+                ],
+                "ROLLCALL_DIGEST_MAIL_ENABLED": [
+                    "Allow `rollcall digest --send` to mail",
+                    "`false`"
+                ],
+                "ROLLCALL_DIGEST_MAIL_DSN": [
+                    "Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed",
+                    "none"
+                ],
+                "ROLLCALL_DIGEST_MAIL_FROM": [
+                    "The from address of the digests",
+                    "none"
                 ],
                 "ROLLCALL_METRICS_ENABLED": [
                     "Turn metrics on (CLI report --format=prometheus and /metrics)",

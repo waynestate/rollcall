@@ -1,0 +1,60 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/waynestate/rollcall/blob/main/contract/snapshot.schema.json",
+    "title": "Rollcall snapshot",
+    "description": "One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json`. Facts only: states are derived from the policy when a report is built, so an old snapshot is re-read against the dates that applied on its day. Internal data: it holds app ids.",
+    "type": "object",
+    "required": ["schema_version", "date", "errors", "apps"],
+    "additionalProperties": false,
+    "properties": {
+        "schema_version": {"const": 1},
+        "date": {"$ref": "#/$defs/date"},
+        "errors": {"type": "array", "items": {"type": "string"}},
+        "apps": {"type": "array", "items": {"$ref": "#/$defs/app"}}
+    },
+    "$defs": {
+        "date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+        "version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+        "app": {
+            "type": "object",
+            "required": ["id", "php_constraint", "php_floor", "image_tag", "php_image", "laravel", "auth_package", "auth_version", "proctor_result", "proctor_version", "overrides", "blobs", "notes"],
+            "additionalProperties": false,
+            "properties": {
+                "id": {"type": "string", "minLength": 1},
+                "php_constraint": {"type": ["string", "null"]},
+                "php_floor": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
+                "image_tag": {"type": ["string", "null"], "maxLength": 200},
+                "php_image": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
+                "laravel": {"type": ["string", "null"]},
+                "auth_package": {"type": ["string", "null"]},
+                "auth_version": {"type": ["string", "null"]},
+                "proctor_result": {"enum": ["pass", "fail", null]},
+                "proctor_version": {"type": ["string", "null"]},
+                "overrides": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["check", "reason", "expires", "expired"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "check": {"type": "string"},
+                            "reason": {"type": "string"},
+                            "expires": {"oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]},
+                            "expired": {"type": "boolean"}
+                        }
+                    }
+                },
+                "blobs": {
+                    "description": "File name to the blob id last read, so an unchanged file is not fetched again.",
+                    "type": "object",
+                    "additionalProperties": {"type": "string"}
+                },
+                "notes": {"type": "array", "items": {"type": "string"}},
+                "upgrade_due": {
+                    "description": "Due date of a pending forced image upgrade (Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]
+                }
+            }
+        }
+    }
+}

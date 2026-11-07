@@ -5,7 +5,9 @@
   <url><loc>https://rollcall.apps.wayne.edu/docs/architecture.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/checks.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/guides/advisor.html</loc></url>
+  <url><loc>https://rollcall.apps.wayne.edu/docs/guides/citadel.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html</loc></url>
+  <url><loc>https://rollcall.apps.wayne.edu/docs/guides/digest.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/guides/laravel.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/guides/metrics.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/guides/quick-start.html</loc></url>
@@ -15,6 +17,8 @@
   <url><loc>https://rollcall.apps.wayne.edu/docs/install.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/reference/commands.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/reference/configuration.html</loc></url>
+  <url><loc>https://rollcall.apps.wayne.edu/docs/reference/contract.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/reference/proof.html</loc></url>
+  <url><loc>https://rollcall.apps.wayne.edu/docs/reference/scripts.html</loc></url>
   <url><loc>https://rollcall.apps.wayne.edu/docs/security.html</loc></url>
 </urlset>

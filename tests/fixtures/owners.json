@@ -1,0 +1,7 @@
+{
+    "owners": [
+        {"contact": "ledger-team@example.test", "digest": true, "projects": ["demo/ledger", "demo/atlas"]},
+        {"contact": "relic-team@example.test", "digest": true, "projects": ["demo/relic"]},
+        {"contact": "quiet-team@example.test", "projects": ["demo/broken"]}
+    ]
+}

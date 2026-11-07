@@ -15,8 +15,12 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | Variable | Meaning | Default | Read in |
 | --- | --- | --- | --- |
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
+| ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
 | ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
+| ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
+| ROLLCALL_DIGEST_MAIL_ENABLED | Allow `rollcall digest --send` to mail | `false` | src/Config.php |
+| ROLLCALL_DIGEST_MAIL_FROM | The from address of the digests | none | src/Config.php |
 | ROLLCALL_GITLAB_GROUPS | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none | config/rollcall.php |
 | ROLLCALL_GITLAB_PROJECTS | Comma-separated full group/project paths; when set, only those projects are scanned and no group is listed | none | config/rollcall.php |
 | ROLLCALL_GITLAB_TOKEN | A GitLab bot or personal access token with the read_api scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed | none | config/rollcall.php |
@@ -26,6 +30,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
+| ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Internal; never in git | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
 | ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group\_\_project.json | none | config/rollcall.php |
 | ROLLCALL_PUBLIC_REPORT_ENABLED | Serve GET /report.json (public counts only) | `false` | config/rollcall.php |

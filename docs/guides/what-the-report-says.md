@@ -1,11 +1,11 @@
 ---
 title: What the report says
-description: The sections of a Rollcall report: versions, states, drift kinds, progress and the EOL burn-down.
+description: The sections of a Rollcall report: versions, states, drift kinds, progress, the EOL burn-down and forced upgrades.
 ---
 
 # What the report says
 
-This page explains each part of the report. Next: [run the collector in Docker](collector-docker.md) if you scan a real GitLab.
+This page explains each part of the report. Next: [Citadel's registrations export](citadel.md) if your apps run on Citadel.
 
 - **Apps present and scan notes**: the first line counts the apps the scan read, then the notes it printed and carried
   on past (`totals.scan_errors` in JSON, `rollcall_scan_errors` in metrics). Today a note means a source is not
@@ -36,6 +36,10 @@ This page explains each part of the report. Next: [run the collector in Docker](
   It reaches back as far as `rollcall prune` keeps snapshots (`ROLLCALL_RETENTION_DAYS`). A report written by 0.1.9
   or older has no `states`, `php_image` or `laravel` on its burn-down days: read that as "no breakdown", not as zero
   apps.
+
+- **Forced image upgrades**: with [Citadel's export](citadel.md) as the image source, how many apps have a forced
+  base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only).
+  The internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source.
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.
