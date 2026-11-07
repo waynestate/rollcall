@@ -84,7 +84,7 @@ recorded in [DECISIONS.md](DECISIONS.md) and [ADR/](ADR/).
 composer require waynestate/rollcall
 ```
 
-Rollcall 0.1.9 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+Rollcall 0.1.10 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 ## Quick start
 

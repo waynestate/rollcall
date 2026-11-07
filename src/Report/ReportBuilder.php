@@ -20,7 +20,7 @@ use Waynestate\Rollcall\Model\Snapshot;
  */
 final class ReportBuilder
 {
-    public const VERSION = '0.1.9';          // fallback for a dev checkout
+    public const VERSION = '0.1.10';          // fallback for a dev checkout
     private const PACKAGE = 'waynestate/rollcall';
 
     /**
