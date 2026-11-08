@@ -28,6 +28,7 @@ shell on the host.
 | Windows (PowerShell) | Linux and macOS (bash) | What they do |
 |---|---|---|
 | `scripts/a11y.ps1` | `scripts/a11y.sh` | The front page accessibility gate: axe-core in Playwright, in Docker |
+| `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public and internal dashboard pages with PHPUnit, then runs the same axe-core check on both, in Docker |
 | `deploy/scripts/parity.ps1` | `deploy/scripts/parity.sh` | Runs the front page locally on the Citadel PHP image behind a proxy (Squire's) |
 
 `scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.

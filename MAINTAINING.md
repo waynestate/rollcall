@@ -35,6 +35,7 @@ Development happens on git.wayne.edu, the canonical repository ([enterprise-apps
 | Check the CREED copy, Linux and macOS | `CREED_PATH=../creed composer creed-copy:check` |
 | Regenerate the front page versions table | `composer site:versions` |
 | Front page accessibility gate | `scripts/a11y.sh` (Linux and macOS) or `scripts/a11y.ps1` (Windows); both run in Docker |
+| Dashboard accessibility gate | `scripts/dashboard-a11y.sh` (Linux and macOS) or `scripts/dashboard-a11y.ps1` (Windows); both run in Docker and write the rendered pages to `build/dashboard-a11y/` |
 
 The README's "Quick start" runs `scan` and `report` against fixtures on Windows (PowerShell `$env:ROLLCALL_*`
 settings) and on Linux and macOS (`export ROLLCALL_*`).
