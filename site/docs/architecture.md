@@ -18,6 +18,8 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`; until Rollcall switches, the copy stays. To refresh it, run `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed` from a CREED checkout. `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit to `src/Creed/` fails that check.
 
+Weekly CREED copy refresh: a scheduled GitLab job (`creed-copy-refresh`, Mondays, an hour after CREED's policy robot) re-exports the copy from CREED main, rebuilds the versions table and docs, runs `composer creed-copy:check` and `composer ci`, and pushes to main only when both pass. A red run leaves main untouched. The steps are in [Scripts on every OS](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-gitlab-ci-only).
+
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
 | Source | Interface | Adapters |

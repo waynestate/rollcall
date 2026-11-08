@@ -43,5 +43,14 @@ and owns them (`deploy/.squire.json`):
 | `deploy/deployments/001-first-release.sh` | Once, when the first release starts |
 | `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
 
+## Inside GitLab CI only
+
+This runs in a GitLab CI job on the Linux composer image, never on a developer machine, so it has no Windows twin.
+It still keeps to POSIX sh and macOS-safe tools, like every `.sh` here.
+
+| File | When GitLab runs it |
+|---|---|
+| `tools/creed-copy-refresh.sh` | The weekly `creed-copy-refresh` job (or a web pipeline on main): re-exports the CREED copy from CREED main, rebuilds the versions table, docs and agent-ready files, runs `composer creed-copy:check` and `composer ci`, and pushes to main with the job token only when both pass |
+
 Before a release, a maintainer runs the smoke test on all three OSes; the checklist is in
 [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md), "Smoke test on every OS".

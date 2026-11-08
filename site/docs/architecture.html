@@ -52,6 +52,10 @@ until Rollcall switches, the copy stays. To refresh it, run
 <code>php &lt;creed&gt;/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed</code> from a CREED checkout.
 <code>composer creed-copy:check</code> proves the copy has not drifted (it reads the checkout from <code>CREED_PATH</code>); a hand edit
 to <code>src/Creed/</code> fails that check.</p>
+<p>Weekly CREED copy refresh: a scheduled GitLab job (<code>creed-copy-refresh</code>, Mondays, an hour after CREED's policy
+robot) re-exports the copy from CREED main, rebuilds the versions table and docs, runs <code>composer creed-copy:check</code>
+and <code>composer ci</code>, and pushes to main only when both pass. A red run leaves main untouched. The steps are in
+<a href="reference/scripts.html#inside-gitlab-ci-only">Scripts on every OS</a>.</p>
 <p>Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>

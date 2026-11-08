@@ -20,6 +20,11 @@ until Rollcall switches, the copy stays. To refresh it, run
 `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit
 to `src/Creed/` fails that check.
 
+Weekly CREED copy refresh: a scheduled GitLab job (`creed-copy-refresh`, Mondays, an hour after CREED's policy
+robot) re-exports the copy from CREED main, rebuilds the versions table and docs, runs `composer creed-copy:check`
+and `composer ci`, and pushes to main only when both pass. A red run leaves main untouched. The steps are in
+[Scripts on every OS](reference/scripts.md#inside-gitlab-ci-only).
+
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
 | Source | Interface | Adapters |

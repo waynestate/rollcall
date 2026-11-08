@@ -61,6 +61,11 @@ until Rollcall switches, the copy stays. To refresh it, run
 `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit
 to `src/Creed/` fails that check.
 
+Weekly CREED copy refresh: a scheduled GitLab job (`creed-copy-refresh`, Mondays, an hour after CREED's policy
+robot) re-exports the copy from CREED main, rebuilds the versions table and docs, runs `composer creed-copy:check`
+and `composer ci`, and pushes to main only when both pass. A red run leaves main untouched. Details in
+MAINTAINING.md, "Refreshing the CREED copy".
+
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
 | Source | Interface | Adapters |
@@ -854,6 +859,8 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`; until Rollcall switches, the copy stays. To refresh it, run `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed` from a CREED checkout. `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit to `src/Creed/` fails that check.
 
+Weekly CREED copy refresh: a scheduled GitLab job (`creed-copy-refresh`, Mondays, an hour after CREED's policy robot) re-exports the copy from CREED main, rebuilds the versions table and docs, runs `composer creed-copy:check` and `composer ci`, and pushes to main only when both pass. A red run leaves main untouched. The steps are in [Scripts on every OS](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-gitlab-ci-only).
+
 Data comes in through three interfaces. Each has a fixture adapter, so you can try everything without a live host:
 
 | Source | Interface | Adapters |
@@ -1642,6 +1649,14 @@ These run on Citadel's Linux container, never on a developer machine, so they ha
 | `deploy/build.sh` | At image build time, as root, with `/bin/sh` |
 | `deploy/deployments/001-first-release.sh` | Once, when the first release starts |
 | `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
+
+### Inside GitLab CI only[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-gitlab-ci-only)
+
+This runs in a GitLab CI job on the Linux composer image, never on a developer machine, so it has no Windows twin. It still keeps to POSIX sh and macOS-safe tools, like every `.sh` here.
+
+| File | When GitLab runs it |
+| --- | --- |
+| `tools/creed-copy-refresh.sh` | The weekly `creed-copy-refresh` job (or a web pipeline on main): re-exports the CREED copy from CREED main, rebuilds the versions table, docs and agent-ready files, runs `composer creed-copy:check` and `composer ci`, and pushes to main with the job token only when both pass |
 
 Before a release, a maintainer runs the smoke test on all three OSes; the checklist is in [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md), "Smoke test on every OS".
 

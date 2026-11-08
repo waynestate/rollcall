@@ -28,6 +28,15 @@ final class ScriptPairsTest extends TestCase
         'deploy/deployments/001-first-release.sh',
     ];
 
+    /**
+     * Shell files that run only inside a GitLab CI job (Linux, the composer
+     * image), never on a developer machine, so they have no .ps1 twin. They
+     * still keep to macOS bash 3.2 and POSIX tools like every other .sh.
+     */
+    private const CI_ONLY = [
+        'tools/creed-copy-refresh.sh',
+    ];
+
     /** @return list<string> repo-relative paths of every .sh and .ps1 outside vendor and node_modules */
     private function scripts(): array
     {
@@ -53,7 +62,7 @@ final class ScriptPairsTest extends TestCase
         $this->assertContains('scripts/a11y.sh', $scripts);
 
         foreach ($scripts as $path) {
-            if (in_array($path, self::SERVER_SIDE, true)) {
+            if (in_array($path, self::SERVER_SIDE, true) || in_array($path, self::CI_ONLY, true)) {
                 continue;
             }
             $twin = str_ends_with($path, '.sh') ? substr($path, 0, -3) . '.ps1' : substr($path, 0, -4) . '.sh';
@@ -63,7 +72,7 @@ final class ScriptPairsTest extends TestCase
 
     public function test_the_server_side_list_is_current(): void
     {
-        foreach (self::SERVER_SIDE as $path) {
+        foreach (array_merge(self::SERVER_SIDE, self::CI_ONLY) as $path) {
             $this->assertFileExists(self::ROOT . '/' . $path, $path . ' is listed as server-side but no longer exists');
         }
     }

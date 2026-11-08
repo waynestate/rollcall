@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: a weekly `creed-copy-refresh` CI job (`tools/creed-copy-refresh.sh`; schedule variable `ROLLCALL_JOB=creed-copy`, or by hand from the web on main) re-exports the generated CREED copy in `src/Creed` from CREED main, rebuilds the versions table, docs and agent-ready files, runs `composer creed-copy:check` and `composer ci`, and pushes to main with the job token only when both pass; a red run leaves main untouched.
 - Added: each app's `booster-hop.json` (Booster's hop record) is read from its default branch; the snapshot keeps `booster_result`, `booster_version` and `booster_at` (BOOSTER-24).
 - Added: the Citadel export may carry php_version and httpd_version per app; Rollcall keeps them and shows "PHP (running)" and "httpd (running)" columns, blank until Citadel sends them.
 - Changed: the generated CREED copy in `src/Creed` is refreshed from CREED 0.1.7-21 (was 0.1.2): newer policy versions (Laravel 12.71.0 and 13.40.0 from the first policy-bot refresh), the `sessions` block, and the reader gains `requires()`, `phpRange()` and `abandonedPackages()`; `composer creed-copy:check` passes again.

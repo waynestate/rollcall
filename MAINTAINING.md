@@ -64,6 +64,16 @@ php ../creed/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Cre
 
 Then run the copy check and `composer ci`, and commit with the CREED commit in the message.
 
+**Weekly CREED copy refresh.** The `creed-copy-refresh` job (`tools/creed-copy-refresh.sh`) does this without a
+person every Monday at 07:03 America/Detroit, one hour after CREED's policy robot. It clones CREED main with the job
+token, re-exports the copy, reruns `composer site:versions`, the docs builder and the agent-ready builder, then runs
+`composer creed-copy:check` and the full `composer ci`. Only when both pass does it push one commit to main, as
+"CREED copy bot". No change in the copy (a moved version stamp in `manifest.json` does not count) means no commit. A
+red run pushes nothing, so main stays as it was and next week's run tries again. The schedule is a GitLab setting
+(CI/CD > Schedules, weekly, variable `ROLLCALL_JOB=creed-copy`); to run it now, start a pipeline on main from the
+web. GitLab starts no pipeline for a job-token push, which is why the job runs the whole gate before it pushes. Use
+the hand steps above only when a refresh cannot wait for Monday.
+
 ## Public output stays anonymous
 
 The per-app list a scan produces is internal data. Nothing in this repo (fixtures, docs, screenshots) may name a real
