@@ -73,7 +73,8 @@ CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html"]
 # playwright stops matching the image tag. Exact versions from
 # tools/a11y/package.json, no install scripts: the image already carries
 # Chromium for this playwright release.
-INNER='if [ ! -d tools/a11y/node_modules/playwright ] || [ "$(node -p require("tools/a11y/node_modules/playwright/package.json").version 2>/dev/null || echo none)" != "$A11Y_PW" ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund); fi
+INNER='INSTALLED=$(sed -n "s/\"version\": *\"\([^\"]*\)\"/\1/p" tools/a11y/node_modules/playwright/package.json 2>/dev/null | sed -n 1p)
+if [ -z "$INSTALLED" ] || [ "$INSTALLED" != "$A11Y_PW" ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund); fi
 printf "%s\n" "$A11Y_CONFIG" > /tmp/a11y-config.json
 A11Y_REPORT_DIR=/work/build/dashboard-a11y node tools/a11y/check.mjs /tmp/a11y-config.json'
 
