@@ -15,6 +15,7 @@ use Waynestate\Rollcall\Digest\Digest;
 use Waynestate\Rollcall\Digest\DigestBuilder;
 use Waynestate\Rollcall\Digest\DigestMailer;
 use Waynestate\Rollcall\Factory;
+use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\Owner\Owners;
 use Waynestate\Rollcall\Report\JsonRenderer;
@@ -26,7 +27,9 @@ use Waynestate\Rollcall\Storage\DigestFileWriter;
  * The opt-in digest: each owner who asked gets plain words about only their
  * own apps, and only when something changed since the previous scan. Prints
  * by default; --out writes files; --send mails, and only when sending is also
- * switched on in the environment. Nobody is ever mailed by accident.
+ * switched on in the environment. Nobody is ever mailed by accident. A
+ * scanned app that no entry of the owners file lists is named on stderr (and
+ * in the JSON) as "no owner on file", so it is never quietly skipped.
  */
 final class DigestCommand extends RollcallCommand
 {
@@ -86,6 +89,11 @@ final class DigestCommand extends RollcallCommand
         $digests = (new DigestBuilder())->build($chosen, $current, $before);
         $news = array_values(array_filter($digests, static fn(Digest $d): bool => $d->hasNews()));
         $errors = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+        // An app nobody answers for is said out loud, never silently left out of every digest.
+        $unowned = array_map(
+            static fn(string $id): string => (string) preg_replace('/[\x00-\x1F\x7F]/', '', $id),
+            $owners->unowned(array_map(static fn(AppFacts $app): string => $app->id, $latest->apps)),
+        );
 
         if ($mailer !== null) {
             foreach ($news as $digest) {
@@ -100,7 +108,7 @@ final class DigestCommand extends RollcallCommand
             $files = (new DigestFileWriter($out))->write($news);
             $errors->writeln(sprintf('Wrote %d digest %s to %s.', count($files), count($files) === 1 ? 'file' : 'files', $out));
         } else {
-            $output->write($format === 'json' ? $this->json($latest, $previous, count($chosen), $news) : $this->text($news), false, OutputInterface::OUTPUT_RAW);
+            $output->write($format === 'json' ? $this->json($latest, $previous, count($chosen), $news, $unowned) : $this->text($news), false, OutputInterface::OUTPUT_RAW);
         }
 
         if ($mailer !== null) {
@@ -108,6 +116,19 @@ final class DigestCommand extends RollcallCommand
                 $mailer->send($digest);
             }
             $errors->writeln(sprintf('Sent %d %s.', count($news), count($news) === 1 ? 'digest' : 'digests'));
+        }
+        if ($unowned !== []) {
+            $errors->writeln(sprintf(
+                'No owner on file for %d of %d %s in this scan, so no digest covers %s. Add %s to the owners file:',
+                count($unowned),
+                count($latest->apps),
+                count($latest->apps) === 1 ? 'app' : 'apps',
+                count($unowned) === 1 ? 'it' : 'them',
+                count($unowned) === 1 ? 'it' : 'them',
+            ), OutputInterface::OUTPUT_RAW);
+            foreach ($unowned as $id) {
+                $errors->writeln('- ' . $id . ': no owner on file', OutputInterface::OUTPUT_RAW);
+            }
         }
         $errors->writeln(sprintf(
             '%d of %d opted-in %s had news; the other %d get nothing this time.',
@@ -167,8 +188,11 @@ final class DigestCommand extends RollcallCommand
         return implode("\n----\n\n", $parts);
     }
 
-    /** @param  list<Digest>  $news */
-    private function json(Snapshot $latest, ?Snapshot $previous, int $optedIn, array $news): string
+    /**
+     * @param  list<Digest>  $news
+     * @param  list<string>  $unowned  the scanned apps no entry of the owners file lists
+     */
+    private function json(Snapshot $latest, ?Snapshot $previous, int $optedIn, array $news, array $unowned): string
     {
         return (new JsonRenderer())->render([
             'tool' => 'rollcall',
@@ -179,6 +203,7 @@ final class DigestCommand extends RollcallCommand
             'opted_in' => $optedIn,
             'quiet' => $optedIn - count($news),
             'digests' => array_map(static fn(Digest $d): array => $d->toArray(), $news),
+            'no_owner_on_file' => $unowned,
         ]) . "\n";
     }
 }

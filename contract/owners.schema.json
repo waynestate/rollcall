@@ -2,10 +2,11 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://github.com/waynestate/rollcall/blob/main/contract/owners.schema.json",
     "title": "Rollcall owners file",
-    "description": "The input behind ROLLCALL_OWNERS_FILE: who answers for which apps, and who asked for a digest. Internal (contacts and app paths): kept by the people who run Rollcall, never in git. An owner without \"digest\": true gets nothing.",
+    "description": "The input behind ROLLCALL_OWNERS_FILE: who answers for which apps, and who asked for a digest. Rollcall keeps its own for the stack's projects in the repo (owners.json), naming roles and team aliases only, because the repo is public; a deployer scanning another fleet keeps theirs wherever they keep the snapshots. An owner without \"digest\": true gets nothing, and a scanned app no entry lists is reported as \"no owner on file\".",
     "type": "object",
     "required": ["owners"],
     "properties": {
+        "$schema": {"type": "string", "description": "Optional: the path or URL of this schema, so an editor can check the file as you type. Rollcall ignores it"},
         "owners": {
             "type": "array",
             "maxItems": 500,
@@ -13,11 +14,12 @@
                 "type": "object",
                 "required": ["contact", "projects"],
                 "properties": {
-                    "contact": {"type": "string", "minLength": 1, "maxLength": 200, "description": "A mail address (required to send) or a team alias; each contact once"},
+                    "contact": {"type": "string", "minLength": 1, "maxLength": 200, "description": "A mail address (required to send), a team alias or a role; each contact once. In a public repo, a team or a role, never a person"},
                     "digest": {"type": "boolean", "default": false, "description": "Opt in to the digest. Left out means no"},
                     "projects": {
                         "type": "array",
                         "maxItems": 500,
+                        "description": "The group/project paths this contact answers for, as the scan names them. An app may be listed under more than one contact",
                         "items": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+$"}
                     }
                 }

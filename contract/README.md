@@ -11,7 +11,7 @@ these schemas, not against an example you once saw.
 | `snapshot.schema.json` | One stored scan, `<ROLLCALL_STORE_DIR>/<date>.json` (internal data: it holds app ids) | Rollcall |
 | `images-export.schema.json` | The image list behind `ROLLCALL_IMAGES_FILE` | Any platform: Citadel, OpenShift, Coolify or a hand-kept file |
 | `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` (Citadel's own words) | A person or a job, from Citadel |
-| `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE` (internal: contacts and apps) | The people who run Rollcall |
+| `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE`: Rollcall's own `owners.json` (roles only) or a fleet's own (contacts and apps, kept internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 
 ## Rules

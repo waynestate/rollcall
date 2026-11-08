@@ -1,0 +1,24 @@
+{
+    "$schema": "contract/owners.schema.json",
+    "owners": [
+        {
+            "contact": "Stack maintainer, Enterprise Applications",
+            "digest": true,
+            "projects": [
+                "enterprise-apps/creed",
+                "enterprise-apps/proctor",
+                "enterprise-apps/preflight",
+                "enterprise-apps/sesame",
+                "enterprise-apps/helmet",
+                "enterprise-apps/sourdough",
+                "enterprise-apps/squire",
+                "enterprise-apps/rollcall",
+                "enterprise-apps/booster",
+                "enterprise-apps/advisor",
+                "enterprise-apps/drawbridge",
+                "enterprise-apps/pinstripe",
+                "enterprise-apps/weld"
+            ]
+        }
+    ]
+}

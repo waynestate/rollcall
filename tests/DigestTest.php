@@ -274,6 +274,57 @@ final class DigestTest extends TestCase
         $this->assertSame(['demo/ledger', 'demo/atlas'], $json['digests'][0]['apps']);
     }
 
+    public function test_when_every_app_has_an_owner_nothing_is_said_about_owners(): void
+    {
+        $this->save(Fleet::snapshot('2026-11-07'));
+        $tester = $this->digest(['--format' => 'json']);
+        $json = json_decode($tester->getDisplay(), true, 32, JSON_THROW_ON_ERROR);
+
+        $this->assertSame([], $json['no_owner_on_file'], 'the fixture owners file lists all four apps');
+        $this->assertStringNotContainsString('No owner on file', $tester->getErrorOutput());
+    }
+
+    public function test_an_app_without_an_owner_is_named_not_dropped(): void
+    {
+        $this->twoScansWithChanges();
+        $owners = Fleet::tempDir();
+        try {
+            // demo/broken and demo/relic are in the scan, but in no entry: nobody answers for them.
+            file_put_contents($owners . '/owners.json', json_encode(['owners' => [
+                ['contact' => 'ledger-team@example.test', 'digest' => true, 'projects' => ['demo/ledger', 'demo/atlas']],
+            ]]));
+            $env = ['ROLLCALL_OWNERS_FILE' => $owners . '/owners.json'];
+
+            $tester = $this->digest([], $env);
+            $errors = $tester->getErrorOutput();
+            $this->assertSame(0, $tester->getStatusCode(), $errors);
+            $this->assertStringContainsString('To: ledger-team@example.test', $tester->getDisplay());
+            $this->assertStringContainsString('No owner on file for 2 of 4 apps in this scan, so no digest covers them. Add them to the owners file:', $errors);
+            $this->assertStringContainsString('- demo/relic: no owner on file', $errors);
+            $this->assertStringContainsString('- demo/broken: no owner on file', $errors);
+            $this->assertStringNotContainsString('no owner on file', $tester->getDisplay(), 'the note goes to stderr, so a mail pipe on stdout stays clean');
+
+            $json = json_decode($this->digest(['--format' => 'json'], $env)->getDisplay(), true, 32, JSON_THROW_ON_ERROR);
+            $unowned = $json['no_owner_on_file'];
+            sort($unowned);
+            $this->assertSame(['demo/broken', 'demo/relic'], $unowned);
+
+            $quiet = $this->digest(['--out' => $this->store . '/digests'], $env);
+            $this->assertStringContainsString('- demo/broken: no owner on file', $quiet->getErrorOutput(), '--out says it too');
+        } finally {
+            Fleet::remove($owners);
+        }
+    }
+
+    public function test_an_owner_who_has_not_opted_in_still_counts_as_an_owner(): void
+    {
+        $owners = Owners::fromFile(Fleet::FIXTURES . '/owners.json');
+
+        // quiet-team has not opted in, but it answers for demo/broken, so demo/broken has an owner on file.
+        $this->assertSame([], $owners->unowned(['demo/ledger', 'demo/atlas', 'demo/relic', 'demo/broken']));
+        $this->assertSame(['demo/new'], $owners->unowned(['demo/ledger', 'demo/new', 'demo/new']));
+    }
+
     public function test_the_owners_file_is_checked_before_anything_is_built(): void
     {
         $dir = Fleet::tempDir();

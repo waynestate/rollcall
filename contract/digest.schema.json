@@ -4,7 +4,7 @@
     "title": "Rollcall owner digests",
     "description": "What `rollcall digest --format=json` prints: one entry per opted-in owner with news since the previous scan. Internal: it names apps and contacts.",
     "type": "object",
-    "required": ["tool", "version", "visibility", "scan_date", "since", "opted_in", "quiet", "digests"],
+    "required": ["tool", "version", "visibility", "scan_date", "since", "opted_in", "quiet", "digests", "no_owner_on_file"],
     "additionalProperties": false,
     "properties": {
         "tool": {"const": "rollcall"},
@@ -31,6 +31,11 @@
                     "body": {"type": "string", "minLength": 1}
                 }
             }
+        },
+        "no_owner_on_file": {
+            "description": "The apps in the latest scan that no entry of the owners file lists, in scan order. Named here so they are never quietly left out of every digest",
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
         }
     },
     "$defs": {

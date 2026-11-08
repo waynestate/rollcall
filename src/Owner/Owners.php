@@ -10,10 +10,14 @@ use Waynestate\Rollcall\RollcallException;
  * Who answers for which apps, read from the file behind ROLLCALL_OWNERS_FILE:
  * {"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}.
  *
- * Internal data, kept by the people who run Rollcall, never in git and never
- * in a public report. An owner gets a digest only when its entry says
- * "digest": true; leaving the key out means no. Rollcall never guesses an
- * owner from commit authors (the substitute teacher does not assign seats).
+ * Rollcall keeps its own file for the stack's projects in the repo
+ * (owners.json, roles and team aliases only, because the repo is public); a
+ * deployer scanning another fleet points ROLLCALL_OWNERS_FILE at theirs. It is
+ * read only by `rollcall digest`, never by a report. An owner gets a digest
+ * only when its entry says "digest": true; leaving the key out means no. An
+ * app no entry lists is "no owner on file", said out loud, never dropped.
+ * Rollcall never guesses an owner from commit authors (the substitute teacher
+ * does not assign seats).
  */
 final class Owners
 {
@@ -88,6 +92,24 @@ final class Owners
     public function optedIn(): array
     {
         return array_values(array_filter($this->owners, static fn(Owner $o): bool => $o->digest));
+    }
+
+    /**
+     * The apps that no entry lists, opted in or not: "no owner on file".
+     *
+     * @param  list<string>  $appIds  the group/project paths of a scan
+     * @return list<string> the ones nobody answers for, in scan order
+     */
+    public function unowned(array $appIds): array
+    {
+        $owned = [];
+        foreach ($this->owners as $owner) {
+            foreach ($owner->projects as $project) {
+                $owned[$project] = true;
+            }
+        }
+
+        return array_values(array_unique(array_filter($appIds, static fn(string $id): bool => ! isset($owned[$id]))));
     }
 
     public function find(string $contact): ?Owner

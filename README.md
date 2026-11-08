@@ -210,7 +210,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
-| `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Internal; never in git | none (no digests) |
+| `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Rollcall's own, for the stack's projects, is `owners.json` in the repo (roles only); keep another fleet's outside a public repo | none (no digests) |
 | `ROLLCALL_DIGEST_MAIL_ENABLED` | Allow `rollcall digest --send` to mail | `false` |
 | `ROLLCALL_DIGEST_MAIL_DSN` | Symfony Mailer DSN for sending, such as `smtp://mail.example.test:25`. A secret: never in git, never printed | none |
 | `ROLLCALL_DIGEST_MAIL_FROM` | The from address of the digests | none |
@@ -288,19 +288,26 @@ An owner who asks can get a short digest of only their own apps: what changed si
 upgrade, a new drift flag, one cleared, a PROCTOR result that moved), then where each app stands. Nothing changed,
 no digest. Nobody gets one by default, and no owner is ever guessed from commit authors.
 
-1. Keep an owners file outside git and point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`;
-   leaving the key out means no.
+1. Point `ROLLCALL_OWNERS_FILE` at an owners file that maps each scanned project to its contacts (a mail address,
+   a team alias or a role). An owner opts in with `"digest": true`; leaving the key out means no. The shape is
+   `contract/owners.schema.json`.
 
    ```json
    {
+       "$schema": "contract/owners.schema.json",
        "owners": [
            {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]}
        ]
    }
    ```
 
+   Rollcall keeps its own in the repo: [owners.json](owners.json) lists the 13 stack projects the scheduled scan
+   reads, all answered for by the stack maintainer. The repo is public, so it names roles and teams, never a person.
+   For another fleet, keep that fleet's file next to its snapshots, outside a public repo.
 2. After a scan, `rollcall digest` prints each digest with news (`--format=json` for a script, `--owner=CONTACT`
    for one owner). `--out=DIR` writes them as `<date>-<contact>.txt` instead, for a mail tool you already have.
+   A scanned app that no entry lists is never dropped: every run names it on stderr as "no owner on file", and the
+   JSON lists it under `no_owner_on_file`.
 3. To have Rollcall mail them itself, install `symfony/mailer`, set `ROLLCALL_DIGEST_MAIL_ENABLED=true`,
    `ROLLCALL_DIGEST_MAIL_DSN` and `ROLLCALL_DIGEST_MAIL_FROM`, and run `rollcall digest --send`. Without all four, it
    sends nothing. Every contact must be a mail address, or nothing goes out at all.

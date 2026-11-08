@@ -190,6 +190,11 @@ final class ContractTest extends TestCase
         $this->assertMatchesContract('owners.schema.json', (string) file_get_contents(Fleet::FIXTURES . '/owners.json'));
     }
 
+    public function test_rollcalls_own_owners_file_matches_the_input_contract(): void
+    {
+        $this->assertMatchesContract('owners.schema.json', (string) file_get_contents(dirname(__DIR__) . '/owners.json'));
+    }
+
     public function test_the_json_digest_matches_the_contract(): void
     {
         $this->rollcall(['command' => 'scan', '--today' => '2026-11-07']);
