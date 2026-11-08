@@ -66,8 +66,9 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 |---|---|---|
 | Pointer and focus rules (WCAG 2.2 AA) | Documented | The dashboard has no controls, sticky headers or tooltips; a positive tabindex fails DashboardAccessibilityTest; revisit when a filter is added |
 | Announce refreshed data | Checked | A role=status line names the apps shown and the scan date; DashboardAccessibilityTest |
+| Automated WCAG 2.2 AA check on the front page and the rendered dashboard | Enforced | CI jobs `a11y-site` and `dashboard-a11y` (Preflight's a11y component; `dashboard-render` renders the pages with `DashboardRenderTest`); `scripts/dashboard-a11y.sh` and `.ps1` run the dashboard check locally |
 
 ## Not yet
 
 A scheduled Citadel export (the reader is built), ownership verification on a schedule, the live Packagist
-advisories fetch, the CycloneDX bill of materials and the axe gate run on the rendered dashboard (needs a browser). See `OPEN_QUESTIONS.md`, "Not built yet".
+advisories fetch, the CycloneDX bill of materials. See `OPEN_QUESTIONS.md`, "Not built yet".

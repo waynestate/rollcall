@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: CI runs axe-core (WCAG 2.2 AA) on the front page and docs (a11y-site) and on the rendered dashboard pages (dashboard-render, dashboard-a11y), with Preflight's a11y component.
 - Changed: CI caches Composer and npm downloads under a fixed key, so a lock change downloads only what changed (D-072).
 - Added: scripts/dashboard-a11y.sh and .ps1 run axe-core against the rendered public and internal dashboard pages.
 - Added: DashboardRenderTest writes the two rendered dashboard pages to ROLLCALL_DASHBOARD_OUT, for the dashboard accessibility gate.

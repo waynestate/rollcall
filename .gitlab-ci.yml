@@ -22,6 +22,21 @@ include:
       proctor_command: vendor/bin/proctor check --format=codequality
       allow_failure: true
       image: "php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
+  # Accessibility: axe-core in Playwright (Preflight's a11y component), WCAG 2.2 AA.
+  # The front page and its docs, served from site/.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.3.0
+    inputs:
+      job_name: a11y-site
+      site_dir: site
+      pages: ["index.html", "docs/**/*.html"]
+      wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
+  # The dashboard pages, rendered by the dashboard-render job below.
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.3.0
+    inputs:
+      job_name: dashboard-a11y
+      site_dir: build/dashboard-a11y
+      pages: ["index.html", "apps.html"]
+      wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 # Dependency caching: images already come through the Dependency Proxy, and
 # every job that installs packages extends a cache under a fixed key, not a
@@ -48,6 +63,23 @@ composer-ci:
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
+
+# dashboard-render: renders the public and internal dashboard pages with PHPUnit
+# (DashboardRenderTest) and hands them to dashboard-a11y as an artifact.
+dashboard-render:
+  extends: .composer-cache
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  script:
+    - composer install --no-interaction --no-progress --prefer-dist
+    - ROLLCALL_DASHBOARD_OUT="$CI_PROJECT_DIR/build/dashboard-a11y" vendor/bin/phpunit --filter DashboardRender
+    - test -s build/dashboard-a11y/index.html && test -s build/dashboard-a11y/apps.html
+  artifacts:
+    paths:
+      - build/dashboard-a11y/
+    expire_in: 7 days
+
+dashboard-a11y:
+  needs: [dashboard-render]
 
 # rollcall-scan: scans the 13 stack projects read-only and keeps the snapshot JSON in
 # var/snapshots/ as a 30 day artifact. The schedule is a GitLab setting (CI/CD > Schedules,
