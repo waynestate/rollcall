@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: scripts/dashboard-a11y.sh and .ps1 run axe-core against the rendered public and internal dashboard pages.
 - Added: DashboardRenderTest writes the two rendered dashboard pages to ROLLCALL_DASHBOARD_OUT, for the dashboard accessibility gate.
 - Added: `rollcall owners` lists the scanned apps with no owner on file (exit 1 when there is one), and the weekly scan job runs it (ROLLCALL-17).
 - Fixed: the docs menu closes with Escape and hands focus back to its button (docs kit synced from Squire).
