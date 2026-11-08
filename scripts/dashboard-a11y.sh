@@ -69,14 +69,18 @@ mkdir -p tools/a11y/node_modules
 # The dashboard-a11y CI job's inputs, as JSON for the checker.
 CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
 
+# The checker reads its inputs from a JSON file next to its reports.
+printf '%s\n' "$CONFIG" > "$OUT_DIR/config.json"
+
 # Install the checker's packages when they are missing or when the installed
-# playwright stops matching the image tag. Exact versions from
+# playwright stops matching the image tag; the installed version is stamped in
+# node_modules/.a11y-pw-stamp after each install. Exact versions from
 # tools/a11y/package.json, no install scripts: the image already carries
-# Chromium for this playwright release.
-INNER='INSTALLED=$(sed -n "s/\"version\": *\"\([^\"]*\)\"/\1/p" tools/a11y/node_modules/playwright/package.json 2>/dev/null | sed -n 1p)
-if [ -z "$INSTALLED" ] || [ "$INSTALLED" != "$A11Y_PW" ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund); fi
-printf "%s\n" "$A11Y_CONFIG" > /tmp/a11y-config.json
-A11Y_REPORT_DIR=/work/build/dashboard-a11y node tools/a11y/check.mjs /tmp/a11y-config.json'
+# Chromium for this playwright release. The inner code carries no quotes and
+# no backslashes: PowerShell 5.1 mangles both when it builds docker's command
+# line, and the .ps1 twin passes this very text through.
+INNER='if [ ! -f tools/a11y/node_modules/.a11y-pw-stamp ] || [ $(cat tools/a11y/node_modules/.a11y-pw-stamp) != $A11Y_PW ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund && printf %s $A11Y_PW > node_modules/.a11y-pw-stamp); fi
+A11Y_REPORT_DIR=/work/build/dashboard-a11y node tools/a11y/check.mjs /work/build/dashboard-a11y/config.json'
 
 docker run --rm \
   -v "${REPO}:/work:ro" \
@@ -84,7 +88,6 @@ docker run --rm \
   -v rollcall-a11y-node-modules:/work/tools/a11y/node_modules \
   -v stack-npm-cache:/npm-cache \
   -e npm_config_cache=/npm-cache \
-  -e "A11Y_CONFIG=$CONFIG" \
   -e "A11Y_PW=$PW" \
   -w /work \
   "$IMAGE" \
