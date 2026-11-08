@@ -1,21 +1,22 @@
 # Dashboard accessibility gate: Preflight's a11y checker (vendored in
 # tools/a11y/check.mjs from Preflight 0.3.1, pinned by tests/A11yCheckerPinTest.php),
-# run in Docker so no host browser is needed. Renders the public and internal
-# dashboard pages with PHPUnit, then checks both rendered pages with the same
-# image, tags, color schemes and widths as the dashboard-a11y CI job, so a
+# run in Docker so no host browser is needed. Renders the public, internal
+# and empty-state dashboard pages with PHPUnit, then checks all three with the
+# same image, tags, color schemes and widths as the dashboard-a11y CI job, so a
 # page that passes here passes CI. Needs only Docker. Windows PowerShell 5.1
 # and PowerShell 7; on Linux and macOS use scripts/dashboard-a11y.sh.
 #
 # The render step copies the repo into a container workdir (never the host
-# checkout) and writes the two pages to build\dashboard-a11y on the host; the
+# checkout) and writes the three pages to build\dashboard-a11y on the host; the
 # check step reuses the same image and named volume as scripts/a11y.ps1, so
 # npm installs once and later runs reuse it. The reports (gl-a11y-junit.xml,
 # gl-a11y-report.json) land next to the rendered pages, in
 # build\dashboard-a11y (gitignored). Exit 0 clean, 1 a violation or a page
 # that did not load, 2 a tool or configuration error.
 #
-# The substitute takes the register twice, once for the class and once for
-# the office, and marks everybody present on both rolls.
+# The substitute takes the register three times, once for the class, once for
+# the office and once for the empty room, and marks everybody present on every
+# roll.
 $ErrorActionPreference = "Stop"
 
 Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
@@ -28,21 +29,18 @@ $image = "mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb2716
 $pw = ([regex]::Match($image, 'playwright:v(\d+\.\d+\.\d+)')).Groups[1].Value
 if (-not $pw) { throw "cannot read the Playwright version from the image tag $image" }
 $outDir = "build/dashboard-a11y"
+# The pages link the bundled WayneUI stylesheet, so the render always styles them.
+$wayneUiCss = "/assets/wayne-ui/wayne-ui.css"
 
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
-$cssFlag = @()
-if ($env:ROLLCALL_WAYNEUI_CSS) {
-    $cssFlag = @("-e", "ROLLCALL_WAYNEUI_CSS=$($env:ROLLCALL_WAYNEUI_CSS)")
-}
-
 # Render: the repo is mounted read-only at /src and copied to /w, so vendor
 # lands in the copy, never in the host checkout. Composer's cache stays in a
-# named volume; the two pages come out through /out, bound to $outDir here.
+# named volume; the three pages come out through /out, bound to $outDir here.
 $inner = 'cp -r /src /w && cd /w && composer install -q --no-progress && ROLLCALL_DASHBOARD_OUT=/out vendor/bin/phpunit --filter DashboardRender'
 
 docker run --rm `
-    @cssFlag `
+    -e "ROLLCALL_WAYNEUI_CSS=$wayneUiCss" `
     -v "${PWD}:/src:ro" `
     -v rollcall-composer-cache:/composer-cache `
     -e COMPOSER_CACHE_DIR=/composer-cache `
@@ -52,6 +50,13 @@ docker run --rm `
 
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+# The pages link the bundled stylesheet, so the checker's local server must serve it.
+if (Test-Path (Join-Path $PWD "$outDir/assets")) {
+    Remove-Item -Recurse -Force (Join-Path $PWD "$outDir/assets")
+}
+New-Item -ItemType Directory -Force -Path (Join-Path $PWD "$outDir/assets") | Out-Null
+Copy-Item -Recurse (Join-Path $PWD "site/assets/wayne-ui") (Join-Path $PWD "$outDir/assets/")
+
 # Check: the same image and node_modules volume as scripts/a11y.ps1, so npm
 # installs once and later runs reuse it. The named volume mounts over this
 # folder; give it an empty mountpoint first (gitignored) so Docker can mount
@@ -60,7 +65,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 New-Item -ItemType Directory -Force -Path (Join-Path $PWD "tools/a11y/node_modules") | Out-Null
 
 # The dashboard-a11y CI job's inputs, as JSON for the checker.
-$config = '{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
+$config = '{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
 
 # The checker reads its inputs from a JSON file next to its reports.
 [System.IO.File]::WriteAllText((Join-Path $PWD "$outDir/config.json"), $config, (New-Object System.Text.UTF8Encoding($false)))

@@ -1,23 +1,24 @@
 #!/bin/sh
 # Dashboard accessibility gate: Preflight's a11y checker (vendored in
 # tools/a11y/check.mjs from Preflight 0.3.1, pinned by tests/A11yCheckerPinTest.php),
-# run in Docker so no host browser is needed. Renders the public and internal
-# dashboard pages with PHPUnit, then checks both rendered pages with the same
-# image, tags, color schemes and widths as the dashboard-a11y CI job, so a
+# run in Docker so no host browser is needed. Renders the public, internal
+# and empty-state dashboard pages with PHPUnit, then checks all three with the
+# same image, tags, color schemes and widths as the dashboard-a11y CI job, so a
 # page that passes here passes CI. Needs only Docker. Linux and macOS; on
 # Windows use scripts/dashboard-a11y.ps1, or this script from Git Bash (the
 # MSYSTEM block below handles its path conversion).
 #
 # The render step copies the repo into a container workdir (never the host
-# checkout) and writes the two pages to build/dashboard-a11y on the host; the
+# checkout) and writes the three pages to build/dashboard-a11y on the host; the
 # check step reuses the same image and named volume as scripts/a11y.sh, so
 # npm installs once and later runs reuse it. The reports (gl-a11y-junit.xml,
 # gl-a11y-report.json) land next to the rendered pages, in build/dashboard-a11y
 # (gitignored). Exit 0 clean, 1 a violation or a page that did not load, 2 a
 # tool or configuration error.
 #
-# The substitute takes the register twice, once for the class and once for
-# the office, and marks everybody present on both rolls.
+# The substitute takes the register three times, once for the class, once for
+# the office and once for the empty room, and marks everybody present on every
+# roll.
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -39,25 +40,27 @@ COMPOSER_IMAGE="composer:2.10.3"
 IMAGE="mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d"
 PW=$(printf '%s\n' "$IMAGE" | sed -n 's/^.*playwright:v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*$/\1/p')
 OUT_DIR="build/dashboard-a11y"
+# The pages link the bundled WayneUI stylesheet, so the render always styles them.
+WAYNEUI_CSS="/assets/wayne-ui/wayne-ui.css"
 
 mkdir -p "$OUT_DIR"
 
-CSS_FLAG=""
-if [ -n "${ROLLCALL_WAYNEUI_CSS:-}" ]; then
-  CSS_FLAG="-e ROLLCALL_WAYNEUI_CSS=${ROLLCALL_WAYNEUI_CSS}"
-fi
-
 # Render: the repo is mounted read-only at /src and copied to /w, so vendor
 # lands in the copy, never in the host checkout. Composer's cache stays in a
-# named volume; the two pages come out through /out, bound to $OUT_DIR here.
+# named volume; the three pages come out through /out, bound to $OUT_DIR here.
 docker run --rm \
-  ${CSS_FLAG} \
+  -e ROLLCALL_WAYNEUI_CSS="$WAYNEUI_CSS" \
   -v "${REPO}:/src:ro" \
   -v rollcall-composer-cache:/composer-cache \
   -e COMPOSER_CACHE_DIR=/composer-cache \
   -v "${REPO}/${OUT_DIR}:/out" \
   "$COMPOSER_IMAGE" \
   sh -c 'cp -r /src /w && cd /w && composer install -q --no-progress && ROLLCALL_DASHBOARD_OUT=/out vendor/bin/phpunit --filter DashboardRender'
+
+# The pages link the bundled stylesheet, so the checker's local server must serve it.
+rm -rf "$OUT_DIR/assets"
+mkdir -p "$OUT_DIR/assets"
+cp -R site/assets/wayne-ui "$OUT_DIR/assets/"
 
 # Check: the same image and node_modules volume as scripts/a11y.sh, so npm
 # installs once and later runs reuse it. The named volume mounts over this
@@ -67,7 +70,7 @@ docker run --rm \
 mkdir -p tools/a11y/node_modules
 
 # The dashboard-a11y CI job's inputs, as JSON for the checker.
-CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
+CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
 
 # The checker reads its inputs from a JSON file next to its reports.
 printf '%s\n' "$CONFIG" > "$OUT_DIR/config.json"
