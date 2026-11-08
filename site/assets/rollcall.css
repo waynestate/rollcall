@@ -836,6 +836,18 @@ html:not(.motion) .caller {
   font-variant-numeric: tabular-nums;
 }
 
+/* Phone: four typewriter columns ran 90px past the page, and the page clips
+   sideways, so the end-of-support dates were simply gone. Set the roll a size
+   smaller, keep each date on one line, and let the long state name fold at its
+   underscore when it must. Everyone still answers; nobody leaves the room. */
+@media (max-width: 560px) {
+  .versions { font-size: 0.75rem; }
+  .versions thead th { padding: 0.6rem 0.4rem 0.45rem; letter-spacing: 0.05em; }
+  .versions td { padding: 0.5rem 0.4rem; }
+  .versions td:nth-child(3) { overflow-wrap: anywhere; }
+  .versions td:nth-child(4) { white-space: nowrap; }
+}
+
 .totals {
   display: flex;
   flex-wrap: wrap;
