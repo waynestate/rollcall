@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: `rollcall owners` lists the scanned apps with no owner on file (exit 1 when there is one), and the weekly scan job runs it (ROLLCALL-17).
 - Fixed: the docs menu closes with Escape and hands focus back to its button (docs kit synced from Squire).
 - Fixed: the docs kit's copy button no longer covers the first line of code when it says Copied or Failed: over the code it keeps its resting width and shows a check or a cross when the word does not fit (docs kit synced from Squire).
 - Fixed: the front page's version chip shows the full version the docs show (Register 0.1.10, was Register 0.1). It carries `data-docs-version` now, so the docs builder (synced from Squire) rewrites it at every release and `composer docs:check` fails while it is stale.
