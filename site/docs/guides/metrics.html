@@ -46,6 +46,12 @@ Prometheus text built from the latest snapshot (a request never triggers a scan)
 public package names: no app names or personal data. The dashboard JSON is in <code>grafana/rollcall-burn-down.json</code>; import
 it into Grafana once a Prometheus server scrapes the endpoint. Run <code>rollcall scan</code>
 on a schedule so the series moves.</p>
+<p>Forced image upgrades from a Citadel export come through as three gauges, counts only, in the same style as the
+rest: <code>rollcall_forced_upgrades_pending_apps</code> (apps with one pending, overdue ones included),
+<code>rollcall_forced_upgrades_overdue_apps</code> (due today or earlier) and
+<code>rollcall_forced_upgrades_next_due_timestamp_seconds</code> (midnight of the next date still ahead, only while there is
+one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and
+overdue as two stat panels.</p>
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
 <br>

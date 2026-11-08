@@ -43,13 +43,15 @@
 <ul>
 <li>Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only <code>GET</code> and <code>HEAD</code>, and a test
 fails if a write verb appears in <code>src/</code>.</li>
-<li>The GitLab token is a bot or personal access token with the <code>read_api</code> scope only and an expiry, whose user can
-read only the projects to scan. It goes in the environment as <code>ROLLCALL_GITLAB_TOKEN</code>, never in git, is sent only
-to the configured <code>https</code> host, and is hidden from debug output and error messages. When the source is GitLab,
-<code>scan</code> reads the token's own record (<code>GET /api/v4/personal_access_tokens/self</code>) and prints a note 14 days before it
-expires, or when it has already expired. The note names the date; the owner rotates the token before its expiry,
-never Rollcall. The check is advisory: a refused, unreachable or unparseable answer prints nothing and never fails
-the scan, and the token value never appears in output.</li>
+<li>The GitLab token is a group or project access token (a GitLab bot), or a service account's personal access token,
+with the <code>read_api</code> scope only, the Reporter role and an expiry. The stack's own is the group access token
+<code>rollcall-scanner</code> (see <a href="#the-scanner-token-and-how-to-rotate-it">the scanner token and how to rotate it</a>). It
+goes in the environment as <code>ROLLCALL_GITLAB_TOKEN</code>, never in git, is sent only to the configured <code>https</code> host,
+and is hidden from debug output and error messages. When the source is GitLab, <code>scan</code> reads the token's own record
+(<code>GET /api/v4/personal_access_tokens/self</code>) and prints a note 14 days before it expires, or when it has already
+expired. The note names the date; the stack maintainer rotates the token before its expiry, never Rollcall. The
+check is advisory: a refused, unreachable or unparseable answer prints nothing and never fails the scan, and the
+token value never appears in output.</li>
 <li>Composer files are parsed as data. No <code>composer install</code>, script or plugin from a scanned repository ever runs.</li>
 <li>PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
 strips control characters.</li>
@@ -133,7 +135,7 @@ through the REST API.</p>
 </tr>
 <tr>
 <td><code>self_rotate</code></td>
-<td>Lets the token rotate itself. A person rotates the token, never Rollcall</td>
+<td>Lets the token rotate itself. The stack maintainer rotates the token, never Rollcall</td>
 </tr>
 <tr>
 <td><code>create_runner</code>, <code>manage_runner</code>, <code>k8s_proxy</code>, <code>ai_features</code> and any admin scope</td>
@@ -146,23 +148,75 @@ through the REST API.</p>
 <li><strong>Reporter, on each project to scan, and nothing more.</strong> Reporter is the lowest role that can read a private
 project's files; Guest cannot. Developer and above add powers Rollcall never uses.</li>
 <li><strong>Membership is the real fence.</strong> <code>ROLLCALL_GITLAB_PROJECTS</code> limits what Rollcall asks for, not what the token
-can read. A group token on a large group would see other teams' repositories, so the token's user is a member of
-just the projects to scan: a service account, or a project or group bot on a small group made for the purpose.</li>
-<li><strong>An expiry, always.</strong> GitLab caps a token at 365 days by default; the stack's habit is 90 days, then rotate.
-<code>scan</code> prints a note 14 days before the expiry and again once it has passed, naming the date.</li>
+can read. A group token reads every project in its group. For the tightest fence, the token's user is a member of
+just the projects to scan: a service account, or a bot on a small group made for the purpose. The stack's own
+token takes the wider road on purpose (below), and the scan job's project list keeps the asking narrow.</li>
+<li><strong>An expiry, always.</strong> GitLab caps a token at 365 days by default. <code>scan</code> prints a note 14 days before the expiry
+and again once it has passed, naming the date.</li>
 <li><strong>Where it lives.</strong> In the environment of the job that scans, as <code>ROLLCALL_GITLAB_TOKEN</code>: on GitLab CI a masked,
 hidden and protected CI/CD variable on the Rollcall project, not a file variable. Never in git, <code>.env.example</code>,
 an image or a log.</li>
-<li><strong>Who rotates it.</strong> The maintainer of the project that runs the scan creates the replacement, updates the
-variable and revokes the old token before the expiry date. Rollcall only reminds.</li>
+<li><strong>Who rotates it.</strong> A role, not a person: the stack maintainer creates the replacement, updates the variable and
+revokes the old token before the expiry date. Rollcall only reminds.</li>
 <li><strong>A refused token stops the scan.</strong> A <code>401</code> or <code>403</code> ends the scan loudly with exit <code>2</code>, so a dead token never
 produces a flattering partial roll.</li>
 </ul>
+<h2 id="the-scanner-token-and-how-to-rotate-it">The scanner token and how to rotate it<a class="docs-heading-link" aria-label="Link to this section" href="#the-scanner-token-and-how-to-rotate-it">#</a></h2>
+<p>The stack's weekly scan on git.wayne.edu reads with one token. Everything about it except its value is here.</p>
+<div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
+<thead>
+<tr>
+<th>What</th>
+<th>The stack's answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Token</td>
+<td>The group access token <code>rollcall-scanner</code> on the <code>enterprise-apps</code> group: Reporter, <code>read_api</code> only. The project owner chose group reach (2026-11-06), so it can read the group's projects; the job asks only for the 13 it lists</td>
+</tr>
+<tr>
+<td>Where it lives</td>
+<td>Its value lives only in the CI/CD variable <code>ROLLCALL_GITLAB_TOKEN</code> on <code>enterprise-apps/rollcall</code>: masked, hidden, protected, not a file. The token itself is listed under the group's Settings &gt; Access tokens</td>
+</tr>
+<tr>
+<td>Expires</td>
+<td>2027-11-06. <code>scan</code> starts its note on 2027-10-23</td>
+</tr>
+<tr>
+<td>Who rotates it</td>
+<td>The stack maintainer, a role, not a named person. Creating a group access token needs the Owner role on the group; a stack maintainer without it asks a group Owner for step 1 and does the rest</td>
+</tr>
+<tr>
+<td>What uses it</td>
+<td>The <code>rollcall-scan</code> job, on the Monday schedule with <code>ROLLCALL_JOB=scan</code>, or started by hand</td>
+</tr>
+</tbody>
+</table></div>
+<p>Rotate it in one sitting, well before the expiry and not just before the Monday schedule runs:</p>
+<ol>
+<li><strong>Make the replacement.</strong> In the group's Settings &gt; Access tokens, add a new token: name <code>rollcall-scanner</code>,
+role Reporter, scope <code>read_api</code> only, an expiry at most a year out. Copy the value once; GitLab never shows it
+again. (The token list's Rotate button is the shortcut, but it revokes the old token at once and you must check
+the new expiry it gives: GitLab's API defaults a rotated token to one week.)</li>
+<li><strong>Update the variable.</strong> In <code>enterprise-apps/rollcall</code>, Settings &gt; CI/CD &gt; Variables, edit
+<code>ROLLCALL_GITLAB_TOKEN</code> and paste the new value. Keep it masked, hidden and protected, not a file. Paste it
+nowhere else: not a chat, a ticket, a file or a commit.</li>
+<li><strong>Prove it.</strong> Run a pipeline on <code>main</code> with the variable <code>ROLLCALL_JOB</code> set to <code>scan</code>. In the job log, look for
+<code>Present: 13 apps.</code> and no <code>not set; skipping</code>, no <code>GitLab refused the token</code> and no <code>Note: the GitLab token</code>
+line (the new token is a year from expiry, so it gets no note).</li>
+<li><strong>Revoke the old one.</strong> Back in the group's access tokens, revoke the old <code>rollcall-scanner</code> (the one with the
+earlier expiry).</li>
+<li><strong>Write down the new date.</strong> Change the expiry in the table above, and note the rotation in <code>CHANGELOG.md</code>, in
+the same merge request.</li>
+</ol>
+<p>A token that leaked is rotated the same way, at once, without waiting for its date. Revoking it first is fine: the
+scan stops loudly until step 2 is done.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/architecture.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Architecture</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/checks.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Checks</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-gitlab-token-exactly">The GitLab token, exactly</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#every-call-rollcall-makes">Every call Rollcall makes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#scopes-it-must-not-have">Scopes it must not have</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#role-membership-and-expiry">Role, membership and expiry</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#the-gitlab-token-exactly">The GitLab token, exactly</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#every-call-rollcall-makes">Every call Rollcall makes</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#scopes-it-must-not-have">Scopes it must not have</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#role-membership-and-expiry">Role, membership and expiry</a></li><li class="docs-toc__item"><a href="#the-scanner-token-and-how-to-rotate-it">The scanner token and how to rotate it</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>0.1.10</span></span>

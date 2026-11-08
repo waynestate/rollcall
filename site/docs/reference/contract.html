@@ -75,7 +75,7 @@ or a script should read Rollcall against these schemas, not against an example i
 </tr>
 <tr>
 <td><code>owners.schema.json</code></td>
-<td>The owners file behind <code>ROLLCALL_OWNERS_FILE</code> (internal)</td>
+<td>The owners file behind <code>ROLLCALL_OWNERS_FILE</code>: Rollcall's own <code>owners.json</code> (roles only) or a fleet's own (internal)</td>
 <td>The people who run Rollcall</td>
 </tr>
 <tr>
@@ -90,8 +90,9 @@ or a script should read Rollcall against these schemas, not against an example i
 <li>The public and internal JSON reports, after one scan and after two, match <code>report.schema.json</code>.</li>
 <li><code>GET /report.json</code> from the raw-PHP endpoint matches the same schema.</li>
 <li>Every stored snapshot matches <code>snapshot.schema.json</code>, and its <code>schema_version</code> equals the code's.</li>
-<li>The image list, Citadel export and owners fixtures match their input schemas, a report and snapshot built from the
-Citadel export match theirs, and <code>rollcall digest --format=json</code> matches <code>digest.schema.json</code>.</li>
+<li>The image list, Citadel export and owners fixtures, and Rollcall's own <code>owners.json</code>, match their input schemas, a
+report and snapshot built from the Citadel export match theirs, and <code>rollcall digest --format=json</code> matches
+<code>digest.schema.json</code>.</li>
 <li>The drift kinds in the schema are exactly the ones the report builder counts, in the same order.</li>
 <li>The schema has teeth: a public report with a per-app list, an <code>owner</code> field or a made-up drift kind is refused,
 and so is an internal report without its list.</li>

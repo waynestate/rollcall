@@ -14,10 +14,11 @@ A digest is a short note in plain words: what changed in that owner's apps since
 
 ## 1. Say who answers for which apps[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
 
-Keep an owners file outside git (it names apps and contacts, so it is internal, like `.env`) and point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`; leaving the key out means no.
+An owners file maps each scanned project to the contacts who answer for it. Point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`; leaving the key out means no.
 
 ```json
 {
+    "$schema": "contract/owners.schema.json",
     "owners": [
         {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]},
         {"contact": "another-team@example.test", "projects": ["group/third-project"]}
@@ -25,7 +26,18 @@ Keep an owners file outside git (it names apps and contacts, so it is internal, 
 }
 ```
 
-Here the first team gets digests and the second does not. A contact is a mail address or a team alias; each one is listed once. The shape is `contract/owners.schema.json`.
+Here the first team gets digests and the second does not. A contact is a mail address, a team alias or a role; each one is listed once, and a project may sit under more than one contact. The shape is `contract/owners.schema.json`, and the optional `"$schema"` line lets an editor check the file as you type.
+
+Rollcall keeps its own file in the repo, [`owners.json`](https://github.com/waynestate/rollcall/blob/main/owners.json): the 13 stack projects the scheduled scan reads, all answered for by the stack maintainer. The repo is public, so its contacts are roles and teams, never a person (a test refuses an `@` in it), and those digests print rather than mail. To scan another fleet, keep that fleet's file next to its snapshots, outside a public repo, and point `ROLLCALL_OWNERS_FILE` there.
+
+An app in the scan that no entry lists is not dropped. `rollcall digest` names it on stderr every run,
+
+```
+No owner on file for 1 of 14 apps in this scan, so no digest covers it. Add it to the owners file:
+- group/new-project: no owner on file
+```
+
+and `--format=json` lists it under `no_owner_on_file`. An owner who has not opted in still counts as its owner. Reports never read the owners file, so the report stays free of owners.
 
 ## 2. Print them[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
 
@@ -35,7 +47,7 @@ After a scan:
 rollcall digest
 ```
 
-prints one digest per opted-in owner with news, each headed `To:` and `Subject:`. `--owner=CONTACT` picks one owner (an owner who has not opted in is refused), `--format=json` gives a script the same digests (`contract/digest.schema.json`), and `--out=DIR` writes them as `<scan date>-<contact>.txt` instead of printing, for a mail tool you already run. A line on stderr counts how many owners had news and how many get nothing this time.
+prints one digest per opted-in owner with news, each headed `To:` and `Subject:`. `--owner=CONTACT` picks one owner (an owner who has not opted in is refused), `--format=json` gives a script the same digests (`contract/digest.schema.json`), and `--out=DIR` writes them as `<scan date>-<contact>.txt` instead of printing, for a mail tool you already run. Lines on stderr name any app with no owner on file and count how many owners had news and how many get nothing this time.
 
 What counts as a change, app by app:
 

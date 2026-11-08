@@ -88,7 +88,8 @@ apps.</p>
 <li>
 <p><strong>Forced image upgrades</strong>: with <a href="citadel.html">Citadel's export</a> as the image source, how many apps have a forced
 base-image upgrade pending, how many are due today or earlier, and the next date (<code>forced_upgrades</code>, counts only).
-The internal per-app list carries each app's <code>upgrade_due</code>. All three are zero with any other image source.</p>
+The same counts reach <a href="metrics.html">metrics</a> and ADVISOR's <code>rollcall_fleet_summary</code> (<a href="advisor.html">ADVISOR</a>). The
+internal per-app list carries each app's <code>upgrade_due</code>. All three are zero with any other image source.</p>
 </li>
 </ul>
 <p>State is never decided in code: it is derived from the dates in <code>policy.json</code> by CREED's reader. A version the

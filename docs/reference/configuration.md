@@ -21,14 +21,14 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_DIGEST_MAIL_FROM | The from address of the digests | none | src/Config.php |
 | ROLLCALL_GITLAB_GROUPS | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none | config/rollcall.php |
 | ROLLCALL_GITLAB_PROJECTS | Comma-separated full group/project paths; when set, only those projects are scanned and no group is listed | none | config/rollcall.php |
-| ROLLCALL_GITLAB_TOKEN | A GitLab bot or personal access token with the read_api scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed | none | config/rollcall.php |
+| ROLLCALL_GITLAB_TOKEN | A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed | none | config/rollcall.php |
 | ROLLCALL_GITLAB_URL | https:// base URL of the GitLab instance | none | config/rollcall.php |
 | ROLLCALL_IMAGES_FILE | Export of the app list: {"apps": [{"project": "group/project", "image": "php:8.4-apache"}]} | none | config/rollcall.php |
 | ROLLCALL_INTERNAL_ENABLED | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
-| ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Internal; never in git | none (no digests) | src/Config.php |
+| ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
 | ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group__project.json | none | config/rollcall.php |
 | ROLLCALL_PUBLIC_REPORT_ENABLED | Serve GET /report.json (public counts only) | `false` | config/rollcall.php |
