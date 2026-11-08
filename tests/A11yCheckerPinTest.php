@@ -45,7 +45,7 @@ final class A11yCheckerPinTest extends TestCase
         $this->assertSame(
             self::CHECKER_SHA256,
             hash('sha256', str_replace("\r\n", "\n", $raw)),
-            'tools/a11y/check.mjs does not match Preflight ' . self::PREFLIGHT_TAG . ' byte for byte. ' . self::UPDATE
+            'tools/a11y/check.mjs does not match Preflight ' . self::PREFLIGHT_TAG . ' byte for byte. ' . self::UPDATE,
         );
     }
 
@@ -59,7 +59,7 @@ final class A11yCheckerPinTest extends TestCase
             $this->assertSame(
                 self::PREFLIGHT_TAG,
                 $tag,
-                '.gitlab-ci.yml pins the a11y component to ' . $tag . ', not ' . self::PREFLIGHT_TAG . '. ' . self::UPDATE
+                '.gitlab-ci.yml pins the a11y component to ' . $tag . ', not ' . self::PREFLIGHT_TAG . '. ' . self::UPDATE,
             );
         }
     }
@@ -81,7 +81,7 @@ final class A11yCheckerPinTest extends TestCase
                 $this->assertSame(
                     self::IMAGE,
                     $image,
-                    $script . ' uses ' . $image . ', not the pinned image. ' . self::UPDATE
+                    $script . ' uses ' . $image . ', not the pinned image. ' . self::UPDATE,
                 );
             }
         }
@@ -96,12 +96,12 @@ final class A11yCheckerPinTest extends TestCase
         $this->assertSame(
             self::AXE_PLAYWRIGHT_VERSION,
             $dependencies['@axe-core/playwright'] ?? null,
-            '@axe-core/playwright must pin the template axe_playwright_version default. ' . self::UPDATE
+            '@axe-core/playwright must pin the template axe_playwright_version default. ' . self::UPDATE,
         );
         $this->assertSame(
             self::AXE_CORE_VERSION,
             $dependencies['axe-core'] ?? null,
-            'axe-core must pin the template axe_core_version default. ' . self::UPDATE
+            'axe-core must pin the template axe_core_version default. ' . self::UPDATE,
         );
     }
 }
