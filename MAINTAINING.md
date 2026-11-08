@@ -15,9 +15,10 @@ That somebody is you.
 - **Its policy comes from CREED.** `src/Creed/` is a generated copy of CREED's reader and `policy.json`
   (namespace `Waynestate\Rollcall\Creed`). Never hand-edit it. `tests/fixtures/policy.json` is a separate snapshot used
   only by tests.
-- It reads repositories through a GitLab bot token (project or group bot, `read_api` only, with an expiry) requested
-  from the GitLab administrator. The token is configuration, never committed; until it exists Rollcall runs on its
-  fixtures.
+- It reads repositories through a GitLab token with `read_api` only, the Reporter role and an expiry. The stack's is
+  the group access token `rollcall-scanner` on `enterprise-apps`, kept in the CI/CD variable
+  `ROLLCALL_GITLAB_TOKEN`, expiring 2027-11-06. The token is configuration, never committed; without it Rollcall runs
+  on its fixtures and the scan job skips green.
 
 ## Where it lives
 
@@ -73,6 +74,22 @@ red run pushes nothing, so main stays as it was and next week's run tries again.
 (CI/CD > Schedules, weekly, variable `ROLLCALL_JOB=creed-copy`); to run it now, start a pipeline on main from the
 web. GitLab starts no pipeline for a job-token push, which is why the job runs the whole gate before it pushes. Use
 the hand steps above only when a refresh cannot wait for Monday.
+
+## Rotating the scanner token
+
+The stack maintainer rotates `rollcall-scanner`: a role, not a named person, so the job survives a change of
+people. Do it before 2027-11-06; `scan` starts printing `Note: the GitLab token expires on ...` on 2027-10-23, so a
+reminder a month ahead keeps it calm. In short: make a replacement token (same name, Reporter, `read_api`, at most a
+year), paste it into the `ROLLCALL_GITLAB_TOKEN` variable, run the scan by hand and read the log, revoke the old
+token, then write the new date into the docs. The full runbook, with where each setting lives and what a good log
+says, is "The scanner token and how to rotate it" in [docs/security.md](docs/security.md). A leaked token is
+rotated at once, the same way.
+
+## Owners file
+
+`owners.json` is Rollcall's own owners file: who answers for each of the 13 projects the scan job names (today the
+stack maintainer, for all of them). When a project joins the scan job's list, add it here in the same change;
+`OwnersFileTest` fails until you do. The repo is public, so contacts are roles or teams, never a person.
 
 ## Public output stays anonymous
 

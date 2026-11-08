@@ -202,7 +202,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
 | `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none |
 | `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
-| `ROLLCALL_GITLAB_TOKEN` | A GitLab bot or personal access token with the read_api scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed | none |
+| `ROLLCALL_GITLAB_TOKEN` | A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed | none |
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
 | `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
@@ -263,24 +263,28 @@ Next: after a good scan, `var/snapshots/<today>.json` holds the day's attendance
 Rollcall's own repository (on git.wayne.edu, its canonical home) carries a `rollcall-scan` job in `.gitlab-ci.yml`. It
 runs `scan` over the 13 stack projects read-only and keeps the snapshot in `var/snapshots/` as a 30 day artifact.
 It runs when a GitLab schedule says so, or when a person starts it by hand from the web; without a token it skips
-green. To make it run, create three things in GitLab:
+green. It needs three things in GitLab, and on git.wayne.edu all three exist:
 
-1. A token: a bot or personal access token for a user who is a member (role Reporter) of only the 13 projects the
-   job names in `.gitlab-ci.yml`, with the `read_api` scope only and an expiry (90 days, then rotate; Rollcall
-   prints a note 14 days before it expires).
+1. A token with the `read_api` scope only, the Reporter role and an expiry. The stack's is the group access token
+   `rollcall-scanner` on the `enterprise-apps` group, which expires 2027-11-06 (Rollcall prints a note 14 days
+   before).
 2. A CI/CD variable `ROLLCALL_GITLAB_TOKEN` on the ROLLCALL project: masked and hidden, protected (the schedule
    runs on the protected default branch), and not a file.
 3. A schedule on `main`: CI/CD > Schedules, weekly (Monday), with the variable `ROLLCALL_JOB` set to `scan`.
 
-Why a per-project token: a group token on enterprise-apps would see other teams' repositories, which the scan must
-not read. The allowlist `ROLLCALL_GITLAB_PROJECTS` limits what Rollcall asks for (it never lists the group and
-never asks for another project), but it does not limit what the token can read; only the token's membership does.
-So the token's user must be a member of just those projects.
+The token is rotated by a role, the stack maintainer, not a named person. The runbook (where the token lives, when
+it expires, the five steps, and what to look for in the job log) is "The scanner token and how to rotate it" in
+[docs/security.md](docs/security.md).
+
+About reach: a group token reads every project in its group. The project owner chose group reach for the stack's
+token; the allowlist `ROLLCALL_GITLAB_PROJECTS` keeps what Rollcall asks for to the 13 projects (it never lists the
+group and never asks for another project). If your fleet needs a tighter fence, give a service account Reporter on
+just the projects to scan and use its token instead, because only membership limits what a token can read.
 
 Exactly which scope, and why each other scope stays off: `read_api` covers all five calls Rollcall makes (listed
 one by one, with the role and the expiry rules, under "The GitLab token, exactly" in
 [docs/security.md](docs/security.md)). Not `api`, not `read_repository` (Rollcall never clones), not `read_user`,
-not `self_rotate` (a person rotates the token, never Rollcall).
+not `self_rotate` (the stack maintainer rotates the token, never Rollcall).
 
 ## Owner digests (opt-in)
 
@@ -469,15 +473,16 @@ and macOS, `scripts/a11y.ps1` on Windows; MAINTAINING.md says when to run it.
 
 - Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only `GET` and `HEAD`, and a test
   fails if a write verb appears in `src/`.
-- The GitLab token is a bot or personal access token with the `read_api` scope only and an expiry, whose user can
-  read only the projects to scan. It goes in the environment as `ROLLCALL_GITLAB_TOKEN`, never in git, is sent only
-  to the configured `https` host, and is hidden from debug output and error messages. `ROLLCALL_GITLAB_PROJECTS`
-  limits what Rollcall asks for, not what the token can read; only the token's membership does that, so the token's
-  user stays a member of just the listed projects. When the source is GitLab, `scan` reads the token's own record
-  (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days before it expires, or when it has already
-  expired. The note names the date; the owner rotates the token before its expiry, never Rollcall. The check is
-  advisory: a refused, unreachable or unparseable answer prints nothing and never fails the scan, and the token
-  value never appears in output.
+- The GitLab token is a group or project access token (a GitLab bot), or a service account's token, with the
+  `read_api` scope only, the Reporter role and an expiry; the stack's is the group access token `rollcall-scanner`,
+  which expires 2027-11-06. It goes in the environment as `ROLLCALL_GITLAB_TOKEN`, never in git, is sent only to the
+  configured `https` host, and is hidden from debug output and error messages. `ROLLCALL_GITLAB_PROJECTS` limits
+  what Rollcall asks for, not what the token can read; only the token's membership does that. When the source is
+  GitLab, `scan` reads the token's own record (`GET /api/v4/personal_access_tokens/self`) and prints a note 14 days
+  before it expires, or when it has already expired. The note names the date; the stack maintainer (a role, not a
+  named person) rotates the token before its expiry, never Rollcall, following the runbook in
+  [docs/security.md](docs/security.md). The check is advisory: a refused, unreachable or unparseable answer prints
+  nothing and never fails the scan, and the token value never appears in output.
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
   strips control characters.

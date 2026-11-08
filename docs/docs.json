@@ -40,7 +40,7 @@
                     "none"
                 ],
                 "ROLLCALL_GITLAB_TOKEN": [
-                    "A GitLab bot or personal access token with the read_api scope only and an expiry, whose user can read only the projects to scan. Never in git, never logged, never printed",
+                    "A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed",
                     "none"
                 ],
                 "ROLLCALL_GITLAB_GROUPS": [

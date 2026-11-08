@@ -11,8 +11,8 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Rule | Tag | How |
 |---|---|---|
 | Never write to the systems you scan | Enforced | `GitLabRepositorySource::send()` allows only `GET` and `HEAD`; `ReadOnlyAndDocsTest` fails on a write verb in `src/` and on file writes outside the snapshot store |
-| Use the smallest token scope (`read_api`), on a GitLab bot token (project or group bot) requested from the GitLab administrator | Checked | `docs/security.md` lists every API call and the scope that covers it, and `TokenScopeDocsTest` fails if the GitLab adapter calls a path the table does not list; Rollcall cannot see a token's scopes |
-| Plan token expiry and rotation; an expired token is a loud failure | Enforced (warning, loud failure) / Documented (rotation) | A 401 or 403 stops the scan with a plain message; `scan` prints a note 14 days before the token expires (and when it has already expired); the GitLab administrator rotates the token before its expiry (question 4) |
+| Use the smallest token scope (`read_api`), on a GitLab group or project access token (a bot) | Checked | `docs/security.md` lists every API call and the scope that covers it, and `TokenScopeDocsTest` fails if the GitLab adapter calls a path the table does not list; Rollcall cannot see a token's scopes |
+| Plan token expiry and rotation; an expired token is a loud failure | Enforced (warning, loud failure) / Documented (rotation) | A 401 or 403 stops the scan with a plain message; `scan` prints a note 14 days before the token expires (and when it has already expired); the stack maintainer, a role, rotates the token before its expiry with the runbook in `docs/security.md` (question 4) |
 | List projects per group with subgroups, in the small form | Enforced | `include_subgroups=true&simple=true&archived=false`, tested |
 | Fetch only the files you need, never clone | Enforced | File endpoints only; the directory adapter reads two named files |
 | Skip what has not changed | Enforced | `HEAD` blob id compared with the last snapshot; tested for both adapters |
