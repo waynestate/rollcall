@@ -1,22 +1,22 @@
 # composer ci is the contract: the checks are defined there, and this pipeline wraps them.
 # It also carries rollcall-scan, a read-only scan of the 13 stack projects on a schedule or by hand.
 # Rollcall's pipeline, built from the Preflight components on this GitLab.
-# Pinned to Preflight 0.3.1. Never use ~latest.
+# Pinned to Preflight 0.4.0. Never use ~latest.
 # Rollcall requires PHP ^8.3, so the test matrix starts at 8.3.
 # Docker Hub images go through the GitLab Dependency Proxy to avoid the anonymous pull limit.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.4.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       image: "php:${PHP_VERSION}-cli-trixie"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.4.0
     inputs:
       image: "composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc"
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
   # allow_failure: deploy/ is a subfolder, so PROCTOR always warns that it has no .gitlab-ci.yml (the pipeline is
   # here at the root). On 2026-11-06 it also failed composer audit on Symfony 7.4.22 in deploy/composer.lock,
   # fixed by the move to 7.4.23.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.4.0
     inputs:
       working_dir: deploy
       proctor_command: vendor/bin/proctor check --format=codequality
@@ -24,14 +24,14 @@ include:
       image: "php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
   # Accessibility: axe-core in Playwright (Preflight's a11y component), WCAG 2.2 AA.
   # The front page and its docs, served from site/.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.4.0
     inputs:
       job_name: a11y-site
       site_dir: site
       pages: ["index.html", "docs/**/*.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
   # The dashboard pages, rendered by the dashboard-render job below.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.3.1
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.4.0
     inputs:
       job_name: dashboard-a11y
       site_dir: build/dashboard-a11y
