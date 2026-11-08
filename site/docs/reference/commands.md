@@ -15,6 +15,7 @@ This page lists the commands (generated from the CLI) and what each one prints, 
 | `rollcall advisories` | Check locked package versions against a saved Packagist security-advisories response. |
 | `rollcall digest` | Print (or write, or send) each opted-in owner's digest of what changed in their apps. |
 | `rollcall drift` | Compare policy.json with a saved endoflife.date v1 product file. |
+| `rollcall owners` | List the scanned apps that no owners-file entry lists; exit 1 when there is one. |
 | `rollcall prune` | Delete snapshots older than the retention window; the newest is never deleted. |
 | `rollcall report` | Print the fleet report from the stored snapshots. |
 | `rollcall scan` | Scan the fleet read-only and store a snapshot. |
@@ -57,6 +58,18 @@ Usage: `rollcall drift [--today TODAY] [--feed FEED] [--component COMPONENT]`
 | `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
 | `--feed=VALUE` | Path to the saved endoflife.date JSON. |  |
 | `--component=VALUE` | Policy component to compare. | `php` |
+| `--silent` | Do not output any message |  |
+
+### `rollcall owners` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-owners)
+
+List the scanned apps that no owners-file entry lists; exit 1 when there is one.
+
+Usage: `rollcall owners [--today TODAY] [--format FORMAT]`
+
+| Option | Meaning | Default |
+| --- | --- | --- |
+| `--today=VALUE` | Override today's date (YYYY-MM-DD). |  |
+| `--format=VALUE` | text or json. | `text` |
 | `--silent` | Do not output any message |  |
 
 ### `rollcall prune` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-prune)
