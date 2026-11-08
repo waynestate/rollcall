@@ -94,7 +94,7 @@ shell on the host.</p>
 <tr>
 <td><code>scripts/dashboard-a11y.ps1</code></td>
 <td><code>scripts/dashboard-a11y.sh</code></td>
-<td>The dashboard accessibility gate: renders the public and internal dashboard pages with PHPUnit, then runs the same Preflight checker on both, in Docker</td>
+<td>The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit (styled with the bundled WayneUI stylesheet), then runs the same axe-core check on all three, in Docker</td>
 </tr>
 <tr>
 <td><code>deploy/scripts/parity.ps1</code></td>
