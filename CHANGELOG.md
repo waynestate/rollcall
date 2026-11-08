@@ -5,6 +5,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Fixed: the docs menu closes with Escape and hands focus back to its button (docs kit synced from Squire).
+- Fixed: the docs kit's copy button no longer covers the first line of code when it says Copied or Failed: over the code it keeps its resting width and shows a check or a cross when the word does not fit (docs kit synced from Squire).
+- Fixed: the front page's version chip shows the full version the docs show (Register 0.1.10, was Register 0.1). It carries `data-docs-version` now, so the docs builder (synced from Squire) rewrites it at every release and `composer docs:check` fails while it is stale.
 - Changed: the deploy layer requires PROCTOR ^0.8 (locked 0.8.0).
 - Fixed: on a phone the front page's versions table ran past the page edge, and the page clips sideways, so the end-of-support dates could not be seen. Below 560 px the table is set a size smaller, keeps each date on one line and lets the long state name wrap at its underscore.
 - Added: a weekly `creed-copy-refresh` CI job (`tools/creed-copy-refresh.sh`; schedule variable `ROLLCALL_JOB=creed-copy`, or by hand from the web on main) re-exports the generated CREED copy in `src/Creed` from CREED main, rebuilds the versions table, docs and agent-ready files, runs `composer creed-copy:check` and `composer ci`, and pushes to main with the job token only when both pass; a red run leaves main untouched.
