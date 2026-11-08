@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Changed: the local a11y scripts run Preflight's own checker (0.3.1, axe-core 4.14.0, 320 and 1280 px, reflow), pinned by SHA-256 in tests/A11yCheckerPinTest.php, so a page that passes locally passes CI.
 - Fixed: the dashboard's tables scroll inside their own region at 320 px even when no WayneUI stylesheet is linked, so the page reflows (WCAG 1.4.10; caught by the dashboard-a11y CI job).
 - Changed: CI pins the Preflight components to 0.3.1 (fixed cache keys, and caches saved even when a job fails; D-072).
 - Changed: CI saves its Composer and npm caches even when a job fails, so a retry after a dropped download fetches only what is missing (D-072).

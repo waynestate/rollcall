@@ -162,9 +162,9 @@ clean clone.
    machine). Expect the app to come up on the printed address. If it does not, read the logs the script points at,
    then bring the stack down with `down`.
 
-7. **Run the front page accessibility gate.** `scripts/a11y.sh` on Linux and macOS, or `scripts/a11y.ps1` on
-   Windows. Expect zero axe violations. If any violation is reported, fix the front page and run the gate again
-   until it is clean.
+7. **Run the accessibility gates.** `scripts/a11y.sh` (front page) and `scripts/dashboard-a11y.sh` (dashboard)
+   on Linux and macOS, or `scripts/a11y.ps1` and `scripts/dashboard-a11y.ps1` on Windows. Expect zero axe
+   violations. If any violation is reported, fix the page and run the gate again until it is clean.
 
 When the list is done, record the date, the OS and the result of each item in the release merge request.
 
@@ -200,17 +200,25 @@ so the committed `site/index.md` carries the table without markers; the check ac
 
 ### Accessibility gate
 
-The front page must pass an accessibility gate: axe-core with the WCAG 2.2 AA tag set (`wcag2a`, `wcag2aa`,
-`wcag21a`, `wcag21aa`, `wcag22aa`), run in a real Chromium browser by Playwright. The check lives in `tools/a11y/`
-and runs in Docker (image `mcr.microsoft.com/playwright:v1.49.1-noble`), so no host browser is needed:
+The front page and the dashboard must pass an accessibility gate: Preflight's own a11y checker, vendored byte
+for byte into `tools/a11y/check.mjs` from Preflight 0.3.1 and pinned by `tests/A11yCheckerPinTest.php`, run in
+Docker with the same digest-pinned Playwright image, WCAG 2.2 AA tag set (`wcag2a`, `wcag2aa`, `wcag21a`,
+`wcag21aa`, `wcag22aa`), color schemes (light and dark) and widths (320 px and 1280 px) as the CI jobs, so a
+page that passes locally passes CI. No host browser is needed:
 
-- Linux and macOS: `scripts/a11y.sh`
-- Windows: `scripts/a11y.ps1` (PowerShell 5.1 and 7)
+- Front page: `scripts/a11y.sh` on Linux and macOS, or `scripts/a11y.ps1` on Windows (PowerShell 5.1 and 7);
+  checks every HTML page under `site/`.
+- Dashboard: `scripts/dashboard-a11y.sh` or `scripts/dashboard-a11y.ps1`; renders the public and internal
+  dashboard pages first, then checks both.
 
-It serves `site/` on a local port and analyzes `index.html` in light mode and in dark mode at 360 px and 1280 px
-wide; any violation fails the run (exit 1, exit 2 on a tool error). Run it after any change under `site/` and
-before every release. It is not part of `composer ci`: CI has no browser, so the gate is run by hand. The Laravel
-dashboard page (Blade) is not covered; only the static front page is gated.
+At 320 px the checker also fails a page whose content overflows its viewport (reflow, violation id
+`preflight-reflow`). Any violation, or a page that does not load, fails the run (exit 1; exit 2 on a tool or
+configuration error). The reports (`gl-a11y-junit.xml`, `gl-a11y-report.json`) land in `build/a11y/` and
+`build/dashboard-a11y/` (gitignored). The checker's npm packages live in a named Docker volume
+(`rollcall-a11y-node-modules`), installed once and reused, so the first run is slow and later ones are fast.
+
+Run the gates after any change under `site/` or the dashboard views, and before every release. They mirror the
+`a11y-site` and `dashboard-a11y` CI jobs, which run the same checker from the Preflight component.
 
 ## Who maintains it
 
