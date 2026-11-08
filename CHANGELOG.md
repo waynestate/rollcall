@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Changed: the deploy layer runs Squire's kit 0.7.1 (was 0.6.0): `.squire/php.ini` no longer sets the deprecated `session.sid_*` lines, web requests get a `disable_functions` list and Apache hardening (`.squire/php-web.ini`, `.squire/apache-hardening.conf`), and opcache gets production settings with `SQUIRE_OPCACHE_VALIDATE` as the one switch.
 - Changed: the front page deploy layer requires HELMET ^1.0 (lock at 1.0.1, was 0.4.0), like the rest of the stack; its shared front controller already runs on HELMET 1.0 in Squire, Sourdough and Pinstripe.
 - Changed: the local a11y scripts run Preflight's own checker (0.3.1, axe-core 4.14.0, 320 and 1280 px, reflow), pinned by SHA-256 in tests/A11yCheckerPinTest.php, so a page that passes locally passes CI.
 - Fixed: the dashboard's tables scroll inside their own region at 320 px even when no WayneUI stylesheet is linked, so the page reflows (WCAG 1.4.10; caught by the dashboard-a11y CI job).
