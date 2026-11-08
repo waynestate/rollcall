@@ -10,6 +10,8 @@ use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
 use Waynestate\Rollcall\Source\DirectoryRepositorySource;
+use Waynestate\Rollcall\Source\RepoFile;
+use Waynestate\Rollcall\Source\RepositorySource;
 use Waynestate\Rollcall\Storage\JsonFileSnapshotStore;
 use Waynestate\Rollcall\Tests\Support\CountingSource;
 use Waynestate\Rollcall\Tests\Support\Fleet;
@@ -68,6 +70,55 @@ final class ScannerTest extends TestCase
         $this->assertSame('8.3', $broken->phpImage);
     }
 
+    public function test_the_booster_hop_record_joins_the_facts_or_becomes_a_note(): void
+    {
+        $apps = $this->byId(Fleet::snapshot('2026-10-28'));
+
+        $ledger = $apps['demo/ledger'];
+        $this->assertSame('pass', $ledger->boosterResult);
+        $this->assertSame('1.10.0', $ledger->boosterVersion);
+        $this->assertSame('2026-11-08T14:07:41+00:00', $ledger->boosterAt);
+
+        $relic = $apps['demo/relic'];
+        $this->assertNull($relic->boosterResult);
+        $this->assertNull($relic->boosterVersion);
+        $this->assertNull($relic->boosterAt);
+
+        $broken = $apps['demo/broken'];
+        $this->assertNull($broken->boosterResult);
+        $this->assertContains('Booster hop record could not be read', $broken->notes);
+    }
+
+    public function test_a_stale_booster_result_does_not_survive_when_the_record_disappears(): void
+    {
+        $first = Fleet::snapshot('2026-10-27');
+        $hidden = new class (Fleet::repositories()) implements RepositorySource {
+            public function __construct(private readonly RepositorySource $inner) {}
+
+            public function projects(): array
+            {
+                return $this->inner->projects();
+            }
+
+            public function file(string $project, string $path, ?string $knownBlobId = null): RepoFile
+            {
+                if ($path === 'booster-hop.json') {
+                    return RepoFile::missing();
+                }
+
+                return $this->inner->file($project, $path, $knownBlobId);
+            }
+        };
+        $second = Fleet::scanner('2026-10-28', $hidden)->scan($first);
+
+        foreach ($second->apps as $app) {
+            $this->assertNull($app->boosterResult);
+            $this->assertNull($app->boosterVersion);
+            $this->assertNull($app->boosterAt);
+            $this->assertNotContains('Booster hop record could not be read', $app->notes);
+        }
+    }
+
     public function test_missing_sources_are_reported_on_the_snapshot(): void
     {
         $scanner = new \Waynestate\Rollcall\Scan\Scanner(Fleet::repositories(), null, null, new \Waynestate\Rollcall\Clock\FixedClock('2026-10-28'));
@@ -83,9 +134,10 @@ final class ScannerTest extends TestCase
         $source = new CountingSource(Fleet::repositories());
         $second = Fleet::scanner('2026-10-28', $source)->scan($first);
 
-        // Apps with both files present must never have a body sent again. An app missing one file
-        // re-reads the other, because the parser needs both bodies.
-        $complete = array_filter($source->calls, static fn(string $c): bool => str_starts_with($c, 'demo/ledger:') || str_starts_with($c, 'demo/atlas:'));
+        // Apps with both composer files present must never have a composer body sent again. An app
+        // missing one file re-reads the other, because the parser needs both bodies. The hop record
+        // is parsed on every scan, so its body is asked for again.
+        $complete = array_filter($source->calls, static fn(string $c): bool => (str_starts_with($c, 'demo/ledger:') || str_starts_with($c, 'demo/atlas:')) && ! str_contains($c, ':booster-hop.json:'));
         $this->assertCount(4, $complete);
         foreach ($complete as $call) {
             $this->assertStringEndsWith(':unchanged', $call);

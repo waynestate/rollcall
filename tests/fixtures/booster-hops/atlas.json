@@ -1,0 +1,26 @@
+{
+    "tool": "booster",
+    "version": "1.10.0",
+    "dry_run": false,
+    "result": "pass",
+    "started_at": "2026-11-08T14:03:22+00:00",
+    "finished_at": "2026-11-08T14:07:41+00:00",
+    "php_from": "8.1",
+    "php_to": "8.3",
+    "laravel_from": null,
+    "laravel_to": null,
+    "rule_packages": {
+        "rector/rector": "2.8.5",
+        "driftingly/rector-laravel": "2.7.2"
+    },
+    "hops": [
+        {
+            "step": 1,
+            "hop": "php-81-to-82",
+            "status": "applied",
+            "rules": {
+                "SomeRector": 12
+            }
+        }
+    ]
+}

@@ -13,10 +13,11 @@ Front page: [`site/index.html`](https://github.com/waynestate/rollcall/blob/main
 On Citadel, the raw-PHP deploy layer in [`deploy/`](https://github.com/waynestate/rollcall/tree/main/deploy) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
 
 Rollcall is the fleet scanner for the Wayne State application stack. For each app it records the PHP image, the
-lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, and the PROCTOR
-result. Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per scan, so you can
-see drift and an EOL burn-down over time. It prunes old snapshots after the retention window (default 90 days; the
-newest one always stays).
+lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, the PROCTOR result,
+and, when the app commits one, the result, Booster version and finish time of Booster's hop record
+(`booster-hop.json`). Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per
+scan, so you can see drift and an EOL burn-down over time. It prunes old snapshots after the retention window
+(default 90 days; the newest one always stays).
 
 Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
 the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The

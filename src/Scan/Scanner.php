@@ -7,6 +7,7 @@ namespace Waynestate\Rollcall\Scan;
 use Psr\Clock\ClockInterface;
 use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
+use Waynestate\Rollcall\Parse\BoosterHopReader;
 use Waynestate\Rollcall\Parse\ComposerReader;
 use Waynestate\Rollcall\Parse\ImageTag;
 use Waynestate\Rollcall\Parse\ProctorReportReader;
@@ -18,10 +19,10 @@ use Waynestate\Rollcall\Source\RuntimeVersionSource;
 use Waynestate\Rollcall\Source\UpgradeDueSource;
 
 /**
- * Calls the roll. For each repository it reads the two Composer files, then
- * adds the image and the PROCTOR result from their own sources. Everything it
- * touches is read-only, and a gap in one source becomes a note on the app, not
- * a failed scan.
+ * Calls the roll. For each repository it reads the two Composer files and the
+ * app's booster-hop.json, then adds the image and the PROCTOR result from
+ * their own sources. Everything it touches is read-only, and a gap in one
+ * source becomes a note on the app, not a failed scan.
  */
 final class Scanner
 {
@@ -32,6 +33,7 @@ final class Scanner
         private readonly ClockInterface $clock,
         private readonly ComposerReader $composer = new ComposerReader(),
         private readonly ProctorReportReader $proctor = new ProctorReportReader(),
+        private readonly BoosterHopReader $booster = new BoosterHopReader(),
     ) {}
 
     /** @param  Snapshot|null  $previous  the last scan, used to skip files that have not changed */
@@ -45,8 +47,8 @@ final class Scanner
         $apps = [];
         $errors = [];
         foreach ($this->repositories->projects() as $project) {
-            $facts = $this->composerFacts($project, $before[$project] ?? null);
-            $apps[] = $this->withImage($this->withProctor($facts));
+            $facts = $this->clear($this->composerFacts($project, $before[$project] ?? null));
+            $apps[] = $this->withImage($this->withProctor($this->withBooster($facts)));
         }
         if ($this->images === null) {
             $errors[] = 'No image source configured; PHP images are unknown.';
@@ -94,10 +96,24 @@ final class Scanner
         );
     }
 
+    private function withBooster(AppFacts $facts): AppFacts
+    {
+        // A record the developer committed: this scan's read wins, or the result is unknown.
+        $hop = $this->repositories->file($facts->id, 'booster-hop.json');
+        if (! $hop->isFound()) {
+            return $facts;
+        }
+        try {
+            $record = $this->booster->read((string) $hop->content);
+        } catch (RollcallException) {
+            return $this->note($facts, 'Booster hop record could not be read');
+        }
+
+        return $facts->with(boosterResult: $record['result'], boosterVersion: $record['version'], boosterAt: $record['at']);
+    }
+
     private function withProctor(AppFacts $facts): AppFacts
     {
-        // What an earlier scan said is dropped: this scan's report wins, or the result is unknown.
-        $facts = $this->clear($facts);
         $raw = $this->reports?->report($facts->id);
         if ($raw === null) {
             return $facts;
@@ -146,7 +162,7 @@ final class Scanner
             null,
             [],
             $facts->blobs,
-            array_values(array_filter($facts->notes, static fn(string $n): bool => ! str_starts_with($n, 'PROCTOR report') && ! str_starts_with($n, 'image tag'))),
+            array_values(array_filter($facts->notes, static fn(string $n): bool => ! str_starts_with($n, 'PROCTOR report') && ! str_starts_with($n, 'image tag') && ! str_starts_with($n, 'Booster hop record'))),
             null,
         );
     }
@@ -170,6 +186,9 @@ final class Scanner
             $facts->upgradeDue,
             $facts->runtimePhp,
             $facts->runtimeHttpd,
+            $facts->boosterResult,
+            $facts->boosterVersion,
+            $facts->boosterAt,
         );
     }
 }

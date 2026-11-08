@@ -14,6 +14,8 @@ namespace Waynestate\Rollcall\Model;
  * forced image upgrade, when the image source can say (a Citadel export).
  * runtimePhp and runtimeHttpd are the versions inside the running container,
  * when the image source reports them (a Citadel export); null until then.
+ * boosterResult, boosterVersion and boosterAt are Booster's hop record, when
+ * the app commits a readable booster-hop.json; null until then.
  */
 final class AppFacts
 {
@@ -39,6 +41,9 @@ final class AppFacts
         public readonly ?string $upgradeDue = null,
         public readonly ?string $runtimePhp = null,
         public readonly ?string $runtimeHttpd = null,
+        public readonly ?string $boosterResult = null,
+        public readonly ?string $boosterVersion = null,
+        public readonly ?string $boosterAt = null,
     ) {}
 
     /** The Laravel major, such as "12", or null. */
@@ -61,6 +66,9 @@ final class AppFacts
         ?string $upgradeDue = null,
         ?string $runtimePhp = null,
         ?string $runtimeHttpd = null,
+        ?string $boosterResult = null,
+        ?string $boosterVersion = null,
+        ?string $boosterAt = null,
     ): self {
         return new self(
             $this->id,
@@ -79,6 +87,9 @@ final class AppFacts
             $upgradeDue ?? $this->upgradeDue,
             $runtimePhp ?? $this->runtimePhp,
             $runtimeHttpd ?? $this->runtimeHttpd,
+            $boosterResult ?? $this->boosterResult,
+            $boosterVersion ?? $this->boosterVersion,
+            $boosterAt ?? $this->boosterAt,
         );
     }
 
@@ -102,6 +113,9 @@ final class AppFacts
             'upgrade_due' => $this->upgradeDue,
             'runtime_php' => $this->runtimePhp,
             'runtime_httpd' => $this->runtimeHttpd,
+            'booster_result' => $this->boosterResult,
+            'booster_version' => $this->boosterVersion,
+            'booster_at' => $this->boosterAt,
         ];
     }
 
@@ -146,6 +160,9 @@ final class AppFacts
             $str('upgrade_due'),
             $str('runtime_php'),
             $str('runtime_httpd'),
+            $str('booster_result'),
+            $str('booster_version'),
+            $str('booster_at'),
         );
     }
 }

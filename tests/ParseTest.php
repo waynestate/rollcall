@@ -6,6 +6,7 @@ namespace Waynestate\Rollcall\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Waynestate\Rollcall\Parse\BoosterHopReader;
 use Waynestate\Rollcall\Parse\ComposerReader;
 use Waynestate\Rollcall\Parse\ImageTag;
 use Waynestate\Rollcall\Parse\ProctorReportReader;
@@ -117,5 +118,32 @@ final class ParseTest extends TestCase
         $json = (string) json_encode(['tool' => 'proctor', 'result' => 'pass', 'overrides' => [['check' => 'a', 'reason' => str_repeat('x', 5000), 'expired' => false]]]);
         $report = (new ProctorReportReader())->read($json);
         $this->assertSame(500, strlen($report['overrides'][0]->reason));
+    }
+
+    public function test_booster_hop_record_is_read_in_the_shape_booster_writes(): void
+    {
+        $record = (new BoosterHopReader())->read((string) file_get_contents(self::FIXTURES . '/booster-hops/atlas.json'));
+
+        $this->assertSame('pass', $record['result']);
+        $this->assertSame('1.10.0', $record['version']);
+        $this->assertSame('2026-11-08T14:07:41+00:00', $record['at']);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function badBoosterRecords(): iterable
+    {
+        yield 'not json' => ['nope'];
+        yield 'another tool' => ['{"tool": "proctor", "result": "pass", "started_at": "2026-11-08T14:03:22+00:00", "finished_at": "2026-11-08T14:07:41+00:00"}'];
+        yield 'bad result' => ['{"tool": "booster", "result": "maybe", "started_at": "2026-11-08T14:03:22+00:00", "finished_at": "2026-11-08T14:07:41+00:00"}'];
+        yield 'missing started_at' => ['{"tool": "booster", "result": "pass", "finished_at": "2026-11-08T14:07:41+00:00"}'];
+        yield 'a replay without timestamps' => ['{"tool": "booster", "result": "pass"}'];
+        yield 'hops not a list' => ['{"tool": "booster", "result": "pass", "started_at": "2026-11-08T14:03:22+00:00", "finished_at": "2026-11-08T14:07:41+00:00", "hops": "one"}'];
+    }
+
+    #[DataProvider('badBoosterRecords')]
+    public function test_a_booster_hop_record_in_the_wrong_shape_is_refused(string $json): void
+    {
+        $this->expectException(RollcallException::class);
+        (new BoosterHopReader())->read($json);
     }
 }

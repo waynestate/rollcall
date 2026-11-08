@@ -63,6 +63,19 @@
                     "description": "The Apache httpd version in the running container, such as 2.4.62, when the image source reports it (a Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
                     "type": ["string", "null"],
                     "maxLength": 50
+                },
+                "booster_result": {
+                    "description": "The result Booster recorded in the app's booster-hop.json, when the file is present and readable, or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "enum": ["pass", "fail", null]
+                },
+                "booster_version": {
+                    "description": "The Booster version named in the app's booster-hop.json, when the record has one, or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "type": ["string", "null"]
+                },
+                "booster_at": {
+                    "description": "When Booster finished the hop, from the app's booster-hop.json, or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "type": ["string", "null"],
+                    "maxLength": 40
                 }
             }
         }

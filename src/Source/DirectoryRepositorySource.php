@@ -8,12 +8,13 @@ use Waynestate\Rollcall\RollcallException;
 
 /**
  * Fixture adapter: a directory laid out as <root>/<group>/<project>/ with a
- * composer.json and composer.lock in each. Used by tests, demos and the
- * 0.1 CLI, so no live host is ever needed to try ROLLCALL out.
+ * composer.json, a composer.lock and, when the app has run Booster, a
+ * booster-hop.json in each. Used by tests, demos and the 0.1 CLI, so no live
+ * host is ever needed to try ROLLCALL out.
  */
 final class DirectoryRepositorySource implements RepositorySource
 {
-    private const FILES = ['composer.json', 'composer.lock'];
+    private const FILES = ['composer.json', 'composer.lock', 'booster-hop.json'];
 
     public function __construct(private readonly string $root)
     {
@@ -42,7 +43,7 @@ final class DirectoryRepositorySource implements RepositorySource
 
     public function file(string $project, string $path, ?string $knownBlobId = null): RepoFile
     {
-        // Only the two named files are ever readable, and the project must be a plain group/project pair.
+        // Only the named files are ever readable, and the project must be a plain group/project pair.
         if (! in_array($path, self::FILES, true) || preg_match('#^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$#', $project) !== 1 || str_contains($project, '..')) {
             throw new RollcallException('Refusing to read an unexpected path.');
         }

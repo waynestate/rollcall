@@ -19,10 +19,11 @@ Front page: [`site/index.html`](site/index.html). It is static, with no build st
 On Citadel, the raw-PHP deploy layer in [`deploy/`](deploy/) serves it: a Squire kit whose front controller puts `site/` behind HELMET's security headers. For local development, serve `site/` directly.
 
 Rollcall is the fleet scanner for the Wayne State application stack. For each app it records the PHP image, the
-lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, and the PROCTOR
-result. Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per scan, so you can
-see drift and an EOL burn-down over time. It prunes old snapshots after the retention window (default 90 days; the
-newest one always stays).
+lowest PHP its `composer.json` allows, the Laravel version, the auth package and its version, the PROCTOR result,
+and, when the app commits one, the result, Booster version and finish time of Booster's hop record
+(`booster-hop.json`). Then it looks up each version by date in CREED's `policy.json`. It keeps one snapshot per
+scan, so you can see drift and an EOL burn-down over time. It prunes old snapshots after the retention window
+(default 90 days; the newest one always stays).
 
 Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
 the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The
@@ -68,7 +69,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 
 | Source | Interface | Adapters |
 |---|---|---|
-| Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
+| Repositories (`composer.json`, `composer.lock`, `booster-hop.json`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
 
