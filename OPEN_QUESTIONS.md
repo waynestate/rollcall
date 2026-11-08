@@ -52,7 +52,7 @@ question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is wo
 | Ownership verification on a schedule | Question 12 |
 | CycloneDX bill of materials and Dependency-Track | Question 10; an ADR is needed |
 | Per-app ADVISOR tools | By design: the module exposes public counts only (question 7); the per-app list stays internal |
-| Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The versions table, its `--check` (`composer site:versions-check`, part of `composer ci`) and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) are built; what is left: the dashboard pages are checked in CI (`dashboard-a11y`), and the quick-start block is hand-written |
+| Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | The versions table, its `--check` (`composer site:versions-check`, part of `composer ci`) and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) are built, and CI checks the front page and the rendered dashboard pages (`a11y-site`, `dashboard-a11y`); what is left: the quick-start block is hand-written |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |
 | Tag `1.0.0` and the GitHub mirror | The mirror exists: a push mirror from git.wayne.edu, which is canonical. Only the 1.0.0 tag is left, which is the owner's call |

@@ -71,4 +71,4 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 ## Not yet
 
 A scheduled Citadel export (the reader is built), ownership verification on a schedule, the live Packagist
-advisories fetch, the CycloneDX bill of materials. See `OPEN_QUESTIONS.md`, "Not built yet".
+advisories fetch and the CycloneDX bill of materials. See `OPEN_QUESTIONS.md`, "Not built yet".
