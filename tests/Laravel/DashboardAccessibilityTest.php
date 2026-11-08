@@ -90,4 +90,27 @@ final class DashboardAccessibilityTest extends LaravelTestCase
             $statusText,
         );
     }
+
+    public function test_the_tables_scroll_in_their_own_region_without_a_stylesheet(): void
+    {
+        // No WayneUI stylesheet: the page must reflow on its own (WCAG 1.4.10).
+        config(['rollcall.wayneui_css' => '']);
+
+        $html = $this->get('/rollcall/apps')->assertOk()->getContent() ?: '';
+
+        // The built-in style makes the wrapper scroll, with or without a CSP nonce.
+        $this->assertTrue(
+            (bool) preg_match('/<style\b[^>]*>(.*?)<\/style>/is', $html, $style),
+            'the built-in style element is missing',
+        );
+        $styleText = $style[1] ?? '';
+        $this->assertStringContainsString('.wsu-table-wrap', $styleText);
+        $this->assertStringContainsString('overflow-x: auto', $styleText);
+
+        // Every table is opened by its own scrollable region.
+        $tables = preg_match_all('/<table\b/i', $html);
+        $wrapped = preg_match_all('/<div class="wsu-table-wrap"[^>]*>\s*<table\b/is', $html);
+        $this->assertGreaterThan(0, $tables, 'expected at least one table');
+        $this->assertSame($tables, $wrapped, 'a table is not opened by its wsu-table-wrap region');
+    }
 }

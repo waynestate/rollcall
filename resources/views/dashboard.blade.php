@@ -17,6 +17,11 @@
     @if ($css)
         <link rel="stylesheet" href="{{ $css }}">
     @endif
+    {{-- WCAG 1.4.10: a wide table scrolls inside its own region at 320 px, even with no WayneUI stylesheet. --}}
+    @php($rollcallNonce = \Illuminate\Support\Facades\Vite::cspNonce())
+    <style @if ($rollcallNonce) nonce="{{ $rollcallNonce }}" @endif>
+        .wsu-table-wrap { max-width: 100%; overflow-x: auto; }
+    </style>
 </head>
 <body>
 <a href="#main" class="wsu-skip-link">Skip to the report</a>

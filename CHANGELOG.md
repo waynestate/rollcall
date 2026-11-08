@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Fixed: the dashboard's tables scroll inside their own region at 320 px even when no WayneUI stylesheet is linked, so the page reflows (WCAG 1.4.10; caught by the dashboard-a11y CI job).
 - Changed: CI saves its Composer and npm caches even when a job fails, so a retry after a dropped download fetches only what is missing (D-072).
 - Added: CI runs axe-core (WCAG 2.2 AA) on the front page and docs (a11y-site) and on the rendered dashboard pages (dashboard-render, dashboard-a11y), with Preflight's a11y component.
 - Changed: CI caches Composer and npm downloads under a fixed key, so a lock change downloads only what changed (D-072).
