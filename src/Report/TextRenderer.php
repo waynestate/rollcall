@@ -85,13 +85,16 @@ final class TextRenderer
             $rows = [];
             foreach ($report['apps'] as $app) {
                 $app = self::arr($app);
+                // The runtime versions stay blank until the image source reports them.
                 $rows[] = [
-                    $app['id'] ?? '', $app['php_image'] ?? '-', $app['image_state'] ?? '', $app['php_floor'] ?? '-',
+                    $app['id'] ?? '', $app['php_image'] ?? '-',
+                    $app['runtime_php'] ?? '', $app['runtime_httpd'] ?? '',
+                    $app['image_state'] ?? '', $app['php_floor'] ?? '-',
                     $app['laravel'] ?? '-', $app['auth_package'] ?? '-', $app['proctor'] ?? '-',
                     implode(',', array_map('strval', self::arr($app['drift'] ?? []))),
                 ];
             }
-            $out[] = self::table(['APP', 'IMAGE', 'STATE', 'FLOOR', 'LARAVEL', 'AUTH', 'PROCTOR', 'DRIFT'], $rows);
+            $out[] = self::table(['APP', 'IMAGE', 'PHP (RUNNING)', 'HTTPD (RUNNING)', 'STATE', 'FLOOR', 'LARAVEL', 'AUTH', 'PROCTOR', 'DRIFT'], $rows);
         }
 
         return implode("\n", $out) . "\n";

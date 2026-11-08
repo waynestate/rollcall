@@ -12,6 +12,8 @@ namespace Waynestate\Rollcall\Model;
  * The id is the repository path (for example "group/project"). It is internal:
  * public reports never carry it. upgradeDue is the due date of a pending
  * forced image upgrade, when the image source can say (a Citadel export).
+ * runtimePhp and runtimeHttpd are the versions inside the running container,
+ * when the image source reports them (a Citadel export); null until then.
  */
 final class AppFacts
 {
@@ -35,6 +37,8 @@ final class AppFacts
         public readonly array $blobs = [],
         public readonly array $notes = [],
         public readonly ?string $upgradeDue = null,
+        public readonly ?string $runtimePhp = null,
+        public readonly ?string $runtimeHttpd = null,
     ) {}
 
     /** The Laravel major, such as "12", or null. */
@@ -55,6 +59,8 @@ final class AppFacts
         ?string $proctorVersion = null,
         ?array $overrides = null,
         ?string $upgradeDue = null,
+        ?string $runtimePhp = null,
+        ?string $runtimeHttpd = null,
     ): self {
         return new self(
             $this->id,
@@ -71,6 +77,8 @@ final class AppFacts
             $this->blobs,
             $this->notes,
             $upgradeDue ?? $this->upgradeDue,
+            $runtimePhp ?? $this->runtimePhp,
+            $runtimeHttpd ?? $this->runtimeHttpd,
         );
     }
 
@@ -92,6 +100,8 @@ final class AppFacts
             'blobs' => $this->blobs,
             'notes' => $this->notes,
             'upgrade_due' => $this->upgradeDue,
+            'runtime_php' => $this->runtimePhp,
+            'runtime_httpd' => $this->runtimeHttpd,
         ];
     }
 
@@ -134,6 +144,8 @@ final class AppFacts
             $blobs,
             $notes,
             $str('upgrade_due'),
+            $str('runtime_php'),
+            $str('runtime_httpd'),
         );
     }
 }

@@ -117,13 +117,16 @@
                     <table class="wsu-table wsu-table--zebra">
                         <caption id="cap-apps">Each app's versions, PROCTOR result and drift</caption>
                         <thead>
-                            <tr><th scope="col">App</th><th scope="col">PHP image</th><th scope="col">Image state</th><th scope="col">PHP floor</th><th scope="col">Laravel</th><th scope="col">Auth package</th><th scope="col">PROCTOR</th><th scope="col">Drift</th></tr>
+                            <tr><th scope="col">App</th><th scope="col">PHP image</th><th scope="col">PHP (running)</th><th scope="col">httpd (running)</th><th scope="col">Image state</th><th scope="col">PHP floor</th><th scope="col">Laravel</th><th scope="col">Auth package</th><th scope="col">PROCTOR</th><th scope="col">Drift</th></tr>
                         </thead>
                         <tbody>
                         @foreach ($report['apps'] as $app)
                             <tr>
                                 <th scope="row">{{ $app['id'] }}</th>
                                 <td>{{ $app['php_image'] ?? 'unknown' }}</td>
+                                {{-- The runtime versions stay blank until the image source reports them. --}}
+                                <td>{{ $app['runtime_php'] ?? '' }}</td>
+                                <td>{{ $app['runtime_httpd'] ?? '' }}</td>
                                 <td>{{ str_replace('_', ' ', $app['image_state']) }}</td>
                                 <td>{{ $app['php_floor'] ?? 'unbounded' }}</td>
                                 <td>{{ $app['laravel'] ?? 'none' }}</td>

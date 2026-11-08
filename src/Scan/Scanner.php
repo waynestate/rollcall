@@ -14,6 +14,7 @@ use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Source\ImageSource;
 use Waynestate\Rollcall\Source\ProctorReportSource;
 use Waynestate\Rollcall\Source\RepositorySource;
+use Waynestate\Rollcall\Source\RuntimeVersionSource;
 use Waynestate\Rollcall\Source\UpgradeDueSource;
 
 /**
@@ -117,12 +118,16 @@ final class Scanner
             return $facts;
         }
         $due = $this->images instanceof UpgradeDueSource ? $this->images->upgradeDue($facts->id) : null;
+        $runtime = $this->images instanceof RuntimeVersionSource
+            ? ['php' => $this->images->runtimePhp($facts->id), 'httpd' => $this->images->runtimeHttpd($facts->id)]
+            : ['php' => null, 'httpd' => null];
+        $facts = $facts->with(imageTag: substr($tag, 0, 200), upgradeDue: $due, runtimePhp: $runtime['php'], runtimeHttpd: $runtime['httpd']);
         $php = ImageTag::phpVersion($tag);
         if ($php === null) {
-            return $this->note($facts->with(imageTag: substr($tag, 0, 200), upgradeDue: $due), 'image tag does not name a PHP version');
+            return $this->note($facts, 'image tag does not name a PHP version');
         }
 
-        return $facts->with(imageTag: substr($tag, 0, 200), phpImage: $php, upgradeDue: $due);
+        return $facts->with(phpImage: $php);
     }
 
     /** Drops stale per-scan fields carried over from the last snapshot. */
@@ -163,6 +168,8 @@ final class Scanner
             $facts->blobs,
             [...$facts->notes, $note],
             $facts->upgradeDue,
+            $facts->runtimePhp,
+            $facts->runtimeHttpd,
         );
     }
 }

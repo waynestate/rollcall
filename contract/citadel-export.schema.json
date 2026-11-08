@@ -14,7 +14,9 @@
                 "required": ["repository", "base_image"],
                 "properties": {
                     "repository": {"type": "string", "minLength": 1, "description": "The GitLab group/project path the application deploys from"},
-                    "base_image": {"type": "string", "minLength": 1, "maxLength": 200, "description": "The base image of the active deployment, such as citadel/php-apache:8.4r5"}
+                    "base_image": {"type": "string", "minLength": 1, "maxLength": 200, "description": "The base image of the active deployment, such as citadel/php-apache:8.4r5"},
+                    "php_version": {"type": ["string", "null"], "maxLength": 50, "description": "The PHP version in the running container, such as 8.3.14, when Citadel reports it"},
+                    "httpd_version": {"type": ["string", "null"], "maxLength": 50, "description": "The Apache httpd version in the running container, such as 2.4.62, when Citadel reports it"}
                 }
             }
         },

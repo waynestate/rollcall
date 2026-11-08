@@ -97,6 +97,10 @@ The schema is <code>contract/citadel-export.schema.json</code>; extra fields are
 </tr>
 </tbody>
 </table></div>
+<p>Two fields are optional: <code>applications[].php_version</code> (the PHP version in the running container, such as <code>8.3.14</code>)
+and <code>applications[].httpd_version</code> (the Apache httpd version, such as <code>2.4.62</code>). We have asked the Citadel team to
+send them. When they arrive, Rollcall keeps them in the snapshot and shows them per app in the internal report as
+&quot;PHP (running)&quot; and &quot;httpd (running)&quot;, blank until Citadel sends them; an export without them changes nothing.</p>
 <p>Entries Rollcall cannot trust are skipped, never guessed: an application with no repository, an upgrade with no real
 date (<code>&quot;soon&quot;</code>, <code>2026-02-30</code>) or without <code>&quot;completed&quot;: false</code>. An app registered on Citadel but not in the scan is
 not invented either: the census starts from the repositories.</p>

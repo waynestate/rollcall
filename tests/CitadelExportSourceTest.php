@@ -14,6 +14,7 @@ use Waynestate\Rollcall\Model\AppFacts;
 use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\Parse\ComposerReader;
 use Waynestate\Rollcall\Report\ReportBuilder;
+use Waynestate\Rollcall\Report\TextRenderer;
 use Waynestate\Rollcall\RollcallException;
 use Waynestate\Rollcall\Scan\Scanner;
 use Waynestate\Rollcall\Source\CitadelExportSource;
@@ -97,6 +98,93 @@ final class CitadelExportSourceTest extends TestCase
         $this->assertContains('image tag does not name a PHP version', $this->app($snapshot, 'demo/relic')->notes);
         $this->assertCount(4, $snapshot->apps, 'Citadel apps with no repository in the scan are not invented');
         $this->assertSame([], $snapshot->errors, 'the Citadel export is a configured image source');
+    }
+
+    public function test_the_runtime_versions_reach_the_facts_when_citadel_sends_them(): void
+    {
+        $source = CitadelExportSource::fromFile(self::EXPORT);
+
+        $this->assertSame('8.4.16', $source->runtimePhp('demo/ledger'));
+        $this->assertSame('2.4.62', $source->runtimeHttpd('demo/ledger'));
+        $this->assertNull($source->runtimePhp('demo/atlas'), 'an app without the fields gets null');
+        $this->assertNull($source->runtimeHttpd('demo/atlas'));
+        $this->assertNull($source->runtimePhp('demo/not-registered'));
+
+        $snapshot = $this->scan();
+        $this->assertSame('8.4.16', $this->app($snapshot, 'demo/ledger')->runtimePhp);
+        $this->assertSame('2.4.62', $this->app($snapshot, 'demo/ledger')->runtimeHttpd);
+        $this->assertNull($this->app($snapshot, 'demo/atlas')->runtimePhp, 'an app without the fields gets null');
+        $this->assertNull($this->app($snapshot, 'demo/broken')->runtimeHttpd);
+    }
+
+    public function test_a_non_string_runtime_version_is_ignored_not_an_error(): void
+    {
+        $source = CitadelExportSource::fromArray([
+            'applications' => [
+                ['repository' => 'g/odd', 'base_image' => 'citadel/php-apache:8.4r5', 'php_version' => 8.4, 'httpd_version' => ['2.4.62']],
+                ['repository' => 'g/empty', 'base_image' => 'citadel/php-apache:8.4r5', 'php_version' => '', 'httpd_version' => null],
+            ],
+        ]);
+
+        $this->assertSame('citadel/php-apache:8.4r5', $source->imageTag('g/odd'), 'the entry is still read for its image');
+        $this->assertNull($source->runtimePhp('g/odd'), 'a non-string is ignored, not an error');
+        $this->assertNull($source->runtimeHttpd('g/odd'));
+        $this->assertNull($source->runtimePhp('g/empty'), 'an empty string is the same as absent');
+        $this->assertNull($source->runtimeHttpd('g/empty'));
+    }
+
+    public function test_the_runtime_versions_survive_a_snapshot_round_trip_and_old_snapshots_still_load(): void
+    {
+        $snapshot = $this->scan();
+        $again = Snapshot::fromArray(json_decode((string) json_encode($snapshot->toArray()), true));
+        $this->assertSame('8.4.16', $this->app($again, 'demo/ledger')->runtimePhp);
+        $this->assertSame('2.4.62', $this->app($again, 'demo/ledger')->runtimeHttpd);
+        $this->assertNull($this->app($again, 'demo/atlas')->runtimePhp);
+
+        $old = $snapshot->toArray();
+        foreach ($old['apps'] as $i => $app) {
+            unset($old['apps'][$i]['runtime_php'], $old['apps'][$i]['runtime_httpd']);
+        }
+        $this->assertNull($this->app(Snapshot::fromArray($old), 'demo/ledger')->runtimePhp, 'a snapshot written before the fields existed loads as null');
+        $this->assertNull($this->app(Snapshot::fromArray($old), 'demo/ledger')->runtimeHttpd);
+    }
+
+    public function test_the_report_shows_the_runtime_versions_and_a_blank_cell_when_absent(): void
+    {
+        $builder = new ReportBuilder(Policy::fromFile(Fleet::FIXTURES . '/policy.json'));
+        $snapshot = $this->scan();
+        $today = new DateTimeImmutable('2026-11-07');
+
+        $internal = $builder->build($snapshot, [$snapshot], $today, true);
+        $byId = [];
+        foreach ($internal['apps'] as $app) {
+            $byId[$app['id']] = $app;
+        }
+        $this->assertSame('8.4.16', $byId['demo/ledger']['runtime_php']);
+        $this->assertSame('2.4.62', $byId['demo/ledger']['runtime_httpd']);
+        $this->assertNull($byId['demo/atlas']['runtime_php'], 'an app without the fields stays null in the report');
+        $this->assertNull($byId['demo/atlas']['runtime_httpd']);
+
+        $public = $builder->build($snapshot, [$snapshot], $today);
+        $this->assertArrayNotHasKey('apps', $public, 'the runtime versions are per-app facts and stay internal, like the image column');
+
+        $text = (new TextRenderer())->render($internal);
+        $this->assertStringContainsString('PHP (RUNNING)', $text);
+        $this->assertStringContainsString('HTTPD (RUNNING)', $text);
+        $ledger = '';
+        $atlas = '';
+        foreach (explode("\n", $text) as $line) {
+            if (str_starts_with($line, 'demo/ledger')) {
+                $ledger = $line;
+            }
+            if (str_starts_with($line, 'demo/atlas')) {
+                $atlas = $line;
+            }
+        }
+        $this->assertStringContainsString('8.4.16', $ledger);
+        $this->assertStringContainsString('2.4.62', $ledger);
+        $this->assertStringNotContainsString('8.4.16', $atlas, 'an app without the fields gets a blank cell');
+        $this->assertStringNotContainsString('2.4.62', $atlas);
     }
 
     public function test_the_due_date_survives_a_snapshot_round_trip_and_old_snapshots_still_load(): void

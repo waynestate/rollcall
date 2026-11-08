@@ -40,6 +40,8 @@ The export uses Citadel's own field names, so the people who keep Citadel can pr
 | `base_image_upgrades[].due_date` | The day Citadel forces the upgrade, `YYYY-MM-DD` | The earliest pending date per image counts |
 | `base_image_upgrades[].completed` | Whether that upgrade is done | Only `false` counts; a done upgrade is ignored |
 
+Two fields are optional: `applications[].php_version` (the PHP version in the running container, such as `8.3.14`) and `applications[].httpd_version` (the Apache httpd version, such as `2.4.62`). We have asked the Citadel team to send them. When they arrive, Rollcall keeps them in the snapshot and shows them per app in the internal report as "PHP (running)" and "httpd (running)", blank until Citadel sends them; an export without them changes nothing.
+
 Entries Rollcall cannot trust are skipped, never guessed: an application with no repository, an upgrade with no real date (`"soon"`, `2026-02-30`) or without `"completed": false`. An app registered on Citadel but not in the scan is not invented either: the census starts from the repositories.
 
 ## 3. Point Rollcall at it[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#3-point-rollcall-at-it)

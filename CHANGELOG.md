@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: the Citadel export may carry php_version and httpd_version per app; Rollcall keeps them and shows "PHP (running)" and "httpd (running)" columns, blank until Citadel sends them.
 - Changed: the generated CREED copy in `src/Creed` is refreshed from CREED 0.1.7-20 (was 0.1.2): newer policy versions, the `sessions` block, and the reader gains `requires()`, `phpRange()` and `abandonedPackages()`; `composer creed-copy:check` passes again.
 - Fixed: the pipeline's PROCTOR jobs no longer pass `--policy`, which PROCTOR 0.7 refuses in CI; PROCTOR checks against the CREED policy it bundles.
 - Changed: the GitLab pipeline pins the Preflight components to 0.2.0 (was 0.1.4).

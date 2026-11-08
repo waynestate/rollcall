@@ -97,6 +97,8 @@ final class ReportBuilder
                 $perApp[] = [
                     'id' => $app->id,
                     'php_image' => $app->phpImage,
+                    'runtime_php' => $app->runtimePhp,
+                    'runtime_httpd' => $app->runtimeHttpd,
                     'image_state' => $this->stateLabel('php', $app->phpImage, $today),
                     'php_floor' => $app->phpFloor,
                     'floor_state' => $this->stateLabel('php', $app->phpFloor, $today),

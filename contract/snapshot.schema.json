@@ -53,6 +53,16 @@
                 "upgrade_due": {
                     "description": "Due date of a pending forced image upgrade (Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
                     "oneOf": [{"$ref": "#/$defs/date"}, {"type": "null"}]
+                },
+                "runtime_php": {
+                    "description": "The PHP version in the running container, such as 8.3.14, when the image source reports it (a Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "type": ["string", "null"],
+                    "maxLength": 50
+                },
+                "runtime_httpd": {
+                    "description": "The Apache httpd version in the running container, such as 2.4.62, when the image source reports it (a Citadel export), or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "type": ["string", "null"],
+                    "maxLength": 50
                 }
             }
         }

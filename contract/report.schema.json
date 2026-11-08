@@ -171,11 +171,21 @@
         "app": {
             "description": "One app in the internal view. The id is the repository path; it never appears in the public view.",
             "type": "object",
-            "required": ["id", "php_image", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
+            "required": ["id", "php_image", "runtime_php", "runtime_httpd", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
             "additionalProperties": false,
             "properties": {
                 "id": {"type": "string", "minLength": 1},
                 "php_image": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
+                "runtime_php": {
+                    "description": "The PHP version in the running container, such as 8.3.14, when the image source reports it (a Citadel export), or null.",
+                    "type": ["string", "null"],
+                    "maxLength": 50
+                },
+                "runtime_httpd": {
+                    "description": "The Apache httpd version in the running container, such as 2.4.62, when the image source reports it (a Citadel export), or null.",
+                    "type": ["string", "null"],
+                    "maxLength": 50
+                },
                 "image_state": {"$ref": "#/$defs/state"},
                 "php_floor": {"oneOf": [{"$ref": "#/$defs/version"}, {"type": "null"}]},
                 "floor_state": {"$ref": "#/$defs/state"},
