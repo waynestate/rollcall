@@ -64,6 +64,15 @@ final class PrometheusRenderer
         $this->gauge($registry, 'moved_apps', 'Apps whose PHP image changed since the previous scan.', [], [[[], $progress['moved'] ?? 0]]);
         $this->gauge($registry, 'upgraded_apps', 'Apps that went from an EOL image to a supported one since the previous scan.', [], [[[], $progress['upgraded_to_supported'] ?? 0]]);
 
+        // Forced image upgrades from a Citadel export. Zero with any other image source, so the series always exist.
+        $forced = self::arr($report['forced_upgrades'] ?? []);
+        $this->gauge($registry, 'forced_upgrades_pending_apps', 'Apps with a forced image upgrade pending in the Citadel export, overdue ones included.', [], [[[], $forced['pending'] ?? 0]]);
+        $this->gauge($registry, 'forced_upgrades_overdue_apps', 'Apps whose forced image upgrade date is today or earlier.', [], [[[], $forced['overdue'] ?? 0]]);
+        $next = \DateTimeImmutable::createFromFormat('!Y-m-d', is_string($forced['next_due'] ?? null) ? $forced['next_due'] : '');
+        if ($next !== false) {
+            $this->gauge($registry, 'forced_upgrades_next_due_timestamp_seconds', 'Unix time of midnight on the next forced image upgrade date still ahead, in the server time zone.', [], [[[], $next->getTimestamp()]]);
+        }
+
         return (new RenderTextFormat())->render($registry->getMetricFamilySamples());
     }
 

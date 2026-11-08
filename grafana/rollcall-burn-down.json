@@ -308,6 +308,60 @@
           "legendFormat": "{{version}} ({{state}})"
         }
       ]
+    },
+    {
+      "id": 11,
+      "title": "Forced image upgrades pending",
+      "type": "stat",
+      "description": "Apps with a forced base-image upgrade pending in the Citadel export, overdue ones included. Zero with any other image source.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "rollcall_forced_upgrades_pending_apps",
+          "legendFormat": "pending"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Forced image upgrades overdue",
+      "type": "stat",
+      "description": "Apps whose forced upgrade date is today or earlier.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "rollcall_forced_upgrades_overdue_apps",
+          "legendFormat": "overdue"
+        }
+      ]
     }
   ],
   "templating": {

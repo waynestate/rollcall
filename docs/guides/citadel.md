@@ -74,6 +74,10 @@ stops with a plain message if both are set. In Laravel, the setting is `rollcall
   `Forced image upgrades pending: 2 (1 due today or earlier), next due 2026-12-15.` and the JSON report carries
   `forced_upgrades` with `pending`, `overdue` (due today or earlier) and `next_due` (the next future date, or
   `null`). Counts only, so it is public. With the image list, or no image source, all three are zero.
+- **Metrics and ADVISOR**: the same counts reach `/metrics` as `rollcall_forced_upgrades_pending_apps`,
+  `rollcall_forced_upgrades_overdue_apps` and `rollcall_forced_upgrades_next_due_timestamp_seconds` (see
+  [metrics](metrics.md)), and ADVISOR's `rollcall_fleet_summary` tool answers with `forced_upgrades` (see
+  [ADVISOR](advisor.md)).
 - **Per app, internally**: the internal report's per-app list carries `upgrade_due`, and the stored snapshot keeps it.
   Snapshots written before it existed load as `null`.
 - **Owner digests**: a new forced upgrade date is news, and so is one that went away. See

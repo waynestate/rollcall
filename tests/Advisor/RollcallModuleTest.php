@@ -17,6 +17,7 @@ use Waynestate\Advisor\Security\SymfonyProcessRunner;
 use Waynestate\Advisor\Support\FixedClock;
 use Waynestate\Rollcall\Advisor\RollcallModule;
 use Waynestate\Rollcall\Creed\Policy;
+use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\Report\ReportBuilder;
 use Waynestate\Rollcall\Storage\JsonFileSnapshotStore;
 use Waynestate\Rollcall\Tests\Support\Fleet;
@@ -109,14 +110,31 @@ final class RollcallModuleTest extends TestCase
         $this->assertSame('Rollcall snapshot store (ROLLCALL_STORE_DIR)', $out['source']);
         $this->assertSame(self::TODAY, $out['as_of']);
         $this->assertSame(self::TODAY, $out['scan_date']);
-        foreach (['totals', 'image_states', 'php_image', 'php_floor', 'laravel', 'auth_package', 'proctor', 'drift', 'progress'] as $field) {
+        foreach (['totals', 'image_states', 'php_image', 'php_floor', 'laravel', 'auth_package', 'proctor', 'drift', 'progress', 'forced_upgrades'] as $field) {
             $this->assertSame($expected[$field], $out[$field], $field);
         }
         $this->assertSame(4, $out['totals']['apps']);
         $this->assertSame(['active' => 1, 'security_only' => 1, 'eol' => 1, 'unknown' => 1], $out['image_states']);
+        $this->assertSame(['pending' => 0, 'overdue' => 0, 'next_due' => null], $out['forced_upgrades'], 'no Citadel export in the fixtures, so zeros');
         $this->assertArrayNotHasKey('apps', $out, 'the per-app list is internal');
         $this->assertArrayNotHasKey('scan_errors', $out, 'the per-app list is internal');
         $this->assertArrayNotHasKey('visibility', $out);
+    }
+
+    public function test_fleet_summary_counts_forced_upgrades_from_a_citadel_export(): void
+    {
+        $snapshot = Fleet::snapshot(self::TODAY);
+        $apps = array_map(static fn($app) => match ($app->id) {
+            'demo/relic' => $app->with(upgradeDue: '2026-12-15'),
+            'demo/broken' => $app->with(upgradeDue: '2026-11-01'),
+            default => $app,
+        }, $snapshot->apps);
+        (new JsonFileSnapshotStore($this->storeDir))->save(new Snapshot($snapshot->date, $apps, $snapshot->errors));
+
+        $out = $this->call($this->tools($this->module())['rollcall_fleet_summary']);
+
+        $this->assertSame(['pending' => 2, 'overdue' => 1, 'next_due' => '2026-12-15'], $out['forced_upgrades']);
+        $this->assertStringNotContainsString('demo/', (string) json_encode($out), 'counts only, no app names');
     }
 
     public function test_burn_down_series_covers_every_scan_day_and_days_limits_it(): void

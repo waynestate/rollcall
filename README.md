@@ -184,8 +184,10 @@ does not gate anything.
   ones written before it existed, so the history reaches back as far as `rollcall prune` keeps snapshots.
 
 - **Forced image upgrades**: with Citadel's export as the image source, how many apps have a forced base-image
-  upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The internal per-app
-  list carries each app's `upgrade_due`. Zero with any other image source. See
+  upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The same counts reach
+  `/metrics` (`rollcall_forced_upgrades_pending_apps`, `rollcall_forced_upgrades_overdue_apps` and
+  `rollcall_forced_upgrades_next_due_timestamp_seconds`) and ADVISOR's `rollcall_fleet_summary`. The internal
+  per-app list carries each app's `upgrade_due`. Zero with any other image source. See
   [docs/guides/citadel.md](docs/guides/citadel.md).
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
@@ -377,6 +379,13 @@ public package names: no app names or personal data. The dashboard JSON is in `g
 it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`
 on a schedule so the series moves.
 
+Forced image upgrades from a Citadel export come through as three gauges, counts only, in the same style as the
+rest: `rollcall_forced_upgrades_pending_apps` (apps with one pending, overdue ones included),
+`rollcall_forced_upgrades_overdue_apps` (due today or earlier) and
+`rollcall_forced_upgrades_next_due_timestamp_seconds` (midnight of the next date still ahead, only while there is
+one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and
+overdue as two stat panels.
+
 ## Laravel
 
 The package registers itself (`extra.laravel.providers`). Publish the config with
@@ -413,7 +422,7 @@ empty store each one says so in plain words and names `rollcall scan`.
 
 | Tool | What it answers |
 |---|---|
-| `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, and the snapshot date |
+| `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, forced image upgrades (`forced_upgrades`: pending, overdue, next due), and the snapshot date |
 | `rollcall_burn_down` | The dated EOL series, one point per scan day, each with its counts per support state, PHP minor and Laravel major; optional `days` (an integer, 1 to 365) keeps only the most recent days |
 | `rollcall_supported_versions` | Every version in CREED's policy, grouped by what it says today: active, security only, or end of life |
 

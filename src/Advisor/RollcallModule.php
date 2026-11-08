@@ -48,6 +48,7 @@ final class RollcallModule implements Module
         'proctor',
         'drift',
         'progress',
+        'forced_upgrades',
     ];
 
     public function __construct(private readonly ModuleContext $context) {}
@@ -64,7 +65,7 @@ final class RollcallModule implements Module
             new ToolDefinition(
                 name: 'rollcall_fleet_summary',
                 title: 'Fleet summary from the latest scan',
-                description: 'Counts from Rollcall\'s latest stored snapshot: apps by PHP image, declared PHP floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, and the snapshot date. Public counts only: no app names, owners or rankings. If no snapshot exists it says so in plain words and names rollcall scan. Read-only; every answer names its source and dates.',
+                description: 'Counts from Rollcall\'s latest stored snapshot: apps by PHP image, declared PHP floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, pending and overdue forced image upgrades from a Citadel export (with the next due date), and the snapshot date. Public counts only: no app names, owners or rankings. If no snapshot exists it says so in plain words and names rollcall scan. Read-only; every answer names its source and dates.',
                 inputSchema: ['type' => 'object', 'properties' => [], 'additionalProperties' => false],
                 handler: fn(array $args): array => $this->fleetSummary(),
                 readOnly: true,

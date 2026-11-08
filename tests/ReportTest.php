@@ -251,6 +251,33 @@ final class ReportTest extends TestCase
         $this->assertStringNotContainsString('Upgrade scheduled', $text);
     }
 
+    public function test_prometheus_carries_the_forced_upgrades_as_counts(): void
+    {
+        $snapshot = Fleet::snapshot(self::TODAY);
+        $apps = array_map(static fn(AppFacts $app): AppFacts => match ($app->id) {
+            'demo/relic' => $app->with(upgradeDue: '2026-12-15'),
+            'demo/broken' => $app->with(upgradeDue: '2026-10-01'),
+            default => $app,
+        }, $snapshot->apps);
+        $dated = new Snapshot($snapshot->date, $apps, $snapshot->errors);
+        $text = (new PrometheusRenderer())->render($this->builder()->build($dated, [$dated], new DateTimeImmutable(self::TODAY)));
+
+        $this->assertStringContainsString("# TYPE rollcall_forced_upgrades_pending_apps gauge\nrollcall_forced_upgrades_pending_apps 2\n", $text);
+        $this->assertStringContainsString("rollcall_forced_upgrades_overdue_apps 1\n", $text);
+        $next = (new DateTimeImmutable('2026-12-15'))->getTimestamp();
+        $this->assertStringContainsString('rollcall_forced_upgrades_next_due_timestamp_seconds ' . $next . "\n", $text);
+        $this->assertStringNotContainsString('demo/', $text);
+    }
+
+    public function test_prometheus_forced_upgrades_are_zero_without_a_citadel_export(): void
+    {
+        $text = (new PrometheusRenderer())->render($this->report());
+
+        $this->assertStringContainsString("rollcall_forced_upgrades_pending_apps 0\n", $text);
+        $this->assertStringContainsString("rollcall_forced_upgrades_overdue_apps 0\n", $text);
+        $this->assertStringNotContainsString('next_due_timestamp', $text, 'no date ahead, no series');
+    }
+
     public function test_prometheus_labels_from_hostile_values_collapse(): void
     {
         $report = $this->report();

@@ -14,6 +14,13 @@ public package names: no app names or personal data. The dashboard JSON is in `g
 it into Grafana once a Prometheus server scrapes the endpoint. Run `rollcall scan`
 on a schedule so the series moves.
 
+Forced image upgrades from a Citadel export come through as three gauges, counts only, in the same style as the
+rest: `rollcall_forced_upgrades_pending_apps` (apps with one pending, overdue ones included),
+`rollcall_forced_upgrades_overdue_apps` (due today or earlier) and
+`rollcall_forced_upgrades_next_due_timestamp_seconds` (midnight of the next date still ahead, only while there is
+one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and
+overdue as two stat panels.
+
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
 
