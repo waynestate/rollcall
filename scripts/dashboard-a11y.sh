@@ -1,15 +1,20 @@
 #!/bin/sh
-# Dashboard accessibility gate (axe-core in Playwright), run in Docker so no
-# host browser is needed. Renders the public and internal dashboard pages
-# with PHPUnit, then checks both rendered pages in light and dark mode at a
-# narrow and a wide viewport. Needs only Docker. Linux and macOS; on Windows
-# use scripts/dashboard-a11y.ps1, or this script from Git Bash (the MSYSTEM
-# block below handles its path conversion).
+# Dashboard accessibility gate: Preflight's a11y checker (vendored in
+# tools/a11y/check.mjs from Preflight 0.3.1, pinned by tests/A11yCheckerPinTest.php),
+# run in Docker so no host browser is needed. Renders the public and internal
+# dashboard pages with PHPUnit, then checks both rendered pages with the same
+# image, tags, color schemes and widths as the dashboard-a11y CI job, so a
+# page that passes here passes CI. Needs only Docker. Linux and macOS; on
+# Windows use scripts/dashboard-a11y.ps1, or this script from Git Bash (the
+# MSYSTEM block below handles its path conversion).
 #
 # The render step copies the repo into a container workdir (never the host
 # checkout) and writes the two pages to build/dashboard-a11y on the host; the
 # check step reuses the same image and named volume as scripts/a11y.sh, so
-# npm installs once and later runs reuse it.
+# npm installs once and later runs reuse it. The reports (gl-a11y-junit.xml,
+# gl-a11y-report.json) land next to the rendered pages, in build/dashboard-a11y
+# (gitignored). Exit 0 clean, 1 a violation or a page that did not load, 2 a
+# tool or configuration error.
 #
 # The substitute takes the register twice, once for the class and once for
 # the office, and marks everybody present on both rolls.
@@ -28,7 +33,11 @@ else
 fi
 
 COMPOSER_IMAGE="composer:2.10.3"
-IMAGE="mcr.microsoft.com/playwright:v1.49.1-noble"
+# The a11y component's image default, digest included (templates/a11y/template.yml
+# of Preflight 0.3.1). Its tag sets the playwright npm version, so the package
+# and the image's browsers always match.
+IMAGE="mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d"
+PW=$(printf '%s\n' "$IMAGE" | sed -n 's/^.*playwright:v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*$/\1/p')
 OUT_DIR="build/dashboard-a11y"
 
 mkdir -p "$OUT_DIR"
@@ -53,13 +62,29 @@ docker run --rm \
 # Check: the same image and node_modules volume as scripts/a11y.sh, so npm
 # installs once and later runs reuse it. The named volume mounts over this
 # folder; give it an empty mountpoint first (gitignored) so Docker can mount
-# it over the read-only repo.
+# it over the read-only repo. $OUT_DIR is mounted read-write, which also gives
+# the checker a place for its reports, next to the pages it checks.
 mkdir -p tools/a11y/node_modules
+
+# The dashboard-a11y CI job's inputs, as JSON for the checker.
+CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
+
+# Install the checker's packages when they are missing or when the installed
+# playwright stops matching the image tag. Exact versions from
+# tools/a11y/package.json, no install scripts: the image already carries
+# Chromium for this playwright release.
+INNER='if [ ! -d tools/a11y/node_modules/playwright ] || [ "$(node -p require("tools/a11y/node_modules/playwright/package.json").version 2>/dev/null || echo none)" != "$A11Y_PW" ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund); fi
+printf "%s\n" "$A11Y_CONFIG" > /tmp/a11y-config.json
+A11Y_REPORT_DIR=/work/build/dashboard-a11y node tools/a11y/check.mjs /tmp/a11y-config.json'
 
 docker run --rm \
   -v "${REPO}:/work:ro" \
   -v "${REPO}/${OUT_DIR}:/work/${OUT_DIR}" \
   -v rollcall-a11y-node-modules:/work/tools/a11y/node_modules \
+  -v stack-npm-cache:/npm-cache \
+  -e npm_config_cache=/npm-cache \
+  -e "A11Y_CONFIG=$CONFIG" \
+  -e "A11Y_PW=$PW" \
   -w /work \
   "$IMAGE" \
-  sh -c 'if [ ! -d tools/a11y/node_modules/playwright ]; then if [ -f tools/a11y/package-lock.json ]; then (cd tools/a11y && npm ci --no-audit --no-fund); else (cd tools/a11y && npm install --no-audit --no-fund); fi; fi && node tools/a11y/check.mjs --root=build/dashboard-a11y --page=index.html && node tools/a11y/check.mjs --root=build/dashboard-a11y --page=apps.html'
+  sh -c "$INNER"
