@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/waynestate/rollcall/blob/main/contract/owners-check.schema.json",
+    "title": "Rollcall owners check",
+    "description": "What `rollcall owners --format=json` prints: the latest scan checked against the owners file. Internal: it names apps. The command exits 1 while `unowned` is not empty.",
+    "type": "object",
+    "required": ["scanned", "owners", "opted_in", "unowned"],
+    "additionalProperties": false,
+    "properties": {
+        "scanned": {"type": "integer", "minimum": 0, "description": "Apps in the latest scan"},
+        "owners": {"type": "integer", "minimum": 0, "description": "Entries in the owners file"},
+        "opted_in": {"type": "integer", "minimum": 0, "description": "Entries with \"digest\": true"},
+        "unowned": {
+            "description": "The scanned apps no entry lists (\"no owner on file\"), in scan order",
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+        }
+    }
+}

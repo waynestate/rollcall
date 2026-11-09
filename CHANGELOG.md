@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: `contract/owners-check.schema.json` for `rollcall owners --format=json`, and the contract suite now gives every schema teeth (a snapshot of an unknown version, an image entry without its image, an owner without a contact, a digest without `no_owner_on_file` and more are refused). `ContractTest` fails if a schema in `contract/` is not validated against real output or has no case it must refuse (ROLLCALL-25).
 - Changed: CI pins the Preflight components to 0.4.0 (the proctor job clones the full history, so the override-approver check can read git blame).
 - Added: the dashboard accessibility gate also checks the empty state, and renders every page against the bundled WayneUI stylesheet so axe checks the real colors in light and dark.
 - Changed: the deploy layer runs Squire's kit 0.7.1 (was 0.6.0): `.squire/php.ini` no longer sets the deprecated `session.sid_*` lines, web requests get a `disable_functions` list and Apache hardening (`.squire/php-web.ini`, `.squire/apache-hardening.conf`), and opcache gets production settings with `SQUIRE_OPCACHE_VALIDATE` as the one switch.

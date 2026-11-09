@@ -49,7 +49,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 
 | Rule | Tag | How |
 |---|---|---|
-| Every output a reader depends on has a schema | Enforced | `contract/*.schema.json`; `ContractTest` validates real reports, snapshots, digests and the input fixtures, and proves a public report with apps or an owner is refused |
+| Every output a reader depends on has a schema | Enforced | `contract/*.schema.json`; `ContractTest` validates real reports, snapshots, digests, the owners check and the input fixtures, gives every schema a case it must refuse (a public report with apps or an owner among them), and fails if a schema is left without either |
 | One image source per scan | Enforced | `ROLLCALL_IMAGES_FILE` or `ROLLCALL_CITADEL_EXPORT`; both set stops the scan; `CitadelExportSourceTest` |
 | Every developer script runs on Windows, macOS and Linux | Enforced | `.sh` and `.ps1` twins, bash 3.2, no host bash on Windows; `ScriptPairsTest` |
 

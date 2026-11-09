@@ -222,6 +222,56 @@ final class ContractTest extends TestCase
         $this->assertBreaksContract('report.schema.json', (string) json_encode($made));
     }
 
+    public function test_the_json_owners_check_matches_the_contract(): void
+    {
+        $this->rollcall(['command' => 'scan', '--today' => '2026-11-07']);
+        $json = $this->rollcall(['command' => 'owners', '--format' => 'json', '--today' => '2026-11-07']);
+
+        $this->assertMatchesContract('owners-check.schema.json', $json);
+        $this->assertSame([], json_decode($json, true)['unowned'], 'the fixture owners file lists every scanned app');
+    }
+
+    public function test_every_other_schema_has_teeth_too(): void
+    {
+        $this->rollcall(['command' => 'scan', '--today' => '2026-11-07']);
+
+        // A snapshot from a schema version nobody wrote, or with a field the contract never promised.
+        $snapshot = json_decode((string) file_get_contents($this->store . '/2026-11-07.json'), true, 64, JSON_THROW_ON_ERROR);
+        $this->assertBreaksContract('snapshot.schema.json', (string) json_encode([...$snapshot, 'schema_version' => 2]));
+        $this->assertBreaksContract('snapshot.schema.json', (string) json_encode([...$snapshot, 'owner' => 'someone']));
+
+        // An image list entry without its image, and a Citadel upgrade with a date that is not a date.
+        $this->assertBreaksContract('images-export.schema.json', (string) json_encode(['apps' => [['project' => 'demo/ledger']]]));
+        $this->assertBreaksContract('citadel-export.schema.json', (string) json_encode([
+            'applications' => [['repository' => 'demo/ledger', 'base_image' => 'citadel/php-apache:8.4r5']],
+            'base_image_upgrades' => [['old_image' => 'citadel/php-apache:8.1r2', 'due_date' => 'soon', 'completed' => false]],
+        ]));
+
+        // An owner with no contact, or a project that is not a group/project path.
+        $this->assertBreaksContract('owners.schema.json', (string) json_encode(['owners' => [['projects' => ['demo/ledger']]]]));
+        $this->assertBreaksContract('owners.schema.json', (string) json_encode(['owners' => [['contact' => 'team@example.test', 'projects' => ['ledger']]]]));
+
+        // A digest that forgot the apps nobody answers for.
+        $digest = json_decode($this->rollcall(['command' => 'digest', '--format' => 'json', '--today' => '2026-11-07']), true, 64, JSON_THROW_ON_ERROR);
+        unset($digest['no_owner_on_file']);
+        $this->assertBreaksContract('digest.schema.json', (string) json_encode($digest));
+
+        // An owners check that grew a ranking is not a register any more.
+        $check = json_decode($this->rollcall(['command' => 'owners', '--format' => 'json', '--today' => '2026-11-07']), true, 64, JSON_THROW_ON_ERROR);
+        $this->assertBreaksContract('owners-check.schema.json', (string) json_encode([...$check, 'rank' => 1]));
+    }
+
+    public function test_every_schema_is_held_by_real_output_and_has_teeth(): void
+    {
+        // Roll call for the contract itself: a schema nobody validates against is a promise nobody checks.
+        $suite = (string) file_get_contents(__FILE__);
+        foreach (glob(self::CONTRACT . '/*.schema.json') ?: [] as $file) {
+            $name = basename($file);
+            $this->assertStringContainsString("assertMatchesContract('" . $name . "'", $suite, $name . ' is not validated against any real output here');
+            $this->assertStringContainsString("assertBreaksContract('" . $name . "'", $suite, $name . ' has no case it must refuse here');
+        }
+    }
+
     public function test_the_contract_and_the_code_agree_on_drift_kinds_and_the_snapshot_version(): void
     {
         $report = json_decode((string) file_get_contents(self::CONTRACT . '/report.schema.json'), true, 64, JSON_THROW_ON_ERROR);

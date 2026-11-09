@@ -13,10 +13,11 @@ these schemas, not against an example you once saw.
 | `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` (Citadel's own words) | A person or a job, from Citadel |
 | `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE`: Rollcall's own `owners.json` (roles only) or a fleet's own (contacts and apps, kept internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
+| `owners-check.schema.json` | `rollcall owners --format=json`, the latest scan checked against the owners file (internal: it names apps) | Rollcall |
 
 ## Rules
 
-- **Closed objects.** Rollcall's own output (report, snapshot, digest) uses `additionalProperties: false` throughout, so a
+- **Closed objects.** Rollcall's own output (report, snapshot, digest, owners check) uses `additionalProperties: false` throughout, so a
   new field is a contract change, made in the same commit as the code. Inputs (the image list, Citadel's export, the owners file) stay open: a
   producer may add fields of its own, and Rollcall ignores them.
 - **Public means counts.** The public report may never carry `apps` or `scan_errors`; the schema refuses them
@@ -24,6 +25,8 @@ these schemas, not against an example you once saw.
 - **Versioning.** From 1.0.0 on, Rollcall follows SemVer against this contract: an added field or enum value is a
   minor release, and a removed or renamed field or a changed type is a major release. The snapshot file carries its
   own `schema_version` (1 today); a reader refuses a version it does not know.
+- **Every schema is held and has teeth.** `ContractTest` fails if a schema here is not validated against real
+  output or a fixture, or has no case it must refuse.
 - **Fixtures, not hosts.** The suite never calls GitLab, Citadel or any other host. It reads the fixtures under
   `tests/fixtures/`.
 
