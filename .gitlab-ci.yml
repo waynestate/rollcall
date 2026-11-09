@@ -103,7 +103,8 @@ rollcall-scan:
     export ROLLCALL_GITLAB_URL="${ROLLCALL_GITLAB_URL:-https://$CI_SERVER_FQDN}"
     export ROLLCALL_GITLAB_PROJECTS="${ROLLCALL_GITLAB_PROJECTS:-enterprise-apps/creed,enterprise-apps/proctor,enterprise-apps/preflight,enterprise-apps/sesame,enterprise-apps/helmet,enterprise-apps/sourdough,enterprise-apps/squire,enterprise-apps/rollcall,enterprise-apps/booster,enterprise-apps/advisor,enterprise-apps/drawbridge,enterprise-apps/pinstripe,enterprise-apps/weld}"
     php bin/rollcall scan
-    # The register: a scanned app with no owner on file fails this job, so nobody is left without a teacher.
+    # The register: a scanned app with no owner on file, or one nobody re-confirmed in ROLLCALL_OWNERS_CONFIRM_DAYS,
+    # fails this job, so nobody is left without a teacher.
     ROLLCALL_OWNERS_FILE="${ROLLCALL_OWNERS_FILE:-owners.json}" php bin/rollcall owners
   artifacts:
     paths:

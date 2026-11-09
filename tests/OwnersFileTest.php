@@ -42,6 +42,15 @@ final class OwnersFileTest extends TestCase
         $this->assertSame([], Owners::fromFile(self::FILE)->unowned($projects), 'add the project to owners.json');
     }
 
+    public function test_every_entry_says_when_its_owner_last_confirmed(): void
+    {
+        // Without a date, `rollcall owners` in the weekly scan job calls every app's owner unknown and fails.
+        // Freshness is that job's to judge, not every pipeline's: CI must not go red because a day passed.
+        foreach (Owners::fromFile(self::FILE)->owners as $owner) {
+            $this->assertNotNull($owner->confirmed, $owner->contact . ' needs a "confirmed" date in owners.json');
+        }
+    }
+
     public function test_contacts_are_roles_or_teams_not_people(): void
     {
         foreach (Owners::fromFile(self::FILE)->owners as $owner) {

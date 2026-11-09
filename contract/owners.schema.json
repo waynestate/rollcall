@@ -16,6 +16,7 @@
                 "properties": {
                     "contact": {"type": "string", "minLength": 1, "maxLength": 200, "description": "A mail address (required to send), a team alias or a role; each contact once. In a public repo, a team or a role, never a person"},
                     "digest": {"type": "boolean", "default": false, "description": "Opt in to the digest. Left out means no"},
+                    "confirmed": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "The day (YYYY-MM-DD) this contact last confirmed it still answers for these projects. Left out means never confirmed: `rollcall owners` calls the owner unknown once the date is older than ROLLCALL_OWNERS_CONFIRM_DAYS (365 by default)"},
                     "projects": {
                         "type": "array",
                         "maxItems": 500,

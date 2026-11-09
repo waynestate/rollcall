@@ -75,6 +75,10 @@
                     "Owners file for the digests: who answers for which apps, and who opted in with \"digest\": true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo",
                     "none (no digests)"
                 ],
+                "ROLLCALL_OWNERS_CONFIRM_DAYS": [
+                    "How long an owners-file entry's \"confirmed\" date counts; past it, `rollcall owners` calls that owner unknown and exits 1",
+                    "`365` (0 turns the check off)"
+                ],
                 "ROLLCALL_DIGEST_MAIL_ENABLED": [
                     "Allow `rollcall digest --send` to mail",
                     "`false`"

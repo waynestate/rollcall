@@ -18,8 +18,11 @@ use Waynestate\Rollcall\RollcallException;
 /**
  * The substitute teacher takes the register twice: once from the latest
  * scan, once from the owners file. Every app that answered present to nobody
- * gets named, and while one sits without a teacher the command exits 1, so
- * the weekly scan job fails instead of moving on.
+ * gets named, and so does every app whose teacher has not checked in for
+ * ROLLCALL_OWNERS_CONFIRM_DAYS (a name on last year's seating chart is not a
+ * teacher). Both are "owner unknown", never guessed from commit authors, and
+ * while one is left the command exits 1, so the weekly scan job fails
+ * instead of moving on.
  */
 final class OwnersCommand extends RollcallCommand
 {
@@ -33,7 +36,7 @@ final class OwnersCommand extends RollcallCommand
     {
         parent::configure();
         $this->setName('owners')
-            ->setDescription('List the scanned apps that no owners-file entry lists; exit 1 when there is one.')
+            ->setDescription('List the scanned apps whose owner is unknown (no owners-file entry, or none confirmed within ROLLCALL_OWNERS_CONFIRM_DAYS); exit 1 when there is one.')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'text or json.', 'text');
     }
 
@@ -55,7 +58,10 @@ final class OwnersCommand extends RollcallCommand
         $scanned = count($latest->apps);
         $ownerCount = count($owners->owners);
         $optedIn = count($owners->optedIn());
-        $unowned = $owners->unowned(array_map(static fn(AppFacts $app): string => $app->id, $latest->apps));
+        $ids = array_map(static fn(AppFacts $app): string => $app->id, $latest->apps);
+        $unowned = $owners->unowned($ids);
+        $days = $config->ownersConfirmDays;
+        $unconfirmed = $owners->unconfirmed($ids, $clock->now(), $days);
 
         if ($format === 'json') {
             $output->write((new JsonRenderer())->render([
@@ -63,28 +69,64 @@ final class OwnersCommand extends RollcallCommand
                 'owners' => $ownerCount,
                 'opted_in' => $optedIn,
                 'unowned' => $unowned,
+                'confirm_days' => $days,
+                'unconfirmed' => $unconfirmed,
+                'owner_unknown' => count($unowned) + count($unconfirmed),
             ]) . "\n", false, OutputInterface::OUTPUT_RAW);
         } else {
-            $output->write($this->text($scanned, $ownerCount, $optedIn, $unowned), false, OutputInterface::OUTPUT_RAW);
+            $output->write($this->text($scanned, $ownerCount, $optedIn, $unowned, $days, $unconfirmed), false, OutputInterface::OUTPUT_RAW);
         }
 
-        return $unowned === [] ? 0 : 1;
+        return $unowned === [] && $unconfirmed === [] ? 0 : 1;
     }
 
-    /** @param  list<string>  $unowned */
-    private function text(int $scanned, int $ownerCount, int $optedIn, array $unowned): string
+    /**
+     * @param  list<string>  $unowned
+     * @param  list<array{app: string, last_confirmed: string|null}>  $unconfirmed
+     */
+    private function text(int $scanned, int $ownerCount, int $optedIn, array $unowned, int $days, array $unconfirmed): string
     {
         $noun = $scanned === 1 ? 'app' : 'apps';
         $verb = $scanned === 1 ? 'has' : 'have';
         $lines = [sprintf('Owners file: %d owners, %d opted in to the digest', $ownerCount, $optedIn)];
-        if ($unowned === []) {
-            $lines[] = sprintf('All %d scanned %s %s an owner on file.', $scanned, $noun, $verb);
-        } else {
+        $lines[] = $days > 0
+            ? sprintf('An owner counts as confirmed for %d days after its "confirmed" date.', $days)
+            : 'Confirmation check: off (ROLLCALL_OWNERS_CONFIRM_DAYS=0).';
+        if ($unowned === [] && $unconfirmed === []) {
+            $lines[] = $days > 0
+                ? sprintf('All %d scanned %s %s an owner on file, confirmed in the last %d days.', $scanned, $noun, $verb, $days)
+                : sprintf('All %d scanned %s %s an owner on file.', $scanned, $noun, $verb);
+
+            return implode("\n", $lines) . "\n";
+        }
+        if ($unowned !== []) {
             $lines[] = sprintf('%d of %d scanned %s %s no owner on file:', count($unowned), $scanned, $noun, $verb);
             foreach ($unowned as $id) {
                 $lines[] = '- ' . $id;
             }
         }
+        if ($unconfirmed !== []) {
+            $lines[] = sprintf(
+                '%d of %d scanned %s %s an owner on file that nobody confirmed in the last %d days:',
+                count($unconfirmed),
+                $scanned,
+                $noun,
+                $verb,
+                $days,
+            );
+            foreach ($unconfirmed as $row) {
+                $lines[] = sprintf('- %s (%s)', $row['app'], $row['last_confirmed'] === null ? 'never confirmed' : 'last confirmed ' . $row['last_confirmed']);
+            }
+        }
+        $unknown = count($unowned) + count($unconfirmed);
+        $lines[] = sprintf(
+            'Owner unknown for %d of %d scanned %s. Ask who answers for %s, then list or re-date %s in the owners file.',
+            $unknown,
+            $scanned,
+            $noun,
+            $unknown === 1 ? 'it' : 'them',
+            $unknown === 1 ? 'it' : 'them',
+        );
 
         return implode("\n", $lines) . "\n";
     }

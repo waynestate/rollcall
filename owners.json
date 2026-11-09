@@ -4,6 +4,7 @@
         {
             "contact": "Stack maintainer, Enterprise Applications",
             "digest": true,
+            "confirmed": "2026-11-08",
             "projects": [
                 "enterprise-apps/creed",
                 "enterprise-apps/proctor",

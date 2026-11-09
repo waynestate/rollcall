@@ -44,6 +44,7 @@ final class Config
         private readonly string $digestMailDsn = '',
         public readonly ?string $digestMailFrom = null,
         public readonly ?string $citadelExport = null,
+        public readonly int $ownersConfirmDays = 365,
     ) {}
 
     /** @param  array<string, string|false|null>  $env */
@@ -73,12 +74,13 @@ final class Config
             metricsToken: $get('ROLLCALL_METRICS_TOKEN') ?? '',
             metricsAllow: $list($get('ROLLCALL_METRICS_ALLOW')),
             publicReportEnabled: self::truthy($get('ROLLCALL_PUBLIC_REPORT_ENABLED')),
-            retentionDays: self::days($get('ROLLCALL_RETENTION_DAYS'), 90),
+            retentionDays: self::days($get('ROLLCALL_RETENTION_DAYS'), 90, 'ROLLCALL_RETENTION_DAYS', 'keeps everything'),
             ownersFile: $get('ROLLCALL_OWNERS_FILE'),
             digestMailEnabled: self::truthy($get('ROLLCALL_DIGEST_MAIL_ENABLED')),
             digestMailDsn: $get('ROLLCALL_DIGEST_MAIL_DSN') ?? '',
             digestMailFrom: $get('ROLLCALL_DIGEST_MAIL_FROM'),
             citadelExport: $get('ROLLCALL_CITADEL_EXPORT'),
+            ownersConfirmDays: self::days($get('ROLLCALL_OWNERS_CONFIRM_DAYS'), 365, 'ROLLCALL_OWNERS_CONFIRM_DAYS', 'turns the check off'),
         );
     }
 
@@ -87,14 +89,14 @@ final class Config
         return in_array(strtolower($value ?? ''), ['1', 'true', 'yes', 'on'], true);
     }
 
-    /** A whole number of days; 0 keeps every snapshot forever. */
-    private static function days(?string $value, int $default): int
+    /** A whole number of days; what 0 means is the setting's own (keep everything, or check nothing). */
+    private static function days(?string $value, int $default, string $name, string $zero): int
     {
         if ($value === null) {
             return $default;
         }
         if (preg_match('/^\d+$/', $value) !== 1) {
-            throw new RollcallException('ROLLCALL_RETENTION_DAYS must be a whole number of days (0 keeps everything).');
+            throw new RollcallException(sprintf('%s must be a whole number of days (0 %s).', $name, $zero));
         }
 
         return (int) $value;

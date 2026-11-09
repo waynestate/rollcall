@@ -42,6 +42,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Credit an upgrade on the day it lands | Checked | `upgraded_on` in the internal report; tested |
 | Keep a snapshot per scan | Enforced | One atomic JSON file per day |
 | Owners hear about their own apps only if they ask | Enforced | `rollcall digest` reads only owners with `"digest": true`, sends nothing without `--send` and three settings, and checks every contact before sending; `DigestTest` |
+| Verify ownership on a schedule; an app with no owner, or an unconfirmed one, is "owner unknown", never guessed from commit authors | Enforced | Each owners-file entry carries a `"confirmed"` date; `rollcall owners` names every app no entry lists or none confirmed within `ROLLCALL_OWNERS_CONFIRM_DAYS` (365) and exits 1, and the weekly scan job runs it; `OwnersCommandTest`, and `OwnersFileTest` fails if an entry of Rollcall's own file has no date |
 | Per-app lists stay internal | Enforced | Off in the public report, `/report.json`, `/metrics`; the Laravel per-app page is opt-in behind your middleware |
 | ADVISOR tools answer public counts only, read-only | Enforced | `RollcallModule` builds from the public report and declares every tool `readOnly`; `RollcallModuleTest` fails if a fixture app name or path appears in any tool output |
 
@@ -70,5 +71,5 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 
 ## Not yet
 
-A scheduled Citadel export (the reader is built), ownership verification on a schedule, the live Packagist
+A scheduled Citadel export (the reader is built), the live Packagist
 advisories fetch and the CycloneDX bill of materials. See `OPEN_QUESTIONS.md`, "Not built yet".

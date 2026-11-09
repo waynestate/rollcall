@@ -45,6 +45,32 @@ No owner on file for 1 of 14 apps in this scan, so no digest covers it. Add it t
 and `--format=json` lists it under `no_owner_on_file`. An owner who has not opted in still counts as its owner.
 Reports never read the owners file, so the report stays free of owners.
 
+### Confirm owners on a schedule
+
+An owner on file is only as good as the last time somebody said it is still true. Give each entry a
+`"confirmed"` date, the day the contact last confirmed it answers for those apps:
+
+```json
+{"contact": "team@example.test", "digest": true, "confirmed": "2026-11-01", "projects": ["group/project"]}
+```
+
+`rollcall owners` checks the owners file against the latest scan and calls an app's owner unknown when no entry
+lists the app, or when no entry that lists it was confirmed in the last `ROLLCALL_OWNERS_CONFIRM_DAYS` days (365 by
+default; 0 turns the check off). An entry with no date was never confirmed, and a date after today is not trusted.
+One fresh entry is enough when an app sits under several contacts.
+
+```
+Owners file: 2 owners, 1 opted in to the digest
+An owner counts as confirmed for 365 days after its "confirmed" date.
+1 of 14 scanned apps have an owner on file that nobody confirmed in the last 365 days:
+- group/old-project (last confirmed 2025-06-01)
+Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-date it in the owners file.
+```
+
+It exits 1 while any owner is unknown, so the weekly scan job, which runs it after `scan`, goes red until someone
+asks the contact and writes the new date. `--format=json` gives the same answer to a script
+(`contract/owners-check.schema.json`). Rollcall never fills the gap by guessing an owner from commit authors.
+
 ## 2. Print them
 
 After a scan:

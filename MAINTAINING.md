@@ -92,6 +92,11 @@ rotated at once, the same way.
 stack maintainer, for all of them). When a project joins the scan job's list, add it here in the same change;
 `OwnersFileTest` fails until you do. The repo is public, so contacts are roles or teams, never a person.
 
+Each entry carries a `"confirmed"` date. The weekly scan job's `rollcall owners` step fails once that date is more
+than 365 days old (`ROLLCALL_OWNERS_CONFIRM_DAYS`), so once a year, at the latest when that job goes red, ask the
+owner whether it still answers for its projects and write the new date in the same change. The scanner token
+expires on a yearly cycle too, so one sitting can do both.
+
 ## Public output stays anonymous
 
 The per-app list a scan produces is internal data. Nothing in this repo (fixtures, docs, screenshots) may name a real

@@ -250,6 +250,7 @@ final class ContractTest extends TestCase
         // An owner with no contact, or a project that is not a group/project path.
         $this->assertBreaksContract('owners.schema.json', (string) json_encode(['owners' => [['projects' => ['demo/ledger']]]]));
         $this->assertBreaksContract('owners.schema.json', (string) json_encode(['owners' => [['contact' => 'team@example.test', 'projects' => ['ledger']]]]));
+        $this->assertBreaksContract('owners.schema.json', (string) json_encode(['owners' => [['contact' => 'team@example.test', 'confirmed' => 'soon', 'projects' => ['demo/ledger']]]]));
 
         // A digest that forgot the apps nobody answers for.
         $digest = json_decode($this->rollcall(['command' => 'digest', '--format' => 'json', '--today' => '2026-11-07']), true, 64, JSON_THROW_ON_ERROR);
@@ -259,6 +260,8 @@ final class ContractTest extends TestCase
         // An owners check that grew a ranking is not a register any more.
         $check = json_decode($this->rollcall(['command' => 'owners', '--format' => 'json', '--today' => '2026-11-07']), true, 64, JSON_THROW_ON_ERROR);
         $this->assertBreaksContract('owners-check.schema.json', (string) json_encode([...$check, 'rank' => 1]));
+        // And an unconfirmed owner needs a real date or null, never a guess in words.
+        $this->assertBreaksContract('owners-check.schema.json', (string) json_encode([...$check, 'unconfirmed' => [['app' => 'demo/relic', 'last_confirmed' => 'last year']]]));
     }
 
     public function test_every_schema_is_held_by_real_output_and_has_teeth(): void

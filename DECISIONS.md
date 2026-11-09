@@ -25,6 +25,7 @@ keeping gets an ADR in [ADR/](ADR/); a question nobody has settled yet lives in
 | State is derived from `policy.json` by date, never decided in code; endoflife.date is a drift check only | `BEST_PRACTICES.md`, "Take version states from one source" |
 | The scanner token is a GitLab group access token with `read_api` only, Reporter role and an expiry; a role, the stack maintainer, rotates it, not a named person (2026-11-08) | `docs/security.md`, "The scanner token and how to rotate it"; question 4 |
 | Snapshots are kept 90 days by default; the newest is never deleted | `ROLLCALL_RETENTION_DAYS`; question 9 |
+| An owner counts as confirmed for 365 days after its `"confirmed"` date by default, then `rollcall owners` calls it unknown and fails the weekly scan job | `ROLLCALL_OWNERS_CONFIRM_DAYS`; question 12 |
 | Metrics are off by default, in Prometheus format, behind a token or an allowlist | `docs/guides/metrics.md` |
 | A bill of materials, when one is produced, is CycloneDX | Question 10 |
 | Every developer script ships as a `.sh` and `.ps1` pair (bash 3.2, no host bash on Windows) | `docs/reference/scripts.md`, `tests/ScriptPairsTest.php` |

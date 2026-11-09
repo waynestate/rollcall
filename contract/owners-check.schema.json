@@ -2,9 +2,9 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://github.com/waynestate/rollcall/blob/main/contract/owners-check.schema.json",
     "title": "Rollcall owners check",
-    "description": "What `rollcall owners --format=json` prints: the latest scan checked against the owners file. Internal: it names apps. The command exits 1 while `unowned` is not empty.",
+    "description": "What `rollcall owners --format=json` prints: the latest scan checked against the owners file. Internal: it names apps. The command exits 1 while `owner_unknown` is above 0.",
     "type": "object",
-    "required": ["scanned", "owners", "opted_in", "unowned"],
+    "required": ["scanned", "owners", "opted_in", "unowned", "confirm_days", "unconfirmed", "owner_unknown"],
     "additionalProperties": false,
     "properties": {
         "scanned": {"type": "integer", "minimum": 0, "description": "Apps in the latest scan"},
@@ -14,6 +14,21 @@
             "description": "The scanned apps no entry lists (\"no owner on file\"), in scan order",
             "type": "array",
             "items": {"type": "string", "minLength": 1}
-        }
+        },
+        "confirm_days": {"type": "integer", "minimum": 0, "description": "ROLLCALL_OWNERS_CONFIRM_DAYS: how long a \"confirmed\" date counts. 0 turns the check off"},
+        "unconfirmed": {
+            "description": "The scanned apps an entry lists, but no entry that lists them was confirmed within confirm_days (a date after today is not trusted), in scan order. Their owner is unknown until someone confirms",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["app", "last_confirmed"],
+                "additionalProperties": false,
+                "properties": {
+                    "app": {"type": "string", "minLength": 1},
+                    "last_confirmed": {"oneOf": [{"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}, {"type": "null"}], "description": "The latest trusted confirmation of any entry that lists the app, or null when none was ever recorded"}
+                }
+            }
+        },
+        "owner_unknown": {"type": "integer", "minimum": 0, "description": "How many scanned apps have an unknown owner: unowned plus unconfirmed"}
     }
 }

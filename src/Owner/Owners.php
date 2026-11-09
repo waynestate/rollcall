@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall\Owner;
 
+use DateTimeImmutable;
 use Waynestate\Rollcall\RollcallException;
 
 /**
  * Who answers for which apps, read from the file behind ROLLCALL_OWNERS_FILE:
- * {"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}.
+ * {"owners": [{"contact": "team@example.test", "digest": true, "confirmed": "2026-11-01", "projects": ["group/project"]}]}.
+ * "confirmed" is the day the contact last said it still answers for those
+ * apps; `rollcall owners` calls an owner unknown once that day is older than
+ * ROLLCALL_OWNERS_CONFIRM_DAYS.
  *
  * Rollcall keeps its own file for the stack's projects in the repo
  * (owners.json, roles and team aliases only, because the repo is public); a
@@ -82,7 +86,11 @@ final class Owners
                 }
                 $paths[] = $project;
             }
-            $owners[] = new Owner($contact, $digest, array_values(array_unique($paths)));
+            $confirmed = $entry['confirmed'] ?? null;
+            if ($confirmed !== null && (! is_string($confirmed) || ! self::isDate($confirmed))) {
+                throw new RollcallException($where . ' has a "confirmed" that is not a YYYY-MM-DD date.');
+            }
+            $owners[] = new Owner($contact, $digest, array_values(array_unique($paths)), $confirmed);
         }
 
         return new self($owners);
@@ -110,6 +118,58 @@ final class Owners
         }
 
         return array_values(array_unique(array_filter($appIds, static fn(string $id): bool => ! isset($owned[$id]))));
+    }
+
+    /**
+     * The apps an entry lists, but no entry that lists them was confirmed
+     * within the last $days days: their owner is on file, yet nobody has said
+     * lately that it is still true, so the owner is unknown. A confirmation
+     * dated after today is not trusted (a typo is not a promise). With $days
+     * 0 the check is off and nothing is returned.
+     *
+     * @param  list<string>  $appIds  the group/project paths of a scan
+     * @return list<array{app: string, last_confirmed: string|null}> in scan order
+     */
+    public function unconfirmed(array $appIds, DateTimeImmutable $today, int $days): array
+    {
+        if ($days <= 0) {
+            return [];
+        }
+        $day = $today->format('Y-m-d');
+        $cutoff = $today->modify(sprintf('-%d days', $days))->format('Y-m-d');
+
+        /** @var array<string, string|null> $last the latest trusted confirmation per listed app */
+        $last = [];
+        foreach ($this->owners as $owner) {
+            $when = $owner->confirmed !== null && $owner->confirmed <= $day ? $owner->confirmed : null;
+            foreach ($owner->projects as $project) {
+                $seen = $last[$project] ?? null;
+                $last[$project] = $when !== null && ($seen === null || $when > $seen) ? $when : $seen;
+            }
+        }
+
+        $out = [];
+        $named = [];
+        foreach ($appIds as $id) {
+            if (! array_key_exists($id, $last) || isset($named[$id])) {
+                continue;
+            }
+            $named[$id] = true;
+            if ($last[$id] === null || $last[$id] < $cutoff) {
+                $out[] = ['app' => $id, 'last_confirmed' => $last[$id]];
+            }
+        }
+
+        return $out;
+    }
+
+    private static function isDate(string $value): bool
+    {
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $m) !== 1) {
+            return false;
+        }
+
+        return checkdate((int) $m[2], (int) $m[3], (int) $m[1]);
     }
 
     public function find(string $contact): ?Owner

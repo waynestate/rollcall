@@ -148,8 +148,9 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
   only when something changed since the previous scan. It prints them; `--out=DIR` writes one text file each;
   `--send` mails them, and only when sending is switched on too.
 - `owners` reads the same owners file as `digest`, checks it against the latest scan, and names every scanned app
-  no entry lists. It exits 1 when there is one, and the weekly scan job runs it, so a new app without an owner
-  fails that job.
+  whose owner is unknown: no entry lists it, or no entry that lists it was confirmed (its `"confirmed"` date) in
+  the last `ROLLCALL_OWNERS_CONFIRM_DAYS` days (365 by default). It exits 1 when there is one, and the weekly scan
+  job runs it, so a new app without an owner, or an owner nobody has re-confirmed in a year, fails that job.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
    policy stays the source of truth. Rollcall does not fetch that page itself.
@@ -242,6 +243,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
 | `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Rollcall's own, for the stack's projects, is `owners.json` in the repo (roles only); keep another fleet's outside a public repo | none (no digests) |
+| `ROLLCALL_OWNERS_CONFIRM_DAYS` | How long an owners-file entry's `"confirmed"` date counts; past it, `rollcall owners` calls that owner unknown and exits 1 | `365` (0 turns the check off) |
 | `ROLLCALL_DIGEST_MAIL_ENABLED` | Allow `rollcall digest --send` to mail | `false` |
 | `ROLLCALL_DIGEST_MAIL_DSN` | Symfony Mailer DSN for sending, such as `smtp://mail.example.test:25`. A secret: never in git, never printed | none |
 | `ROLLCALL_DIGEST_MAIL_FROM` | The from address of the digests | none |
@@ -324,14 +326,15 @@ upgrade, a new drift flag, one cleared, a PROCTOR result that moved), then where
 no digest. Nobody gets one by default, and no owner is ever guessed from commit authors.
 
 1. Point `ROLLCALL_OWNERS_FILE` at an owners file that maps each scanned project to its contacts (a mail address,
-   a team alias or a role). An owner opts in with `"digest": true`; leaving the key out means no. The shape is
-   `contract/owners.schema.json`.
+   a team alias or a role). An owner opts in with `"digest": true`; leaving the key out means no. `"confirmed"` is
+   the day the contact last said it still answers for those apps; `rollcall owners` calls the owner unknown once
+   that day is older than `ROLLCALL_OWNERS_CONFIRM_DAYS`. The shape is `contract/owners.schema.json`.
 
    ```json
    {
        "$schema": "contract/owners.schema.json",
        "owners": [
-           {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]}
+           {"contact": "team@example.test", "digest": true, "confirmed": "2026-11-01", "projects": ["group/project", "group/other-project"]}
        ]
    }
    ```
