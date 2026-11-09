@@ -283,7 +283,7 @@ Output: the files you changed, the schedule entry for each OS, then your questio
 
 ### Rollcall in a Laravel app
 
-The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with.
+The scheduled scan and the dashboard of totals: the package's Blade page, or in an Inertia app one of your own Vue pages, inside your layout.
 
 A prompt for your coding agent. Copy it as it stands:
 
@@ -299,7 +299,7 @@ Task:
 1. Add Rollcall with `composer require waynestate/rollcall`. Its service provider registers itself.
 2. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, and add the settings to .env.example as placeholders.
 3. Schedule `php artisan rollcall:scan` once a day.
-4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. It is the package's Blade page in WayneUI's class names, even in an Inertia app; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS.
+4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. In a Blade app it is the package's page in WayneUI's class names; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS. In an Inertia app (WELD), publish the Vue page with `php artisan vendor:publish --tag=rollcall-inertia`, set ROLLCALL_DASHBOARD_INERTIA and rebuild the assets, so it renders inside this app's own layout.
 5. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED) off unless I ask. It runs behind the web and auth.sesame middleware and fails closed without them.
 
 Constraints:
@@ -342,7 +342,7 @@ Rollcall scans and compares
 - Terminal`text` and `json` reports
 - /metricsPrometheus text, off by default
 - Grafanathe bundled burn-down dashboard
-- Dashboard pageWayneUI totals, in Laravel or raw PHP
+- Dashboard pageWayneUI totals, in Laravel, Inertia/Vue or raw PHP
 
 Rollcall's place in the stack
 

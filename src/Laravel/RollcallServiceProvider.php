@@ -59,6 +59,10 @@ class RollcallServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([__DIR__ . '/../../config/rollcall.php' => $this->app->configPath('rollcall.php')], 'rollcall-config');
+        // The Inertia page an app (WELD) owns once published; the Vue component it wraps stays in vendor/.
+        $this->publishes([
+            __DIR__ . '/../../resources/js/pages/Rollcall/Dashboard.vue' => $this->app->resourcePath('js/pages/Rollcall/Dashboard.vue'),
+        ], 'rollcall-inertia');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'rollcall');
 
         if ($this->app->runningInConsole()) {

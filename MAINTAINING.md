@@ -214,7 +214,8 @@ page that passes locally passes CI. No host browser is needed:
 - Front page: `scripts/a11y.sh` on Linux and macOS, or `scripts/a11y.ps1` on Windows (PowerShell 5.1 and 7);
   checks every HTML page under `site/`.
 - Dashboard: `scripts/dashboard-a11y.sh` or `scripts/dashboard-a11y.ps1`; renders the public, internal and
-  empty-state dashboard pages from Laravel and from the raw-PHP entry point first (six pages), then checks all six.
+  empty-state dashboard pages from Laravel and from the raw-PHP entry point first (six pages), server-renders the Vue page
+  from the same report and fails unless it matches (three more), then checks all nine.
 
 At 320 px the checker also fails a page whose content overflows its viewport (reflow, violation id
 `preflight-reflow`). Any violation, or a page that does not load, fails the run (exit 1; exit 2 on a tool or

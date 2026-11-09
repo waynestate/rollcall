@@ -26,6 +26,7 @@
         "symfony/http-client": "^7.4"
     },
     "require-dev": {
+        "inertiajs/inertia-laravel": "^3.0",
         "laravel/pint": "^1.32",
         "league/commonmark": "^2.10",
         "opis/json-schema": "^2.6",
@@ -37,6 +38,7 @@
         "waynestate/pinstripe": "^0.1"
     },
     "suggest": {
+        "inertiajs/inertia-laravel": "Only for the dashboard as one of an Inertia app's own Vue pages (ROLLCALL_DASHBOARD_INERTIA); the Blade and raw-PHP pages need nothing extra",
         "laravel/framework": "For the Laravel adapter: the dashboard page and the scheduled scan",
         "symfony/mailer": "Only to mail the opt-in owner digests (rollcall digest --send); printing them needs nothing extra",
         "waynestate/advisor": "ADVISOR's MCP server loads the Rollcall module (src/Advisor/RollcallModule.php) with its three read-only tools",

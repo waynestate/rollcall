@@ -119,6 +119,10 @@
                     "Laravel and raw PHP: serve the per-app page (Laravel at `<path>/apps` behind your sign-in middleware; raw PHP only where you call rollcall_dashboard(['internal' => true]) behind your sign-in)",
                     "`false`"
                 ],
+                "ROLLCALL_DASHBOARD_INERTIA": [
+                    "Laravel + Inertia: answer the dashboard routes with the app's Vue page (Rollcall/Dashboard, published with vendor:publish --tag=rollcall-inertia) instead of the Blade view; same switches, same report. Needs inertiajs/inertia-laravel",
+                    "`false`"
+                ],
                 "ROLLCALL_WAYNEUI_CSS": [
                     "Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard",
                     "none"

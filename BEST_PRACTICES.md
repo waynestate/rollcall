@@ -43,7 +43,7 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 | Keep a snapshot per scan | Enforced | One atomic JSON file per day |
 | Owners hear about their own apps only if they ask | Enforced | `rollcall digest` reads only owners with `"digest": true`, sends nothing without `--send` and three settings, and checks every contact before sending; `DigestTest` |
 | Verify ownership on a schedule; an app with no owner, or an unconfirmed one, is "owner unknown", never guessed from commit authors | Enforced | Each owners-file entry carries a `"confirmed"` date; `rollcall owners` names every app no entry lists or none confirmed within `ROLLCALL_OWNERS_CONFIRM_DAYS` (365) and exits 1, and the weekly scan job runs it; `OwnersCommandTest`, and `OwnersFileTest` fails if an entry of Rollcall's own file has no date |
-| Per-app lists stay internal | Enforced | Off in the public report, `/report.json`, `/metrics`; the Laravel per-app page is opt-in behind your middleware; the raw-PHP per-app page needs `ROLLCALL_INTERNAL_ENABLED` and `'internal' => true` from a file behind your sign-in, and answers 404 without either (`RawDashboardTest`) |
+| Per-app lists stay internal | Enforced | Off in the public report, `/report.json`, `/metrics`; the Laravel per-app page, Blade or the Vue page, is opt-in behind your middleware, and the public Vue page's props carry no app (`DashboardInertiaTest`); the raw-PHP per-app page needs `ROLLCALL_INTERNAL_ENABLED` and `'internal' => true` from a file behind your sign-in, and answers 404 without either (`RawDashboardTest`) |
 | ADVISOR tools answer public counts only, read-only | Enforced | `RollcallModule` builds from the public report and declares every tool `readOnly`; `RollcallModuleTest` fails if a fixture app name or path appears in any tool output |
 
 ## Keep the shape promised
@@ -65,10 +65,10 @@ Tags: **Enforced** (code or a failing test), **Checked** (a test or CI warns), *
 
 | Rule | Tag | How |
 |---|---|---|
-| Pointer and focus rules (WCAG 2.2 AA) | Documented | The dashboard (Laravel and the raw-PHP page) has no controls, sticky headers or tooltips; a positive tabindex fails DashboardAccessibilityTest; revisit when a filter is added |
-| Announce refreshed data | Checked | A role=status line names the apps shown and the scan date, on the Laravel page and the raw-PHP page alike; DashboardAccessibilityTest, RawDashboardTest |
-| One dashboard markup for every path | Enforced | The Laravel view and `rollcall_dashboard()` both print `DashboardPage`; `DashboardParityTest` fails unless the raw-PHP page and the Laravel page are byte for byte the same for the same snapshot |
-| Automated WCAG 2.2 AA check on the front page and the rendered dashboard | Enforced | CI jobs `a11y-site` and `dashboard-a11y` (Preflight's a11y component; `dashboard-render` renders the Laravel and the raw-PHP pages with `DashboardRenderTest`, six pages in light and dark at 320 and 1280 px); `scripts/dashboard-a11y.sh` and `.ps1` run the dashboard check locally |
+| Pointer and focus rules (WCAG 2.2 AA) | Documented | The dashboard (the Laravel page, the Vue page and the raw-PHP page) has no controls, sticky headers or tooltips; a positive tabindex fails DashboardAccessibilityTest; revisit when a filter is added |
+| Announce refreshed data | Checked | A role=status line names the apps shown and the scan date, on the Laravel page, the Vue page and the raw-PHP page alike; DashboardAccessibilityTest, RawDashboardTest, and the dashboard-vue parity check for the Vue page |
+| One dashboard markup for every path | Enforced | The Laravel view and `rollcall_dashboard()` both print `DashboardPage`; `DashboardParityTest` fails unless the raw-PHP page and the Laravel page are byte for byte the same for the same snapshot. The Vue page (`resources/js/RollcallDashboard.vue`) gets the same report as props, and the CI job `dashboard-vue` (`tools/vue-dashboard/parity.mjs`) server-renders it and fails on any element, attribute or text that differs from the Laravel page |
+| Automated WCAG 2.2 AA check on the front page and the rendered dashboard | Enforced | CI jobs `a11y-site` and `dashboard-a11y` (Preflight's a11y component; `dashboard-render` renders the Laravel and the raw-PHP pages with `DashboardRenderTest` and `dashboard-vue` the Vue page, nine pages in light and dark at 320 and 1280 px); `scripts/dashboard-a11y.sh` and `.ps1` run the dashboard check locally |
 
 ## Not yet
 

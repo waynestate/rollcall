@@ -12,6 +12,7 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve. It prints the same renderer (`src/Dashboard/DashboardPage.php`) as the Laravel page, so the two cannot drift.
+- `resources/js/RollcallDashboard.vue`: the same dashboard as a Vue component for an Inertia app's own page. The Laravel adapter hands it the same report as props, and the CI job `dashboard-vue` fails it on any difference from the PHP renderer's markup.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made

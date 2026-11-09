@@ -30,12 +30,13 @@ include:
       site_dir: site
       pages: ["index.html", "docs/**/*.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
-  # The dashboard pages, rendered by the dashboard-render job below: Laravel (index, apps, empty) and raw PHP (raw-*).
+  # The dashboard pages, rendered by the dashboard-render job below: Laravel (index, apps, empty) and raw PHP (raw-*),
+  # plus the Vue page (vue-*), server-rendered by dashboard-vue once it matches the PHP page.
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.4.0
     inputs:
       job_name: dashboard-a11y
       site_dir: build/dashboard-a11y
-      pages: ["index.html", "apps.html", "empty.html", "raw.html", "raw-apps.html", "raw-empty.html"]
+      pages: ["index.html", "apps.html", "empty.html", "raw.html", "raw-apps.html", "raw-empty.html", "vue.html", "vue-apps.html", "vue-empty.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 # Dependency caching: images already come through the Dependency Proxy, and
@@ -68,8 +69,9 @@ composer-ci:
     - composer ci
 
 # dashboard-render: renders the public, internal and empty-state dashboard pages, from
-# Laravel and from the raw-PHP entry point, with PHPUnit (DashboardRenderTest) and hands
-# them to dashboard-a11y as an artifact.
+# Laravel and from the raw-PHP entry point, with PHPUnit (DashboardRenderTest), plus the Inertia
+# page objects the same routes answer with (inertia*.json), and hands them to dashboard-vue and
+# dashboard-a11y as an artifact.
 dashboard-render:
   extends: .composer-cache
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
@@ -79,13 +81,37 @@ dashboard-render:
     - mkdir -p build/dashboard-a11y/assets && cp -r site/assets/wayne-ui build/dashboard-a11y/assets/
     - test -s build/dashboard-a11y/index.html && test -s build/dashboard-a11y/apps.html && test -s build/dashboard-a11y/empty.html
     - test -s build/dashboard-a11y/raw.html && test -s build/dashboard-a11y/raw-apps.html && test -s build/dashboard-a11y/raw-empty.html
+    - test -s build/dashboard-a11y/inertia.json && test -s build/dashboard-a11y/inertia-apps.json && test -s build/dashboard-a11y/inertia-empty.json
+  artifacts:
+    paths:
+      - build/dashboard-a11y/
+    expire_in: 7 days
+
+# dashboard-vue: the Vue page's parity check. Server-renders resources/js/RollcallDashboard.vue
+# with the Inertia props dashboard-render saved (inertia*.json) and fails unless it matches the
+# Blade page for the same report, element for element (tools/vue-dashboard/parity.mjs). On a
+# match it writes vue.html, vue-apps.html and vue-empty.html for dashboard-a11y. It runs in the
+# a11y component's own image (Node 26, pinned by digest), so the pipeline pulls no new image.
+dashboard-vue:
+  image: mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d
+  needs: [dashboard-render]
+  variables:
+    npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+  cache:
+    key: npm
+    paths: [.cache/npm/]
+    when: always
+  script:
+    - npm ci --prefix tools/vue-dashboard --ignore-scripts --no-audit --no-fund
+    - node --disable-warning=ExperimentalWarning tools/vue-dashboard/parity.mjs build/dashboard-a11y
+    - test -s build/dashboard-a11y/vue.html && test -s build/dashboard-a11y/vue-apps.html && test -s build/dashboard-a11y/vue-empty.html
   artifacts:
     paths:
       - build/dashboard-a11y/
     expire_in: 7 days
 
 dashboard-a11y:
-  needs: [dashboard-render]
+  needs: [dashboard-render, dashboard-vue]
 
 # rollcall-scan: scans the 13 stack projects read-only and keeps the snapshot JSON in
 # var/snapshots/ as a 30 day artifact. The schedule is a GitLab setting (CI/CD > Schedules,

@@ -11,8 +11,12 @@ use Waynestate\Rollcall\Dashboard\RawDashboard;
  * Writes the rendered dashboard pages (public, internal and the empty state,
  * from Laravel and from the raw-PHP entry point) to the folder named by
  * ROLLCALL_DASHBOARD_OUT, so the dashboard axe gate can read them as static
- * files. The substitute takes the register once per page and keeps a copy of
- * every roll; the raw-PHP room gets its own copy.
+ * files. Next to each Laravel page it writes the Inertia page object the same
+ * route answers with when rollcall.dashboard.inertia is on (inertia*.json),
+ * from the same store in the same request cycle, so the Vue parity check
+ * (tools/vue-dashboard/parity.mjs) renders the component from exactly the
+ * report the Blade page printed. The substitute takes the register once per
+ * page and keeps a copy of every roll; the raw-PHP room gets its own copy.
  */
 final class DashboardRenderTest extends LaravelTestCase
 {
@@ -37,6 +41,8 @@ final class DashboardRenderTest extends LaravelTestCase
 
         file_put_contents($out . '/index.html', $index->getContent() ?: '');
         file_put_contents($out . '/apps.html', $apps->getContent() ?: '');
+        $this->writeInertia($out . '/inertia.json', '/rollcall');
+        $this->writeInertia($out . '/inertia-apps.json', '/rollcall/apps');
 
         $this->assertFileExists($out . '/index.html');
         $this->assertFileExists($out . '/apps.html');
@@ -51,6 +57,7 @@ final class DashboardRenderTest extends LaravelTestCase
         $empty = $this->get('/rollcall')->assertOk();
 
         file_put_contents($out . '/empty.html', $empty->getContent() ?: '');
+        $this->writeInertia($out . '/inertia-empty.json', '/rollcall');
 
         $this->assertFileExists($out . '/empty.html');
         $this->assertStringContainsString('No scan has been stored yet', (string) file_get_contents($out . '/empty.html'));
@@ -75,6 +82,21 @@ final class DashboardRenderTest extends LaravelTestCase
 
         $this->assertStringContainsString('No scan has been stored yet', (string) file_get_contents($out . '/raw-empty.html'));
         $this->assertStringContainsString('role="status"', (string) file_get_contents($out . '/raw.html'));
+    }
+
+    /** The Inertia page object the route answers an Inertia visit with, once the Vue page is switched on. */
+    private function writeInertia(string $file, string $path): void
+    {
+        config()->set('rollcall.dashboard.inertia', true);
+        try {
+            $page = $this->get($path, ['X-Inertia' => 'true'])->assertOk()->assertHeader('X-Inertia', 'true')->json();
+        } finally {
+            config()->set('rollcall.dashboard.inertia', false);
+        }
+
+        $this->assertIsArray($page);
+        $this->assertSame('Rollcall/Dashboard', $page['component'] ?? null);
+        file_put_contents($file, json_encode($page, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
     }
 
     /** @return array<string, string> */

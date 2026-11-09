@@ -1,0 +1,16 @@
+{
+  "name": "rollcall-vue-dashboard",
+  "description": "Parity check for Rollcall's Vue dashboard: server-renders resources/js/RollcallDashboard.vue and compares it with the PHP renderer's page.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "parity": "node parity.mjs"
+  },
+  "dependencies": {
+    "parse5": "8.1.1",
+    "vue": "3.5.44"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

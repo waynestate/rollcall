@@ -37,6 +37,11 @@ return [
         'middleware' => ['web'],
         'internal_enabled' => env('ROLLCALL_INTERNAL_ENABLED', false),
         'internal_middleware' => ['web', 'auth.sesame'],
+        // An Inertia app (WELD) can show the same pages as one of its own Vue pages instead of the Blade view:
+        // same routes, same switches, same report, handed to this page component as props. Publish the page
+        // with `php artisan vendor:publish --tag=rollcall-inertia`. Needs inertiajs/inertia-laravel.
+        'inertia' => env('ROLLCALL_DASHBOARD_INERTIA', false),
+        'inertia_page' => 'Rollcall/Dashboard',
     ],
 
     // Stylesheet that gives the dashboard WayneUI's look until the package is installable here.

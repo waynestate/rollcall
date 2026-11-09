@@ -53,9 +53,11 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve (see "The dashboard in a raw PHP app").
-- `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
+- `src/Laravel/`: a Laravel adapter with a dashboard page (the Blade view, or an Inertia page in your own layout), a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
+- `resources/js/RollcallDashboard.vue`: the same dashboard as a Vue component, for an Inertia app's own page (see "The dashboard in an Inertia app (Vue)").
 
-Both dashboards print the same renderer (`src/Dashboard/DashboardPage.php`) from the same report, so they cannot drift.
+The Blade view and `rollcall_dashboard()` print the same renderer (`src/Dashboard/DashboardPage.php`) from the same
+report, so they cannot drift, and CI fails the Vue component on any difference from that renderer's markup.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made
 by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`;
@@ -255,6 +257,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_DASHBOARD_ENABLED` | Laravel and raw PHP: serve the dashboard page | `false` |
 | `ROLLCALL_DASHBOARD_PATH` | Laravel: dashboard URL path | `rollcall` |
 | `ROLLCALL_INTERNAL_ENABLED` | Laravel and raw PHP: serve the per-app page (Laravel at `/apps`, behind your sign-in middleware; raw PHP only where you call `rollcall_dashboard(['internal' => true])` behind your sign-in) | `false` |
+| `ROLLCALL_DASHBOARD_INERTIA` | Laravel + Inertia: answer the dashboard routes with the app's Vue page (`Rollcall/Dashboard`, published with `vendor:publish --tag=rollcall-inertia`) instead of the Blade view; same switches, same report. Needs `inertiajs/inertia-laravel` | `false` |
 | `ROLLCALL_WAYNEUI_CSS` | Laravel and raw PHP: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
 To scan GitLab you need the token and either a group or the project allowlist. The narrow way is
@@ -426,6 +429,7 @@ The package registers itself (`extra.laravel.providers`). Publish the config wit
 dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it
 runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
+In an Inertia app it can be one of your own Vue pages instead: see "The dashboard in an Inertia app (Vue)".
 The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
 on a separate app or leave metrics off.
 
@@ -454,6 +458,54 @@ SESAME's `sesame_login()` has returned a user. It also needs `ROLLCALL_INTERNAL_
 missing it answers 404, so it fails closed. For a front controller of your own,
 `Waynestate\Rollcall\Dashboard\RawDashboard::response()` returns the same answer as data (status, headers, body).
 
+### The dashboard in an Inertia app (Vue)
+
+In a Laravel + Inertia + Vue app (WELD's shape) the dashboard can be one of the app's own pages, inside its own
+layout. Same routes, same switches, same report: with `ROLLCALL_DASHBOARD_INERTIA=true` the controller hands what
+`DashboardPage::report()` built to an Inertia page as props (`report`, `internal`, `scanCommand`) instead of printing
+the Blade view. From a WELD app:
+
+```bash
+php artisan vendor:publish --tag=rollcall-inertia   # writes resources/js/pages/Rollcall/Dashboard.vue
+# .env: ROLLCALL_DASHBOARD_ENABLED=true and ROLLCALL_DASHBOARD_INERTIA=true
+npm run build
+```
+
+The published page is short and it is yours. In essence it puts the component in WELD's `AppLayout` with a title
+and a `noindex` tag:
+
+```vue
+<script setup lang="ts">
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import RollcallDashboard from '../../../../vendor/waynestate/rollcall/resources/js/RollcallDashboard.vue';
+
+defineProps<{ report: Record<string, unknown> | null; internal: boolean; scanCommand: string }>();
+</script>
+
+<template>
+    <Head title="Rollcall"><meta name="robots" content="noindex" /></Head>
+    <AppLayout>
+        <RollcallDashboard :report="report" :internal="internal" :scan-command="scanCommand" />
+    </AppLayout>
+</template>
+```
+
+Why this shape: the page is published because the layout is the app's, and the component is imported straight
+from `vendor/` because the markup is Rollcall's. `composer update` moves the component together with the PHP
+renderer it must match, and there is no npm package to install or keep in step (Rollcall publishes none). Vite and
+`vue-tsc` follow the relative import like any file in the project, and the component imports nothing but `vue`,
+which the app already has. An app that does not use the Vue page loads none of it; `inertiajs/inertia-laravel` is
+needed only when the switch is on.
+
+The component renders what the Blade page shows inside ``: the same WayneUI classes, the `role="status"` line,
+the captions and headers, and the per-app table only on the internal page (`/apps`, still behind
+`rollcall.dashboard.internal_middleware` and `ROLLCALL_INTERNAL_ENABLED`). It has no style block, no style attribute
+and no script of its own, so it works under HELMET's CSP, and it takes its look from the app's WayneUI stylesheet.
+Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms together: `dashboard-vue` server-renders
+the component with the props the route sends and fails on any difference from the Blade page (elements, attributes
+and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y`
+checks the three Vue pages with the other six.
 ### Use Rollcall from your coding agent (ADVISOR)
 
 Rollcall ships a module for [ADVISOR](https://packagist.org/packages/waynestate/advisor), the stack's MCP server: three
@@ -847,7 +899,7 @@ Output: the files you changed, the schedule entry for each OS, then your questio
 
 #### Rollcall in a Laravel app
 
-The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with.
+The scheduled scan and the dashboard of totals: the package's Blade page, or in an Inertia app one of your own Vue pages, inside your layout.
 
 A prompt for your coding agent. Copy it as it stands:
 
@@ -863,7 +915,7 @@ Task:
 1. Add Rollcall with `composer require waynestate/rollcall`. Its service provider registers itself.
 2. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, and add the settings to .env.example as placeholders.
 3. Schedule `php artisan rollcall:scan` once a day.
-4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. It is the package's Blade page in WayneUI's class names, even in an Inertia app; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS.
+4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. In a Blade app it is the package's page in WayneUI's class names; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS. In an Inertia app (WELD), publish the Vue page with `php artisan vendor:publish --tag=rollcall-inertia`, set ROLLCALL_DASHBOARD_INERTIA and rebuild the assets, so it renders inside this app's own layout.
 5. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED) off unless I ask. It runs behind the web and auth.sesame middleware and fails closed without them.
 
 Constraints:
@@ -906,7 +958,7 @@ Rollcall scans and compares
 - Terminal`text` and `json` reports
 - /metricsPrometheus text, off by default
 - Grafanathe bundled burn-down dashboard
-- Dashboard pageWayneUI totals, in Laravel or raw PHP
+- Dashboard pageWayneUI totals, in Laravel, Inertia/Vue or raw PHP
 
 Rollcall's place in the stack
 
@@ -942,6 +994,7 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve. It prints the same renderer (`src/Dashboard/DashboardPage.php`) as the Laravel page, so the two cannot drift.
+- `resources/js/RollcallDashboard.vue`: the same dashboard as a Vue component for an Inertia app's own page. The Laravel adapter hands it the same report as props, and the CI job `dashboard-vue` fails it on any difference from the PHP renderer's markup.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`; until Rollcall switches, the copy stays. To refresh it, run `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed` from a CREED checkout. `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit to `src/Creed/` fails that check.
@@ -1217,11 +1270,42 @@ Source: https://rollcall.apps.wayne.edu/docs/guides/laravel.html
 
 ## Laravel[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
 
-This page wires Rollcall into a Laravel app, and shows the same dashboard in a raw PHP app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
+This page wires Rollcall into a Laravel app, and shows the same dashboard as a Vue page in an Inertia app and in a raw PHP app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
 
-The package registers itself (`extra.laravel.providers`). Publish the config with `php artisan vendor:publish --tag=rollcall-config`, set the variables in [the configuration reference](https://rollcall.apps.wayne.edu/docs/reference/configuration.html), and schedule `rollcall:scan`. The dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`. The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.
+The package registers itself (`extra.laravel.providers`). Publish the config with `php artisan vendor:publish --tag=rollcall-config`, set the variables in [the configuration reference](https://rollcall.apps.wayne.edu/docs/reference/configuration.html), and schedule `rollcall:scan`. The dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`. In an Inertia app it can be one of your own Vue pages instead (below). The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.
 
-### The dashboard in a raw PHP app[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
+### The dashboard in an Inertia app (Vue)[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-an-inertia-app-vue)
+
+In a Laravel + Inertia + Vue app (WELD's shape) the dashboard can be one of the app's own pages, inside its own layout. Same routes, same switches, same report: with `ROLLCALL_DASHBOARD_INERTIA=true` the controller hands what `DashboardPage::report()` built to an Inertia page as props (`report`, `internal`, `scanCommand`) instead of printing the Blade view. From a WELD app:
+
+```bash
+php artisan vendor:publish --tag=rollcall-inertia   # writes resources/js/pages/Rollcall/Dashboard.vue
+# .env: ROLLCALL_DASHBOARD_ENABLED=true and ROLLCALL_DASHBOARD_INERTIA=true
+npm run build
+```
+
+The published page is short and it is yours. In essence it puts the component in WELD's `AppLayout` with a title and a `noindex` tag:
+
+```vue
+<script setup lang="ts">
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import RollcallDashboard from '../../../../vendor/waynestate/rollcall/resources/js/RollcallDashboard.vue';
+
+defineProps<{ report: Record<string, unknown> | null; internal: boolean; scanCommand: string }>();
+</script>
+
+<template>
+    <Head title="Rollcall"><meta name="robots" content="noindex" /></Head>
+    <AppLayout>
+        <RollcallDashboard :report="report" :internal="internal" :scan-command="scanCommand" />
+    </AppLayout>
+</template>
+```
+
+Why this shape: the page is published because the layout is the app's, and the component is imported straight from `vendor/` because the markup is Rollcall's. `composer update` moves the component together with the PHP renderer it must match, and there is no npm package to install or keep in step (Rollcall publishes none). Vite and `vue-tsc` follow the relative import like any file in the project, and the component imports nothing but `vue`, which the app already has. An app that does not use the Vue page loads none of it; `inertiajs/inertia-laravel` is needed only when the switch is on.
+
+The component renders what the Blade page shows inside `<main>`: the same WayneUI classes, the `role="status"` line, the captions and headers, and the per-app table only on the internal page (`<path>/apps`, still behind `rollcall.dashboard.internal_middleware` and `ROLLCALL_INTERNAL_ENABLED`). It has no style block, no style attribute and no script of its own, so it works under HELMET's CSP, and it takes its look from the app's WayneUI stylesheet. Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms together: `dashboard-vue` server-renders the component with the props the route sends and fails on any difference from the Blade page (elements, attributes and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y` checks the three Vue pages with the other six.
 
 The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
 
@@ -1238,7 +1322,7 @@ It answers 404 until `ROLLCALL_DASHBOARD_ENABLED=true`, sends `X-Robots-Tag: noi
 
 The per-app page is a second file, behind your sign-in: call `rollcall_dashboard(['internal' => true])` after SESAME's `sesame_login()` has returned a user. It also needs `ROLLCALL_INTERNAL_ENABLED=true`; with either one missing it answers 404, so it fails closed. For a front controller of your own, `Waynestate\Rollcall\Dashboard\RawDashboard::response()` returns the same answer as data (status, headers, body).
 
-Both pages go through the same accessibility gate: `DashboardRenderTest` writes the Laravel and the raw-PHP pages, and `dashboard-a11y` checks all six in light and dark at 320 and 1280 px.
+All three go through the same accessibility gate: `DashboardRenderTest` writes the Laravel and the raw-PHP pages and the Inertia props, `dashboard-vue` renders the Vue pages from those props once they match, and `dashboard-a11y` checks all nine (public, internal and empty, in each room) in light and dark at 320 and 1280 px.
 
 ---
 
@@ -1588,6 +1672,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
 | ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
 | ROLLCALL_DASHBOARD_ENABLED | Laravel and raw PHP: serve the dashboard page | `false` | config/rollcall.php |
+| ROLLCALL_DASHBOARD_INERTIA | Laravel + Inertia: answer the dashboard routes with the app's Vue page (Rollcall/Dashboard, published with vendor:publish --tag=rollcall-inertia) instead of the Blade view; same switches, same report. Needs inertiajs/inertia-laravel | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
 | ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
 | ROLLCALL_DIGEST_MAIL_ENABLED | Allow `rollcall digest --send` to mail | `false` | src/Config.php |
@@ -1799,7 +1884,7 @@ Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is
 | Windows (PowerShell) | Linux and macOS (bash) | What they do |
 | --- | --- | --- |
 | `scripts/a11y.ps1` | `scripts/a11y.sh` | The front page accessibility gate: Preflight's a11y checker (vendored in `tools/a11y/check.mjs`, pinned by `tests/A11yCheckerPinTest.php`) in Docker, the same image and inputs as the `a11y-site` CI job |
-| `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), then runs the same axe-core check on all six, in Docker |
+| `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), server-renders the Vue page and fails unless it matches the Laravel page (`tools/vue-dashboard/parity.mjs`), then runs the same axe-core check on all nine, in Docker |
 | `deploy/scripts/parity.ps1` | `deploy/scripts/parity.sh` | Runs the front page locally on the Citadel PHP image behind a proxy (Squire's) |
 
 `scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.

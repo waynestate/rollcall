@@ -490,7 +490,7 @@ Output: the files you changed, the schedule entry for each OS, then your questio
             <div>
               <p class="ar-prompt__kicker">Note 3 · Laravel, Blade or Inertia</p>
               <h3 class="ar-prompt__title" id="prompt-laravel-title">Rollcall in a Laravel app</h3>
-              <p class="ar-prompt__desc">The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with.</p>
+              <p class="ar-prompt__desc">The scheduled scan and the dashboard of totals: the package's Blade page, or in an Inertia app one of your own Vue pages, inside your layout.</p>
             </div>
           </header>
           <pre class="ar-prompt__text"><code>You are a coding agent adding Rollcall, the fleet scanner of WELD, the Wayne State application stack, to a Laravel app: the scheduled scan, the dashboard page of totals and, only if I ask, the internal per-app page.
@@ -504,7 +504,7 @@ Task:
 1. Add Rollcall with `composer require waynestate/rollcall`. Its service provider registers itself.
 2. Publish the config with `php artisan vendor:publish --tag=rollcall-config`, and add the settings to .env.example as placeholders.
 3. Schedule `php artisan rollcall:scan` once a day.
-4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. It is the package's Blade page in WayneUI's class names, even in an Inertia app; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS.
+4. Turn on the dashboard with ROLLCALL_DASHBOARD_ENABLED. In a Blade app it is the package's page in WayneUI's class names; give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS. In an Inertia app (WELD), publish the Vue page with `php artisan vendor:publish --tag=rollcall-inertia`, set ROLLCALL_DASHBOARD_INERTIA and rebuild the assets, so it renders inside this app's own layout.
 5. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED) off unless I ask. It runs behind the web and auth.sesame middleware and fails closed without them.
 
 Constraints:
@@ -566,7 +566,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
             <li class="card"><span class="card__k">Terminal</span><span class="card__v"><code>text</code> and <code>json</code> reports</span></li>
             <li class="card"><span class="card__k">/metrics</span><span class="card__v">Prometheus text, off by default</span></li>
             <li class="card"><span class="card__k">Grafana</span><span class="card__v">the bundled burn-down dashboard</span></li>
-            <li class="card"><span class="card__k">Dashboard page</span><span class="card__v">WayneUI totals, in Laravel or raw PHP</span></li>
+            <li class="card"><span class="card__k">Dashboard page</span><span class="card__v">WayneUI totals, in Laravel, Inertia/Vue or raw PHP</span></li>
           </ul>
         </div>
       </div>
