@@ -91,7 +91,7 @@ recorded in [DECISIONS.md](https://github.com/waynestate/rollcall/blob/HEAD/DECI
 composer require waynestate/rollcall
 ```
 
-Rollcall 1.0.0 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
+Rollcall 1.1.0 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
 From 1.0 Rollcall follows SemVer against its contract ([`contract/`](https://github.com/waynestate/rollcall/blob/HEAD/contract/README.md)): inside 1.x the report,
 the stored snapshot and the image list may gain a field (a minor release) but never lose or retype one. Promoted
@@ -645,7 +645,7 @@ Rollcall is the stack's fleet scanner. For each app it records the PHP image, th
 
 `$ composer require waynestate/rollcall`
 
-Promoted to **1.0.0**, on Packagist. Inside 1.x the report, the snapshot and the image list never lose or retype a field: [the contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html) says so.
+Promoted to **1.1.0**, on Packagist. Inside 1.x the report, the snapshot and the image list never lose or retype a field: [the contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html) says so.
 
 **Works alongside [WELD](https://weld.apps.wayne.edu/).** Rollcall doesn't go inside your app. You run it on its own to see what every app in the fleet is running, WELD apps included.
 
@@ -813,12 +813,12 @@ php bin/rollcall scan
 php bin/rollcall report
 ```
 
-What comes back real output, abridged, Rollcall 1.0, bundled fixtures (four demo apps)
+What comes back real output, abridged, Rollcall 1.1, bundled fixtures (four demo apps)
 
 ```
 Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
 
-ROLLCALL 1.0.0 | scan 2026-10-28 | as of 2026-10-28 | public
+ROLLCALL 1.1.0 | scan 2026-10-28 | as of 2026-10-28 | public
 Apps present: 4 (scan notes: 0)
 
 PHP image
@@ -1554,7 +1554,7 @@ Optional: `composer require symfony/mailer` only if Rollcall should mail the [ow
 
 ### Versions[#](https://rollcall.apps.wayne.edu/docs/install.html#versions)
 
-1.0.0 is the current release, and Composer's `^1.0` takes every 1.x after it. From 1.0 Rollcall follows SemVer against its [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html): inside 1.x the report, the stored snapshot and the image list may gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
+1.1.0 is the current release, and Composer's `^1.0` takes every 1.x. From 1.0 Rollcall follows SemVer against its [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html): inside 1.x the report, the stored snapshot and the image list may gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
 
 ---
 
