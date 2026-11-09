@@ -71,6 +71,14 @@ shell on the host.</p>
 <td>Regenerates the front page versions table from CREED's policy</td>
 </tr>
 <tr>
+<td><code>php bin/quickstart-versions.php</code> (<code>composer site:versions</code>)</td>
+<td>Regenerates the quick-start printout's policy values in <code>site/index.html</code> and <code>site/index.md</code> from CREED's policy, between the <code>quickstart-versions</code> markers</td>
+</tr>
+<tr>
+<td><code>composer site:versions-check</code></td>
+<td>Fails when the front page versions table or the quick-start printout's policy values are stale; runs in <code>composer ci</code></td>
+</tr>
+<tr>
 <td><code>php tools/creed-copy-check.php</code> (<code>composer creed-copy:check</code>)</td>
 <td>Proves the CREED copy has not drifted</td>
 </tr>
