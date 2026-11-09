@@ -17,7 +17,7 @@ shell on the host.
 
 | Command | What it does |
 |---|---|
-| `php bin/rollcall` (`vendor/bin/rollcall` in an install) | The CLI: `scan`, `report`, `digest`, `drift`, `advisories`, `prune` |
+| `php bin/rollcall` (`vendor/bin/rollcall` in an install) | The CLI: `scan`, `report`, `digest`, `owners`, `drift`, `advisories`, `prune` |
 | `php bin/docs-site.php` (`composer docs`) | Builds the docs site from `docs/` |
 | `php bin/agent-ready.php` (`composer site:agent-ready`) | Writes the Markdown twins, `llms.txt` and the sitemap |
 | `php tools/versions-table.php` (`composer site:versions`) | Regenerates the front page versions table from CREED's policy |

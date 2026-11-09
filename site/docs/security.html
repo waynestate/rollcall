@@ -85,8 +85,8 @@ through the REST API.</p>
 </tr>
 <tr>
 <td><code>HEAD /api/v4/projects/:id/repository/files/:file_path?ref=</code></td>
-<td>Every scan, for <code>composer.json</code> and <code>composer.lock</code></td>
-<td>Reads the blob id only, so an unchanged file is not fetched again</td>
+<td>Every scan, for <code>composer.json</code>, <code>composer.lock</code> and <code>booster-hop.json</code></td>
+<td>Reads the blob id, so an unchanged Composer file is not fetched again (a 404 means the app has no such file)</td>
 <td><code>read_api</code></td>
 </tr>
 <tr>
@@ -141,7 +141,7 @@ through the REST API.</p>
 </tr>
 <tr>
 <td><code>read_repository</code></td>
-<td>Git-over-HTTP pull. Rollcall never clones; it reads two files through the API, which <code>read_api</code> covers</td>
+<td>Git-over-HTTP pull. Rollcall never clones; it reads single files through the API, which <code>read_api</code> covers</td>
 </tr>
 <tr>
 <td><code>read_user</code></td>
@@ -177,7 +177,9 @@ an image or a log.</li>
 <li><strong>Who rotates it.</strong> A role, not a person: the stack maintainer creates the replacement, updates the variable and
 revokes the old token before the expiry date. Rollcall only reminds.</li>
 <li><strong>A refused token stops the scan.</strong> A <code>401</code> or <code>403</code> ends the scan loudly with exit <code>2</code>, so a dead token never
-produces a flattering partial roll.</li>
+produces a flattering partial roll. One <code>403</code> is not the token: with <code>ROLLCALL_PROCTOR_SOURCE=gitlab</code>, a <code>403</code> on
+a project's pipeline list means CI/CD is off for that project (the same token has just read its files), so that
+app has no PROCTOR report and the scan carries on.</li>
 </ul>
 <h2 id="the-scanner-token-and-how-to-rotate-it">The scanner token and how to rotate it<a class="docs-heading-link" aria-label="Link to this section" href="#the-scanner-token-and-how-to-rotate-it">#</a></h2>
 <p>The stack's weekly scan on git.wayne.edu reads with one token. Everything about it except its value is here.</p>

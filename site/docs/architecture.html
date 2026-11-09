@@ -42,7 +42,7 @@
 <p>This page shows the moving parts. Next: <a href="security.html">security notes</a>.</p>
 <p>A framework-free core (<code>src/</code>) plus thin entry points that hold no rules:</p>
 <ul>
-<li><code>bin/rollcall</code>: the CLI (<code>scan</code>, <code>report</code>, <code>digest</code>, <code>drift</code>, <code>advisories</code>, <code>prune</code>). One PHP command, so it works the same on Windows, macOS and Linux.</li>
+<li><code>bin/rollcall</code>: the CLI (<code>scan</code>, <code>report</code>, <code>digest</code>, <code>owners</code>, <code>drift</code>, <code>advisories</code>, <code>prune</code>). One PHP command, so it works the same on Windows, macOS and Linux.</li>
 <li><code>public/index.php</code>: a raw-PHP front controller for <code>GET /metrics</code> and <code>GET /report.json</code>.</li>
 <li><code>rollcall_dashboard()</code>: the dashboard page for a raw PHP app, one call in a file you serve. It prints the same renderer (<code>src/Dashboard/DashboardPage.php</code>) as the Laravel page, so the two cannot drift.</li>
 <li><code>resources/js/RollcallDashboard.vue</code>: the same dashboard as a Vue component for an Inertia app's own page. The Laravel adapter hands it the same report as props, and the CI job <code>dashboard-vue</code> fails it on any difference from the PHP renderer's markup.</li>
@@ -69,7 +69,7 @@ and <code>composer ci</code>, and pushes to main only when both pass. A red run 
 </thead>
 <tbody>
 <tr>
-<td>Repositories (<code>composer.json</code>, <code>composer.lock</code>)</td>
+<td>Repositories (<code>composer.json</code>, <code>composer.lock</code>, <code>booster-hop.json</code>)</td>
 <td><code>RepositorySource</code></td>
 <td>a directory of fixtures; GitLab over PSR-18, tested against recorded responses</td>
 </tr>
@@ -107,7 +107,10 @@ report becomes the note &quot;PROCTOR report could not be read&quot; for that ap
 other call: a refused token stops the scan, 429 waits, anything else fails it.</p>
 <p>For the CI reader to find a report, the app's pipeline must keep PROCTOR's JSON report as a file artifact
 (<code>artifacts: paths</code>, not only <code>artifacts: reports: codequality</code>, which this endpoint cannot read), with <code>when: always</code> so
-a failing job still keeps it, and an <code>expire_in</code> longer than the gap between scans.</p>
+a failing job still keeps it, and an <code>expire_in</code> longer than the gap between scans. For apps that include
+Preflight's proctor component, that means Preflight 0.5.0 or later: the earlier components keep only the Code
+Quality report, so over CI every such app reads <code>none</code>. A pipeline with a proctor job of its own can add the
+artifact itself.</p>
 <p>Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
 <code>rollcall digest --out</code> asks for them.</p>
 <p>The decisions behind this shape (saved files over live calls, counts in public, one image source, the contract) are

@@ -25,9 +25,9 @@ and, when the app commits one, the result, Booster version and finish time of Bo
 scan, so you can see drift and an EOL burn-down over time. It prunes old snapshots after the retention window
 (default 90 days; the newest one always stays).
 
-Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
-the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The
-per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
+Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and `scan` and `report`
+exit `0` whatever the fleet looks like (only `rollcall owners`, a check of the owners file, exits `1`). The public
+report has totals only: counts and progress, no app names, owners or rankings. The per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
 
 <div align="center">
   <img src="docs/readme/register.svg" width="100%" alt="A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">
@@ -54,7 +54,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `owners`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve (see "The dashboard in a raw PHP app").
 - `src/Laravel/`: a Laravel adapter with a dashboard page (the Blade view, or an Inertia page in your own layout), a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
@@ -175,8 +175,9 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
   newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
   `--dry-run` lists what would go without deleting anything.
 
-Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: Rollcall
-does not gate anything.
+Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). Rollcall does not gate
+the fleet, so no command exits `1` over what the apps run. The one `1` is `rollcall owners`, while an app's owner is
+unknown: that is the register, not the fleet.
 
 ### Which command when
 
@@ -241,7 +242,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_POLICY_FILE` | Path to CREED's `policy.json` | none (required for `report`, `drift`) |
 | `ROLLCALL_STORE_DIR` | Snapshot directory, the only place Rollcall writes | `var/snapshots` |
 | `ROLLCALL_SOURCE` | `directory` (fixtures) or `gitlab` | `directory` |
-| `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none |
+| `ROLLCALL_REPOS_DIR` | Fixture repositories as `<group>/<project>/composer.{json,lock}`, plus `booster-hop.json` where an app has one | none |
 | `ROLLCALL_GITLAB_URL` | `https://` base URL of the GitLab instance | none |
 | `ROLLCALL_GITLAB_TOKEN` | A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed | none |
 | `ROLLCALL_GITLAB_GROUPS` | Comma-separated group ids or paths; subgroups are included. Ignored when ROLLCALL_GITLAB_PROJECTS is set | none |
@@ -274,9 +275,14 @@ To scan GitLab you need the token and either a group or the project allowlist. T
 group. Otherwise set `ROLLCALL_GITLAB_GROUPS`. The token is a GitLab bot or personal access token with `read_api`
 only and an expiry, whose user can read only the projects to scan; until it exists Rollcall runs on its fixtures.
 Set `ROLLCALL_SOURCE=gitlab` and the GitLab variables. The `rollcall-scan` job in `.gitlab-ci.yml` does this on a
-schedule or by hand (see below). Rollcall sends only `GET` and `HEAD`, fetches the two Composer files without
-cloning, skips a file whose blob id has not changed, follows `Link` pagination only to the configured host, and
-waits out `429 Retry-After`.
+schedule or by hand (see below). Rollcall sends only `GET` and `HEAD`, fetches the two Composer files and Booster's
+`booster-hop.json` without cloning, skips a Composer file whose blob id has not changed, follows `Link` pagination
+only to the configured host, and waits out `429 Retry-After`.
+
+PROCTOR results can come from GitLab CI too: with `ROLLCALL_PROCTOR_SOURCE=gitlab` the scan reads each project's
+`proctor.json` from its proctor job's artifact, with the same token. That needs apps whose CI keeps `proctor.json`
+as an artifact: Preflight 0.5.0 or later, or a proctor job of your own that does (see
+[docs/architecture.md](docs/architecture.md#where-proctor-results-come-from)). Elsewhere every app reads `none`.
 
 ### Run the collector in Docker
 
@@ -327,7 +333,7 @@ token; the allowlist `ROLLCALL_GITLAB_PROJECTS` keeps what Rollcall asks for to 
 group and never asks for another project). If your fleet needs a tighter fence, give a service account Reporter on
 just the projects to scan and use its token instead, because only membership limits what a token can read.
 
-Exactly which scope, and why each other scope stays off: `read_api` covers all five calls Rollcall makes (listed
+Exactly which scope, and why each other scope stays off: `read_api` covers every call Rollcall makes (listed
 one by one, with the role and the expiry rules, under "The GitLab token, exactly" in
 [docs/security.md](docs/security.md)). Not `api`, not `read_repository` (Rollcall never clones), not `read_user`,
 not `self_rotate` (the stack maintainer rotates the token, never Rollcall).
@@ -515,6 +521,7 @@ Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms togethe
 the component with the props the route sends and fails on any difference from the Blade page (elements, attributes
 and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y`
 checks the three Vue pages with the other six.
+
 ## Use Rollcall from your coding agent (ADVISOR)
 
 Rollcall ships a module for [ADVISOR](https://packagist.org/packages/waynestate/advisor), the stack's MCP server: three
@@ -578,8 +585,9 @@ run `composer docs`. Never edit `site/assets/docs.css` or `docs.js`: they are Sq
 Maintainers: how to build, test and release this project, and where its data comes from, is in [MAINTAINING.md](MAINTAINING.md).
 Why it is built this way is in [DECISIONS.md](DECISIONS.md) and the ADRs under [ADR/](ADR/).
 
-`composer ci` runs every check: manifest, tests (the contract suite among them), Pint, PHPStan, `composer audit`, a
-check that the front page versions table still matches CREED's policy, and a check that the docs site is current.
+`composer ci` runs every check: manifest, tests (the contract suite among them), Pint, the agent-ready files, a
+check that the docs site is current, a check that the front page's versions table and quick-start printout still
+match CREED's policy, PHPStan and `composer audit`.
 The contract itself is JSON Schema in [`contract/`](contract/README.md): the report, the stored snapshot and the
 image list export. `tests/ContractTest.php` runs the real commands on the fixtures and validates their output
 against it, so a field cannot appear or vanish without the contract changing in the same commit. PHP is not needed on the host:

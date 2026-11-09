@@ -144,5 +144,6 @@ Usage: `rollcall scan [--today TODAY] [--prune [PRUNE]]`
   newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
   `--dry-run` lists what would go without deleting anything.
 
-Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). There is no `1`: Rollcall
-does not gate anything.
+Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). Rollcall does not gate
+the fleet, so no command exits `1` over what the apps run. The one `1` is `rollcall owners`, while an app's owner is
+unknown: that is the register, not the fleet.

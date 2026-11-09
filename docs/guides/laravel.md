@@ -66,6 +66,7 @@ the component with the props the route sends and fails on any difference from th
 and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y`
 checks the three Vue pages with the other six.
 
+## The dashboard in a raw PHP app
 
 The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same
 report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:

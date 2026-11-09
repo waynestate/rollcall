@@ -34,7 +34,7 @@ through the REST API.
 |---|---|---|---|
 | `GET /api/v4/groups/:id/projects?include_subgroups=true&simple=true&archived=false&per_page=100` | `ROLLCALL_GITLAB_GROUPS` is set and `ROLLCALL_GITLAB_PROJECTS` is not | Lists the projects to scan, following `Link` pagination to the same host | `read_api` |
 | `GET /api/v4/projects/:id?simple=true` | `ROLLCALL_GITLAB_PROJECTS` is set (no group is listed) | Reads each named project's id and default branch | `read_api` |
-| `HEAD /api/v4/projects/:id/repository/files/:file_path?ref=` | Every scan, for `composer.json` and `composer.lock` | Reads the blob id only, so an unchanged file is not fetched again | `read_api` |
+| `HEAD /api/v4/projects/:id/repository/files/:file_path?ref=` | Every scan, for `composer.json`, `composer.lock` and `booster-hop.json` | Reads the blob id, so an unchanged Composer file is not fetched again (a 404 means the app has no such file) | `read_api` |
 | `GET /api/v4/projects/:id/repository/files/:file_path/raw?ref=` | When a file is new or changed | Reads the file's bytes, without cloning | `read_api` |
 | `GET /api/v4/projects/:id/pipelines?ref=&scope=finished&order_by=id&sort=desc&per_page=5` | `ROLLCALL_PROCTOR_SOURCE=gitlab`, once per project per scan | Finds the newest finished pipelines on the default branch, passed or failed | `read_api` (Reporter reads pipelines) |
 | `GET /api/v4/projects/:id/pipelines/:pipeline_id/jobs?per_page=100` | `ROLLCALL_PROCTOR_SOURCE=gitlab`, newest pipeline first until one ran the proctor job | Finds that pipeline's proctor job id, following `Link` pagination to the same host | `read_api` |
@@ -49,7 +49,7 @@ through the REST API.
 |---|---|
 | `api` | Read and write access to the whole API. Rollcall never writes, so a leaked `api` token would hand out powers Rollcall never uses |
 | `write_repository` | Push access. Rollcall never pushes |
-| `read_repository` | Git-over-HTTP pull. Rollcall never clones; it reads two files through the API, which `read_api` covers |
+| `read_repository` | Git-over-HTTP pull. Rollcall never clones; it reads single files through the API, which `read_api` covers |
 | `read_user` | The `/user` profile. Rollcall never reads a profile; the expiry note uses `personal_access_tokens/self` |
 | `read_registry`, `read_virtual_registry` | Container and package registries. Rollcall reads no images; the image tag comes from an export |
 | `self_rotate` | Lets the token rotate itself. The stack maintainer rotates the token, never Rollcall |
@@ -71,7 +71,9 @@ through the REST API.
 - **Who rotates it.** A role, not a person: the stack maintainer creates the replacement, updates the variable and
   revokes the old token before the expiry date. Rollcall only reminds.
 - **A refused token stops the scan.** A `401` or `403` ends the scan loudly with exit `2`, so a dead token never
-  produces a flattering partial roll.
+  produces a flattering partial roll. One `403` is not the token: with `ROLLCALL_PROCTOR_SOURCE=gitlab`, a `403` on
+  a project's pipeline list means CI/CD is off for that project (the same token has just read its files), so that
+  app has no PROCTOR report and the scan carries on.
 
 ## The scanner token and how to rotate it
 

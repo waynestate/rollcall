@@ -206,7 +206,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
 2026-11-09  4     1    2          1
 ```
 
-**exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
+**exit 0**, however the fleet looks. Neither command exits 1: Rollcall takes attendance, it does not hand out detention.
 
 - **`rollcall scan`**: Scans once and saves `<date>.json`. A second scan on the same day replaces it.
 - **`rollcall report`**: `--format=text|json|prometheus`. `--internal` adds the per-app list; keep that inside the project.
@@ -226,7 +226,7 @@ Call the sample roll from a checkout, with the bundled fixtures, and have the ag
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing and always exits 0.
+You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing: scan and report always exit 0.
 
 Read first:
 - https://rollcall.apps.wayne.edu/llms.txt, the index of Rollcall's pages, each one as Markdown. Work from them, not from memory.
@@ -318,7 +318,7 @@ Classroom rules
 ## For noticing who is missing, not for shaming them
 
 1. ### It enforces nothing.
-   It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever it finds.
+   It never opens an issue, leaves a comment or deploys anything, and its scan and report exit `0` whatever they find.
 2. ### The public report has totals only.
    Counts and progress. There are no app names, owners or rankings in it.
 3. ### It only reads.
@@ -334,7 +334,7 @@ Rollcall reads three sources plus CREED's policy, and writes one snapshot per sc
 
 - Repositories`composer.json` and `.lock`, from GitLab or a folder
 - App listthe PHP image each app runs
-- [PROCTOR](https://proctor.apps.wayne.edu/) one JSON report per app
+- [PROCTOR](https://proctor.apps.wayne.edu/) one JSON report per app, from a folder or CI
 - [CREED](https://creed.apps.wayne.edu/) `policy.json`, the dates
 
 Rollcall scans and compares

@@ -12,7 +12,7 @@ This page shows the moving parts. Next: [security notes](https://rollcall.apps.w
 
 A framework-free core (`src/`) plus thin entry points that hold no rules:
 
-- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
+- `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `owners`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
 - `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve. It prints the same renderer (`src/Dashboard/DashboardPage.php`) as the Laravel page, so the two cannot drift.
 - `resources/js/RollcallDashboard.vue`: the same dashboard as a Vue component for an Inertia app's own page. The Laravel adapter hands it the same report as props, and the CI job `dashboard-vue` fails it on any difference from the PHP renderer's markup.
@@ -26,7 +26,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 
 | Source | Interface | Adapters |
 | --- | --- | --- |
-| Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
+| Repositories (`composer.json`, `composer.lock`, `booster-hop.json`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports (the default); or, with `ROLLCALL_PROCTOR_SOURCE=gitlab`, each project's proctor job artifact in GitLab CI |
 
@@ -41,7 +41,7 @@ GitLab's one-call "artifact from the latest successful pipeline" endpoint is not
 
 In both readers a missing report is no report: the app's PROCTOR result is `none` and the scan carries on. Over CI that covers no pipeline yet, no proctor job in the newest five finished pipelines, a 404 for the file (never kept, or the artifact expired) and CI/CD turned off for the project (a 403 on its pipeline list). A file that is not a PROCTOR report becomes the note "PROCTOR report could not be read" for that app. Any other GitLab error is handled like every other call: a refused token stops the scan, 429 waits, anything else fails it.
 
-For the CI reader to find a report, the app's pipeline must keep PROCTOR's JSON report as a file artifact (`artifacts: paths`, not only `artifacts: reports: codequality`, which this endpoint cannot read), with `when: always` so a failing job still keeps it, and an `expire_in` longer than the gap between scans.
+For the CI reader to find a report, the app's pipeline must keep PROCTOR's JSON report as a file artifact (`artifacts: paths`, not only `artifacts: reports: codequality`, which this endpoint cannot read), with `when: always` so a failing job still keeps it, and an `expire_in` longer than the gap between scans. For apps that include Preflight's proctor component, that means Preflight 0.5.0 or later: the earlier components keep only the Code Quality report, so over CI every such app reads `none`. A pipeline with a proctor job of its own can add the artifact itself.
 
 Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when `rollcall digest --out` asks for them.
 

@@ -42,9 +42,9 @@
 <p>This page shows how the project is built, tested and released, and where changes land.</p>
 <p>Checks: <code>composer ci</code> (the same command runs on GitLab and GitHub).</p>
 <p>Maintainers: how to build, test and release this project, and where its data comes from, is in <a rel="noopener" href="https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md">MAINTAINING.md</a>.</p>
-<p><code>composer ci</code> runs every check: manifest, tests (the <a href="reference/contract.html">contract suite</a> among them), Pint,
-PHPStan, <code>composer audit</code>, a check that the front page versions table still matches CREED's policy, and a check that
-the docs site is current. PHP is not needed on the host:</p>
+<p><code>composer ci</code> runs every check: manifest, tests (the <a href="reference/contract.html">contract suite</a> among them), Pint, the
+agent-ready files, a check that the docs site is current, a check that the front page's versions table and
+quick-start printout still match CREED's policy, PHPStan and <code>composer audit</code>. PHP is not needed on the host:</p>
 <pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 </code></pre>
 <p>(On Windows PowerShell <code>${PWD}</code> works as written; in Git Bash use <code>$(pwd -W)</code> and set <code>MSYS_NO_PATHCONV=1</code>.)</p>

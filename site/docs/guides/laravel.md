@@ -45,6 +45,8 @@ Why this shape: the page is published because the layout is the app's, and the c
 
 The component renders what the Blade page shows inside `<main>`: the same WayneUI classes, the `role="status"` line, the captions and headers, and the per-app table only on the internal page (`<path>/apps`, still behind `rollcall.dashboard.internal_middleware` and `ROLLCALL_INTERNAL_ENABLED`). It has no style block, no style attribute and no script of its own, so it works under HELMET's CSP, and it takes its look from the app's WayneUI stylesheet. Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms together: `dashboard-vue` server-renders the component with the props the route sends and fails on any difference from the Blade page (elements, attributes and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y` checks the three Vue pages with the other six.
 
+## The dashboard in a raw PHP app[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
+
 The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
 
 ```php

@@ -387,6 +387,8 @@ EOL burn-down (state on each scan day)
 DATE        APPS  EOL  SUPPORTED  UNKNOWN
 2026-11-09  4     1    2          1</pre><!-- quickstart-versions:end -->
           <p class="printout__foot"><strong>exit 0</strong>, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.</p>
+2026-10-28  4     1    2          1</pre><!-- quickstart-versions:end -->
+          <p class="printout__foot"><strong>exit 0</strong>, however the fleet looks. Neither command exits 1: Rollcall takes attendance, it does not hand out detention.</p>
         </div>
         </div>
 
@@ -428,7 +430,7 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
               <p class="ar-prompt__desc">Call the sample roll from a checkout, with the bundled fixtures, and have the agent read the report back to you.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing and always exits 0.
+          <pre class="ar-prompt__text"><code>You are a coding agent helping a Wayne State University developer try Rollcall, the fleet scanner of WELD, the Wayne State application stack. Rollcall reads each app's composer.json and composer.lock, its PHP image and its PROCTOR report, and checks every version against CREED's policy.json by date. It enforces nothing: scan and report always exit 0.
 
 Read first:
 - https://rollcall.apps.wayne.edu/llms.txt, the index of Rollcall's pages, each one as Markdown. Work from them, not from memory.
@@ -533,7 +535,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
       <div class="chapter__body">
         <h2 id="rules-title">For noticing who is missing, not for shaming them</h2>
         <ol class="rules">
-          <li class="reveal"><h3>It enforces nothing.</h3><p>It never opens an issue, leaves a comment or deploys anything, and it exits <code>0</code> whatever it finds.</p></li>
+          <li class="reveal"><h3>It enforces nothing.</h3><p>It never opens an issue, leaves a comment or deploys anything, and its scan and report exit <code>0</code> whatever they find.</p></li>
           <li class="reveal"><h3>The public report has totals only.</h3><p>Counts and progress. There are no app names, owners or rankings in it.</p></li>
           <li class="reveal"><h3>It only reads.</h3><p><code>GET</code> and <code>HEAD</code> only, and a test fails if a write verb shows up in <code>src/</code>. It writes its own snapshot folder, and digest files only when you ask.</p></li>
           <li class="reveal"><h3>Metrics stay off until you turn them on.</h3><p>Once they're on, <code>/metrics</code> needs a bearer token or an allowed address. If neither is set, nobody gets in.</p></li>
@@ -556,7 +558,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
           <ul class="flow__col">
             <li class="card"><span class="card__k">Repositories</span><span class="card__v"><code>composer.json</code> and <code>.lock</code>, from GitLab or a folder</span></li>
             <li class="card"><span class="card__k">App list</span><span class="card__v">the PHP image each app runs</span></li>
-            <li class="card card--part"><img src="assets/marks/proctor.png" width="36" height="36" alt=""><span><span class="card__k"><a class="part-link" href="https://proctor.apps.wayne.edu/">PROCTOR</a></span><span class="card__v">one JSON report per app</span></span></li>
+            <li class="card card--part"><img src="assets/marks/proctor.png" width="36" height="36" alt=""><span><span class="card__k"><a class="part-link" href="https://proctor.apps.wayne.edu/">PROCTOR</a></span><span class="card__v">one JSON report per app, from a folder or CI</span></span></li>
             <li class="card card--part"><img src="assets/marks/creed.png" width="36" height="36" alt=""><span><span class="card__k"><a class="part-link" href="https://creed.apps.wayne.edu/">CREED</a></span><span class="card__v"><code>policy.json</code>, the dates</span></span></li>
           </ul>
           <span class="flow__wire" aria-hidden="true"></span>

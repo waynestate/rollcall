@@ -32,7 +32,7 @@
                     "`directory`"
                 ],
                 "ROLLCALL_REPOS_DIR": [
-                    "Fixture repositories as `<group>/<project>/composer.{json,lock}`",
+                    "Fixture repositories as `<group>/<project>/composer.{json,lock}`, plus `booster-hop.json` where an app has one",
                     "none"
                 ],
                 "ROLLCALL_GITLAB_URL": [

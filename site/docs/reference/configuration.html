@@ -204,7 +204,7 @@
 </tr>
 <tr>
 <td>ROLLCALL_REPOS_DIR</td>
-<td>Fixture repositories as <code>&lt;group&gt;/&lt;project&gt;/composer.{json,lock}</code></td>
+<td>Fixture repositories as <code>&lt;group&gt;/&lt;project&gt;/composer.{json,lock}</code>, plus <code>booster-hop.json</code> where an app has one</td>
 <td>none</td>
 <td>config/rollcall.php</td>
 </tr>
@@ -247,9 +247,12 @@ over the bare <code>wayne-cas</code> entry.</p>
 group. Otherwise set <code>ROLLCALL_GITLAB_GROUPS</code>. The token is a GitLab bot or personal access token with <code>read_api</code>
 only and an expiry, whose user can read only the projects to scan; until it exists Rollcall runs on its fixtures.
 Set <code>ROLLCALL_SOURCE=gitlab</code> and the GitLab variables. The <code>rollcall-scan</code> job in <code>.gitlab-ci.yml</code> does this on a
-schedule or by hand. Rollcall sends only <code>GET</code> and <code>HEAD</code>, fetches the two Composer files without cloning, skips a
-file whose blob id has not changed, follows <code>Link</code> pagination only to the configured host, and waits out
-<code>429 Retry-After</code>.</p>
+schedule or by hand. Rollcall sends only <code>GET</code> and <code>HEAD</code>, fetches the two Composer files and Booster's
+<code>booster-hop.json</code> without cloning, skips a Composer file whose blob id has not changed, follows <code>Link</code> pagination
+only to the configured host, and waits out <code>429 Retry-After</code>.</p>
+<p>With <code>ROLLCALL_PROCTOR_SOURCE=gitlab</code> the same token reads each project's <code>proctor.json</code> from its proctor job's
+artifact. Only apps whose CI keeps that file as an artifact have one to read: Preflight 0.5.0 or later, or a proctor
+job of their own that does. See <a href="../architecture.html#where-proctor-results-come-from">where PROCTOR results come from</a>.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/commands.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Commands</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/scripts.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Scripts on every OS</span></a></nav>

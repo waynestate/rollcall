@@ -19,9 +19,9 @@ and, when the app commits one, the result, Booster version and finish time of Bo
 scan, so you can see drift and an EOL burn-down over time. It prunes old snapshots after the retention window
 (default 90 days; the newest one always stays).
 
-Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and it exits `0` whatever
-the fleet looks like. The public report has totals only: counts and progress, no app names, owners or rankings. The
-per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
+Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys anything, and `scan` and `report`
+exit `0` whatever the fleet looks like (only `rollcall owners`, a check of the owners file, exits `1`). The public
+report has totals only: counts and progress, no app names, owners or rankings. The per-app list is internal. Like a good attendance sheet, it is for noticing who is missing, not for shaming them.
 
 <div align="center">
   <img src="readme/register.svg" width="100%" alt="A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.">

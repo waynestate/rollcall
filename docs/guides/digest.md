@@ -89,6 +89,7 @@ What counts as a change, app by app:
 
 - the PHP image moved (a move from end of life to a supported PHP says so, with a well-earned "Present!");
 - the declared PHP floor, the Laravel version or the PROCTOR result changed;
+- a forced image upgrade date from [Citadel's export](citadel.md) appeared, moved or went away;
 - a drift flag appeared ("now runs an end-of-life Laravel") or cleared ("no longer has a failing PROCTOR result"),
   including one that appears because a date in CREED's policy passed;
 - an app answered present for the first time, or was in the last scan and is not in this one.

@@ -384,8 +384,9 @@ names and counts only: no app ids.</li>
 newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
 <code>--dry-run</code> lists what would go without deleting anything.</li>
 </ul>
-<p>Exit codes: <code>0</code> ok, <code>2</code> tool error (bad option, unreadable policy, a source that refused). There is no <code>1</code>: Rollcall
-does not gate anything.</p>
+<p>Exit codes: <code>0</code> ok, <code>2</code> tool error (bad option, unreadable policy, a source that refused). Rollcall does not gate
+the fleet, so no command exits <code>1</code> over what the apps run. The one <code>1</code> is <code>rollcall owners</code>, while an app's owner is
+unknown: that is the register, not the fleet.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/advisor.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Use Rollcall from your coding agent (ADVISOR)</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/configuration.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Configuration</span></a></nav>

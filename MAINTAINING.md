@@ -7,8 +7,9 @@ That somebody is you.
 
 ## What Rollcall is and what it depends on
 
-- `waynestate/rollcall` on Packagist, with the CLI `bin/rollcall` (`scan`, `report`) and an optional Laravel
-  provider. Metrics in Prometheus format, off by default.
+- `waynestate/rollcall` on Packagist, with the CLI `bin/rollcall` (`scan`, `report`, `digest`, `owners`, `drift`,
+  `advisories`, `prune`), an optional Laravel provider (the Blade dashboard or an Inertia app's own Vue page), and
+  `rollcall_dashboard()` for a raw PHP app. Metrics in Prometheus format, off by default.
 - Runtime dependencies: `symfony/console`, `symfony/http-client`, `composer/semver`, `nyholm/psr7`,
   `promphp/prometheus_client_php`, PSR interfaces. No other stack package at runtime (WayneUI is suggested for the
   dashboard).
@@ -46,13 +47,16 @@ With only Docker:
 docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
 ```
 
-`composer ci` runs `composer validate --strict`, PHPUnit, Pint, PHPStan, `composer audit` and the front page
-versions table check. It does not run the CREED copy check, which needs a CREED checkout (it exits 2 without
+`composer ci` runs `composer validate --strict`, PHPUnit, Pint, the agent-ready check, the docs check, the front
+page check (versions table and quick-start printout), PHPStan and `composer audit`. It does not run the CREED copy check, which needs a CREED checkout (it exits 2 without
 `CREED_PATH`).
 
 ## CI
 
-- **GitLab:** Preflight's `php-test` (PHP 8.3, 8.4, 8.5) and `composer-audit` components, plus a `composer-ci` job.
+- **GitLab:** Preflight 0.4.0's `php-test` (PHP 8.3, 8.4, 8.5), `composer-audit`, `proctor` (on `deploy/`) and
+  `a11y` components (`a11y-site` and `dashboard-a11y`), plus the `composer-ci`, `wayneui-copies`,
+  `dashboard-render` and `dashboard-vue` jobs. `rollcall-scan` and `creed-copy-refresh` run only on their
+  schedules or by hand.
 - **GitHub:** `.github/workflows/ci.yml` calls Preflight's reusable workflow with `composer ci`.
 - Green means `composer ci` passed on all three PHP versions on both.
 
@@ -100,8 +104,9 @@ expires on a yearly cycle too, so one sitting can do both.
 ## Public output stays anonymous
 
 The per-app list a scan produces is internal data. Nothing in this repo (fixtures, docs, screenshots) may name a real
-app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in the JSON. Exit codes are 0 or 2, never
-1, so a scan never looks like a failed build.
+app, owner or finding, and a test refuses `rank`, `owner` or `score` fields in the JSON. `scan` and `report` exit 0
+or 2, never 1, so a scan never looks like a failed build. The one exit 1 is `rollcall owners`, on purpose: an app
+with no confirmed owner turns the weekly scan job red.
 
 ## Smoke test on every OS
 
@@ -228,5 +233,5 @@ Run the gates after any change under `site/`, the dashboard view or its renderer
 
 ## Who maintains it
 
-Adam Perkins, Wayne State University Enterprise Applications. Internal runbook (accounts, tokens, mirrors, scan
+The stack maintainer (a role, not a named person), Wayne State University Enterprise Applications. Internal runbook (accounts, tokens, mirrors, scan
 access): ask Enterprise Applications.
