@@ -189,7 +189,7 @@ What comes back real output, Rollcall 0.1, bundled fixtures (four demo apps)
 ```
 Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
 
-ROLLCALL 0.1.10 | scan 2026-10-28 | as of 2026-10-28 | public
+ROLLCALL 1.0.0 | scan 2026-10-28 | as of 2026-10-28 | public
 Apps present: 4 (scan notes: 0)
 
 PHP image
