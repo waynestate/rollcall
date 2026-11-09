@@ -17,7 +17,7 @@ Maintainers: how to build, test and release this project, and where its data com
 `composer ci` runs every check: manifest, tests (the [contract suite](https://rollcall.apps.wayne.edu/docs/reference/contract.html) among them), Pint, the agent-ready files, a check that the docs site is current, a check that the front page's versions table and quick-start printout still match CREED's policy, PHPStan and `composer audit`. PHP is not needed on the host:
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c "composer install --no-interaction && composer ci"
 ```
 
 (On Windows PowerShell `${PWD}` works as written; in Git Bash use `$(pwd -W)` and set `MSYS_NO_PATHCONV=1`.)

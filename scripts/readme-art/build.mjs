@@ -144,12 +144,17 @@ function buildBadges() {
   console.log("badges:");
   const composer = JSON.parse(readFileSync(path.join(repoRoot, "composer.json"), "utf8"));
   const readme = readFileSync(path.join(repoRoot, "README.md"), "utf8");
-  // The exit-code contract, as the README states it: "`0` ok, `2` tool error".
-  const exits = /Exit codes: `(\d)` ok, `(\d)` tool error/.exec(readme);
+  // The exit-code contract, as the README states it:
+  // "`0` ok, `1` owner unknown (`rollcall owners` only), `2` tool error".
+  const exits = /Exit codes: `(\d)` ok, `(\d)` owner unknown [^,]*, `(\d)` tool error/.exec(readme);
   const defs = [
     { key: "php", label: "php", message: composer.require.php },
-    { key: "license", label: "licence", message: composer.license },
-    { key: "exit-codes", label: "exit codes", message: exits ? `${exits[1]} ok, ${exits[2]} error` : "" },
+    { key: "license", label: "license", message: composer.license },
+    {
+      key: "exit-codes",
+      label: "exit codes",
+      message: exits ? `${exits[1]} ok, ${exits[2]} owner unknown, ${exits[3]} error` : "",
+    },
   ];
   for (const d of defs) {
     if (!d.message) fail(`no fact to badge for "${d.key}"`);

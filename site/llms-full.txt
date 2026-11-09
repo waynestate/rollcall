@@ -171,9 +171,11 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
   newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data.
   `--dry-run` lists what would go without deleting anything.
 
-Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). Rollcall does not gate
-the fleet, so no command exits `1` over what the apps run. The one `1` is `rollcall owners`, while an app's owner is
-unknown: that is the register, not the fleet.
+Exit codes: `0` ok, `1` owner unknown (`rollcall owners` only), `2` tool error (a bad option value, an unreadable
+policy, a source that refused). Rollcall does not gate the fleet, so no command exits `1` over what the apps run:
+`rollcall owners` exits `1` while an app's owner is unknown, and that is the register, not the fleet. A misspelled
+command or an option the CLI does not know never reaches Rollcall: the console library prints the usage and exits
+`1`.
 
 #### Which command when
 
@@ -587,7 +589,7 @@ image list export. `tests/ContractTest.php` runs the real commands on the fixtur
 against it, so a field cannot appear or vanish without the contract changing in the same commit. PHP is not needed on the host:
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c "composer install --no-interaction && composer ci"
 ```
 
 (On Windows PowerShell `${PWD}` works as written; in Git Bash use `$(pwd -W)` and set `MSYS_NO_PATHCONV=1`.)
@@ -1056,7 +1058,7 @@ Maintainers: how to build, test and release this project, and where its data com
 `composer ci` runs every check: manifest, tests (the [contract suite](https://rollcall.apps.wayne.edu/docs/reference/contract.html) among them), Pint, the agent-ready files, a check that the docs site is current, a check that the front page's versions table and quick-start printout still match CREED's policy, PHPStan and `composer audit`. PHP is not needed on the host:
 
 ```
-docker run --rm -v "${PWD}:/app" -w /app composer:2.10.3 sh -c "composer install --no-interaction && composer ci"
+docker run --rm -v "${PWD}:/app" -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c "composer install --no-interaction && composer ci"
 ```
 
 (On Windows PowerShell `${PWD}` works as written; in Git Bash use `$(pwd -W)` and set `MSYS_NO_PATHCONV=1`.)
@@ -1686,7 +1688,7 @@ Usage: `rollcall scan [--today TODAY] [--prune [PRUNE]]`
 - `advisories` checks each app's locked `laravel/framework` and auth-package versions against a saved Packagist security-advisories response (for example `https://packagist.org/api/security-advisories/?packages[]=laravel/framework` saved to a file). One line per package and version, sorted by package then version: the status (`affected`, `clear` or `no data`), the count and the advisory ids, and how many apps hold that pair. A package with no advisory data prints `no data`, never `safe`: an absent row proves nothing about the package, and a version nobody can parse says `no data` too. Rollcall does not fetch that page itself; a person saves it and `--feed` points at the file. Output is package names and counts only: no app ids.
 - `prune` deletes snapshots older than `--days` (default: `ROLLCALL_RETENTION_DAYS`, 90; 0 keeps everything). The newest snapshot is never deleted, even if it is older than the cut-off, so the dashboard always has data. `--dry-run` lists what would go without deleting anything.
 
-Exit codes: `0` ok, `2` tool error (bad option, unreadable policy, a source that refused). Rollcall does not gate the fleet, so no command exits `1` over what the apps run. The one `1` is `rollcall owners`, while an app's owner is unknown: that is the register, not the fleet.
+Exit codes: `0` ok, `1` owner unknown (`rollcall owners` only), `2` tool error (a bad option value, an unreadable policy, a source that refused). Rollcall does not gate the fleet, so no command exits `1` over what the apps run: `rollcall owners` exits `1` while an app's owner is unknown, and that is the register, not the fleet. A misspelled command or an option the CLI does not know never reaches Rollcall: the console library prints the usage and exits `1`.
 
 ---
 

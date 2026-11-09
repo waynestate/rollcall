@@ -45,7 +45,7 @@
 <p><code>composer ci</code> runs every check: manifest, tests (the <a href="reference/contract.html">contract suite</a> among them), Pint, the
 agent-ready files, a check that the docs site is current, a check that the front page's versions table and
 quick-start printout still match CREED's policy, PHPStan and <code>composer audit</code>. PHP is not needed on the host:</p>
-<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.10.3 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
+<pre tabindex="0"><code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 sh -c &quot;composer install --no-interaction &amp;&amp; composer ci&quot;
 </code></pre>
 <p>(On Windows PowerShell <code>${PWD}</code> works as written; in Git Bash use <code>$(pwd -W)</code> and set <code>MSYS_NO_PATHCONV=1</code>.)</p>
 <p>The GitLab pipeline (<code>.gitlab-ci.yml</code>) and the GitHub workflow (<code>.github/workflows/ci.yml</code>) both wrap <code>composer ci</code>,
