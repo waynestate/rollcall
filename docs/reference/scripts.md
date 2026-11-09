@@ -44,6 +44,7 @@ and owns them (`deploy/.squire.json`):
 |---|---|
 | `deploy/build.sh` | At image build time, as root, with `/bin/sh` |
 | `deploy/deployments/001-first-release.sh` | Once, when the first release starts |
+| `deploy/.squire/portable/squire-entrypoint.sh` | Each time the portable image starts (OpenShift, Coolify, raw Docker), as the container entrypoint |
 | `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
 
 ## Inside GitLab CI only
