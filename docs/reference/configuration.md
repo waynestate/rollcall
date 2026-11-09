@@ -32,7 +32,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_OWNERS_CONFIRM_DAYS | How long an owners-file entry's "confirmed" date counts; past it, `rollcall owners` calls that owner unknown and exits 1 | `365` (0 turns the check off) | src/Config.php |
 | ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
-| ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group__project.json | none | config/rollcall.php |
+| ROLLCALL_PROCTOR_ARTIFACT | ROLLCALL_PROCTOR_SOURCE=gitlab: the PROCTOR --format=json report's path inside that job's artifact | `proctor.json` | config/rollcall.php |
+| ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group__project.json. Not read when ROLLCALL_PROCTOR_SOURCE is gitlab | none | config/rollcall.php |
+| ROLLCALL_PROCTOR_JOB | ROLLCALL_PROCTOR_SOURCE=gitlab: the CI job whose artifact holds the report; set it when Preflight's proctor component is included with another job_name | `proctor` | config/rollcall.php |
+| ROLLCALL_PROCTOR_SOURCE | Where PROCTOR reports come from: directory (ROLLCALL_PROCTOR_DIR) or gitlab (each project's proctor job artifact from its newest finished default-branch pipeline, read with the same read_api token and GitLab settings). See the architecture page | `directory` | config/rollcall.php |
 | ROLLCALL_PUBLIC_REPORT_ENABLED | Serve GET /report.json (public counts only) | `false` | config/rollcall.php |
 | ROLLCALL_REPOS_DIR | Fixture repositories as `<group>/<project>/composer.{json,lock}` | none | config/rollcall.php |
 | ROLLCALL_RETENTION_DAYS | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) | config/rollcall.php |

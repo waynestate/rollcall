@@ -23,6 +23,9 @@ final class TokenScopeDocsTest extends TestCase
         $paths = [];
         foreach ($m[0] as $path) {
             $path = preg_replace('#(files/)%[sd]#', '$1:file_path', $path) ?? $path;
+            $path = preg_replace('#(pipelines/)%d#', '$1:pipeline_id', $path) ?? $path;
+            $path = preg_replace('#(jobs/)%d#', '$1:job_id', $path) ?? $path;
+            $path = preg_replace('#(artifacts/)%s#', '$1:artifact_path', $path) ?? $path;
             $paths[] = preg_replace('#%[sd]#', ':id', $path) ?? $path;
         }
 
@@ -34,7 +37,7 @@ final class TokenScopeDocsTest extends TestCase
         $docs = (string) file_get_contents(self::ROOT . '/docs/security.md');
         $paths = $this->apiPaths();
 
-        $this->assertGreaterThanOrEqual(4, count($paths), 'the adapter should build its paths from literals');
+        $this->assertGreaterThanOrEqual(7, count($paths), 'the adapter should build its paths from literals');
         foreach ($paths as $path) {
             $this->assertStringContainsString($path, $docs, $path . ' is called but not in docs/security.md');
         }

@@ -38,6 +38,11 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
 
     private const MAX_RETRY_WAIT = 120;
 
+    /** How many finished default-branch pipelines jobArtifact() looks through for the named job. */
+    private const PIPELINE_LOOKBACK = 5;
+
+    private const MAX_JOB_PAGES = 10;
+
     /** @var array<string, array{id: int, ref: string}>|null */
     private ?array $catalogue = null;
 
@@ -110,6 +115,119 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
         $this->expectOk($raw);
 
         return RepoFile::found((string) $raw->getBody(), $blob !== '' ? $blob : null);
+    }
+
+    /**
+     * One file from the artifacts of a project's newest finished `$job` job on
+     * its default branch, or null when there is none to read.
+     *
+     * Why not GitLab's one-call `jobs/artifacts/:ref/raw/:path?job=` endpoint:
+     * it serves only the latest *successful* pipeline. A PROCTOR job that fails
+     * fails its pipeline, so that endpoint would show a failing app's last
+     * passing report (or none) and the fleet would look better than it is. So
+     * this walks the newest finished pipelines on the default branch instead,
+     * takes the named job whether it passed or failed, and reads its file by
+     * job id: usually three requests, and the answer is the one PROCTOR gave.
+     *
+     * Null, never an exception, for everything that means "no report here":
+     * an unknown project, an empty repository, no finished pipeline, no job of
+     * that name in the newest few, a 404 for the file (never written, or the
+     * artifact expired), a file over $maxBytes, and a 403 on the pipeline list
+     * (CI/CD is turned off for that project; the token itself has already read
+     * the project's files in this scan, so it is not the token). Any other
+     * refusal or error is handled as every other call here: 401 and 403 stop
+     * the scan loudly, 429 waits, anything else not 2xx is an error.
+     */
+    public function jobArtifact(string $project, string $job, string $path, int $maxBytes): ?string
+    {
+        $entry = $this->catalogue()[$project] ?? null;
+        if ($entry === null || $entry['ref'] === 'HEAD') {
+            return null;
+        }
+        $pipelines = $this->send('GET', sprintf(
+            '%s/api/v4/projects/%d/pipelines?ref=%s&scope=finished&order_by=id&sort=desc&per_page=%d',
+            $this->origin(),
+            $entry['id'],
+            rawurlencode($entry['ref']),
+            self::PIPELINE_LOOKBACK,
+        ));
+        if ($pipelines->getStatusCode() === 403 || $pipelines->getStatusCode() === 404) {
+            return null;
+        }
+        $this->expectOk($pipelines);
+
+        foreach ($this->decodeList((string) $pipelines->getBody()) as $pipeline) {
+            if (! is_int($pipeline['id'] ?? null)) {
+                continue;
+            }
+            $jobId = $this->finishedJob($entry['id'], $pipeline['id'], $job);
+            if ($jobId === null) {
+                continue; // this pipeline never ran the job (a docs-only rule, say); try the one before it
+            }
+            $file = $this->send('GET', sprintf(
+                '%s/api/v4/projects/%d/jobs/%d/artifacts/%s',
+                $this->origin(),
+                $entry['id'],
+                $jobId,
+                implode('/', array_map('rawurlencode', explode('/', $path))),
+            ));
+            if ($file->getStatusCode() === 404) {
+                return null; // expired or never written; an older pipeline's copy would be older still
+            }
+            $this->expectOk($file);
+
+            return $this->bounded($file, $maxBytes);
+        }
+
+        return null;
+    }
+
+    /** The id of the named job in one pipeline when it passed or failed, or null. */
+    private function finishedJob(int $projectId, int $pipelineId, string $job): ?int
+    {
+        $next = sprintf(
+            '%s/api/v4/projects/%d/pipelines/%d/jobs?per_page=100',
+            $this->origin(),
+            $projectId,
+            $pipelineId,
+        );
+        $found = null;
+        for ($page = 0; $next !== null && $page < self::MAX_JOB_PAGES; $page++) {
+            $response = $this->send('GET', $next);
+            if ($response->getStatusCode() === 404) {
+                return null;
+            }
+            $this->expectOk($response);
+            foreach ($this->decodeList((string) $response->getBody()) as $candidate) {
+                if (
+                    ($candidate['name'] ?? null) === $job
+                    && in_array($candidate['status'] ?? null, ['success', 'failed'], true)
+                    && is_int($candidate['id'] ?? null)
+                    && ($found === null || $candidate['id'] > $found)
+                ) {
+                    $found = $candidate['id'];
+                }
+            }
+            $next = $this->nextLink($response);
+        }
+
+        return $found;
+    }
+
+    /** The body, or null when it is larger than $maxBytes (read no further than one byte past it). */
+    private function bounded(ResponseInterface $response, int $maxBytes): ?string
+    {
+        $body = $response->getBody();
+        $content = '';
+        while (! $body->eof() && strlen($content) <= $maxBytes) {
+            $chunk = $body->read(65536);
+            if ($chunk === '') {
+                break;
+            }
+            $content .= $chunk;
+        }
+
+        return strlen($content) > $maxBytes ? null : $content;
     }
 
     /**
@@ -208,10 +326,10 @@ final class GitLabRepositorySource implements RepositorySource, TokenExpiry
         try {
             $data = json_decode($body, true, 16, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
-            throw new RollcallException('GitLab sent a project list that is not JSON.');
+            throw new RollcallException('GitLab sent a list (projects, pipelines or jobs) that is not JSON.');
         }
         if (! is_array($data)) {
-            throw new RollcallException('GitLab sent an unexpected project list.');
+            throw new RollcallException('GitLab sent an unexpected list (projects, pipelines or jobs).');
         }
 
         return array_values(array_filter($data, 'is_array'));

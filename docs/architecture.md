@@ -33,7 +33,34 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
-| PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
+| PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports (the default); or, with `ROLLCALL_PROCTOR_SOURCE=gitlab`, each project's proctor job artifact in GitLab CI |
+
+### Where PROCTOR results come from
+
+Rollcall never runs PROCTOR. It reads the JSON report PROCTOR already wrote (`proctor check --format=json`), from
+one of two places, chosen by `ROLLCALL_PROCTOR_SOURCE`:
+
+- `directory` (the default): `ROLLCALL_PROCTOR_DIR`, one file per app, `group/project` read from
+  `group__project.json`. The fixtures and any shared folder a pipeline copies reports into use this.
+- `gitlab`: the report straight from CI, with the same `read_api` token and GitLab adapter as the scan
+  (`ROLLCALL_GITLAB_URL` and the groups or projects must be set even when the repositories come from a directory).
+  For each project Rollcall lists the newest finished pipelines on the default branch, takes the newest one that ran
+  the `proctor` job (`ROLLCALL_PROCTOR_JOB`), whether that job passed or failed, and reads `proctor.json`
+  (`ROLLCALL_PROCTOR_ARTIFACT`) from the job's artifact by job id. Three reads per project, usually; every call is
+  listed in [security notes](security.md#every-call-rollcall-makes).
+
+GitLab's one-call "artifact from the latest successful pipeline" endpoint is not used on purpose: a failing PROCTOR
+job fails its pipeline, so that endpoint would show a failing app's last passing report, or none.
+
+In both readers a missing report is no report: the app's PROCTOR result is `none` and the scan carries on. Over CI
+that covers no pipeline yet, no proctor job in the newest five finished pipelines, a 404 for the file (never kept, or
+the artifact expired) and CI/CD turned off for the project (a 403 on its pipeline list). A file that is not a PROCTOR
+report becomes the note "PROCTOR report could not be read" for that app. Any other GitLab error is handled like every
+other call: a refused token stops the scan, 429 waits, anything else fails it.
+
+For the CI reader to find a report, the app's pipeline must keep PROCTOR's JSON report as a file artifact
+(`artifacts: paths`, not only `artifacts: reports: codequality`, which this endpoint cannot read), with `when: always` so
+a failing job still keeps it, and an `expire_in` longer than the gap between scans.
 
 Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
 `rollcall digest --out` asks for them.

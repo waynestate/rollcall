@@ -36,6 +36,9 @@ through the REST API.
 | `GET /api/v4/projects/:id?simple=true` | `ROLLCALL_GITLAB_PROJECTS` is set (no group is listed) | Reads each named project's id and default branch | `read_api` |
 | `HEAD /api/v4/projects/:id/repository/files/:file_path?ref=` | Every scan, for `composer.json` and `composer.lock` | Reads the blob id only, so an unchanged file is not fetched again | `read_api` |
 | `GET /api/v4/projects/:id/repository/files/:file_path/raw?ref=` | When a file is new or changed | Reads the file's bytes, without cloning | `read_api` |
+| `GET /api/v4/projects/:id/pipelines?ref=&scope=finished&order_by=id&sort=desc&per_page=5` | `ROLLCALL_PROCTOR_SOURCE=gitlab`, once per project per scan | Finds the newest finished pipelines on the default branch, passed or failed | `read_api` (Reporter reads pipelines) |
+| `GET /api/v4/projects/:id/pipelines/:pipeline_id/jobs?per_page=100` | `ROLLCALL_PROCTOR_SOURCE=gitlab`, newest pipeline first until one ran the proctor job | Finds that pipeline's proctor job id, following `Link` pagination to the same host | `read_api` |
+| `GET /api/v4/projects/:id/jobs/:job_id/artifacts/:artifact_path` | `ROLLCALL_PROCTOR_SOURCE=gitlab`, when a proctor job was found | Reads the one report file (`proctor.json`) from that job's artifact; 404 means no report | `read_api` (Reporter reads job artifacts) |
 | `GET /api/v4/personal_access_tokens/self` | Every scan | Reads the token's own expiry date for the 14-day note (advisory) | any valid token |
 
 `tests/TokenScopeDocsTest.php` fails if the GitLab adapter calls an API path this table does not list.

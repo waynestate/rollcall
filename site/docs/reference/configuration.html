@@ -173,9 +173,27 @@
 <td>config/rollcall.php</td>
 </tr>
 <tr>
+<td>ROLLCALL_PROCTOR_ARTIFACT</td>
+<td>ROLLCALL_PROCTOR_SOURCE=gitlab: the PROCTOR --format=json report's path inside that job's artifact</td>
+<td><code>proctor.json</code></td>
+<td>config/rollcall.php</td>
+</tr>
+<tr>
 <td>ROLLCALL_PROCTOR_DIR</td>
-<td>PROCTOR JSON reports, one per app: group/project is read from group__project.json</td>
+<td>PROCTOR JSON reports, one per app: group/project is read from group__project.json. Not read when ROLLCALL_PROCTOR_SOURCE is gitlab</td>
 <td>none</td>
+<td>config/rollcall.php</td>
+</tr>
+<tr>
+<td>ROLLCALL_PROCTOR_JOB</td>
+<td>ROLLCALL_PROCTOR_SOURCE=gitlab: the CI job whose artifact holds the report; set it when Preflight's proctor component is included with another job_name</td>
+<td><code>proctor</code></td>
+<td>config/rollcall.php</td>
+</tr>
+<tr>
+<td>ROLLCALL_PROCTOR_SOURCE</td>
+<td>Where PROCTOR reports come from: directory (ROLLCALL_PROCTOR_DIR) or gitlab (each project's proctor job artifact from its newest finished default-branch pipeline, read with the same read_api token and GitLab settings). See the architecture page</td>
+<td><code>directory</code></td>
 <td>config/rollcall.php</td>
 </tr>
 <tr>

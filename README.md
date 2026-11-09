@@ -81,7 +81,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 |---|---|---|
 | Repositories (`composer.json`, `composer.lock`, `booster-hop.json`) | `RepositorySource` | a directory of fixtures; GitLab over PSR-18, tested against recorded responses |
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
-| PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports |
+| PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports (the default); or, with `ROLLCALL_PROCTOR_SOURCE=gitlab`, each project's proctor job artifact in GitLab CI (see [docs/architecture.md](docs/architecture.md#where-proctor-results-come-from)) |
 
 Rollcall only reads from every source. It writes its own snapshot directory, and digest files only when
 `rollcall digest --out` asks for them.
@@ -248,7 +248,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_GITLAB_PROJECTS` | Comma-separated full `group/project` paths; when set, only those projects are scanned and no group is listed | none |
 | `ROLLCALL_IMAGES_FILE` | Export of the app list: `{"apps": [{"project": "group/project", "image": "php:8.4-apache"}]}` | none |
 | `ROLLCALL_CITADEL_EXPORT` | Citadel's saved registrations export, used instead of `ROLLCALL_IMAGES_FILE` (not both): base images plus forced upgrade dates. See [docs/guides/citadel.md](docs/guides/citadel.md) | none |
-| `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json` | none |
+| `ROLLCALL_PROCTOR_SOURCE` | Where PROCTOR reports come from: `directory` (`ROLLCALL_PROCTOR_DIR`) or `gitlab` (each project's proctor job artifact from its newest finished default-branch pipeline, with the same `read_api` token and GitLab settings) | `directory` |
+| `ROLLCALL_PROCTOR_DIR` | PROCTOR JSON reports, one per app: `group/project` is read from `group__project.json`. Not read when `ROLLCALL_PROCTOR_SOURCE` is `gitlab` | none |
+| `ROLLCALL_PROCTOR_JOB` | `ROLLCALL_PROCTOR_SOURCE=gitlab`: the CI job whose artifact holds the report; set it when Preflight's proctor component is included with another `job_name` | `proctor` |
+| `ROLLCALL_PROCTOR_ARTIFACT` | `ROLLCALL_PROCTOR_SOURCE=gitlab`: the PROCTOR `--format=json` report's path inside that job's artifact | `proctor.json` |
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
 | `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Rollcall's own, for the stack's projects, is `owners.json` in the repo (roles only); keep another fleet's outside a public repo | none (no digests) |

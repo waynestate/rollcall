@@ -96,6 +96,24 @@ through the REST API.</p>
 <td><code>read_api</code></td>
 </tr>
 <tr>
+<td><code>GET /api/v4/projects/:id/pipelines?ref=&amp;scope=finished&amp;order_by=id&amp;sort=desc&amp;per_page=5</code></td>
+<td><code>ROLLCALL_PROCTOR_SOURCE=gitlab</code>, once per project per scan</td>
+<td>Finds the newest finished pipelines on the default branch, passed or failed</td>
+<td><code>read_api</code> (Reporter reads pipelines)</td>
+</tr>
+<tr>
+<td><code>GET /api/v4/projects/:id/pipelines/:pipeline_id/jobs?per_page=100</code></td>
+<td><code>ROLLCALL_PROCTOR_SOURCE=gitlab</code>, newest pipeline first until one ran the proctor job</td>
+<td>Finds that pipeline's proctor job id, following <code>Link</code> pagination to the same host</td>
+<td><code>read_api</code></td>
+</tr>
+<tr>
+<td><code>GET /api/v4/projects/:id/jobs/:job_id/artifacts/:artifact_path</code></td>
+<td><code>ROLLCALL_PROCTOR_SOURCE=gitlab</code>, when a proctor job was found</td>
+<td>Reads the one report file (<code>proctor.json</code>) from that job's artifact; 404 means no report</td>
+<td><code>read_api</code> (Reporter reads job artifacts)</td>
+</tr>
+<tr>
 <td><code>GET /api/v4/personal_access_tokens/self</code></td>
 <td>Every scan</td>
 <td>Reads the token's own expiry date for the 14-day note (advisory)</td>

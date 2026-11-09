@@ -19,6 +19,7 @@ use Waynestate\Rollcall\Scan\Scanner;
 use Waynestate\Rollcall\Source\CitadelExportSource;
 use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
 use Waynestate\Rollcall\Source\DirectoryRepositorySource;
+use Waynestate\Rollcall\Source\GitLab\GitLabArtifactProctorReportSource;
 use Waynestate\Rollcall\Source\GitLab\GitLabRepositorySource;
 use Waynestate\Rollcall\Source\ImageSource;
 use Waynestate\Rollcall\Source\JsonFileImageSource;
@@ -68,10 +69,12 @@ final class Factory
 
     public function scanner(?RepositorySource $repositories = null): Scanner
     {
+        $repositories ??= $this->repositories();
+
         return new Scanner(
-            $repositories ?? $this->repositories(),
+            $repositories,
             $this->images(),
-            $this->reports(),
+            $this->reports($repositories),
             $this->clock,
             new ComposerReader($this->config->authPackages !== [] ? $this->config->authPackages : ComposerReader::DEFAULT_AUTH_PACKAGES),
         );
@@ -80,25 +83,30 @@ final class Factory
     public function repositories(): RepositorySource
     {
         if ($this->config->source === 'gitlab') {
-            if ($this->config->gitlabUrl === null || ($this->config->gitlabGroups === [] && $this->config->gitlabProjects === [])) {
-                throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS (or ROLLCALL_GITLAB_PROJECTS) to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).');
-            }
-            $psr17 = new Psr17Factory();
-
-            return new GitLabRepositorySource(
-                new Psr18Client(HttpClient::create(['timeout' => 20, 'max_redirects' => 0]), $psr17, $psr17),
-                $psr17,
-                $this->config->gitlabUrl,
-                $this->config->gitlabToken(),
-                $this->config->gitlabGroups,
-                projects: $this->config->gitlabProjects,
-            );
+            return $this->gitlab();
         }
         if ($this->config->reposDir === null) {
             throw new RollcallException('Set ROLLCALL_REPOS_DIR to a repository fixture directory (or ROLLCALL_SOURCE=gitlab).');
         }
 
         return new DirectoryRepositorySource($this->config->reposDir);
+    }
+
+    private function gitlab(): GitLabRepositorySource
+    {
+        if ($this->config->gitlabUrl === null || ($this->config->gitlabGroups === [] && $this->config->gitlabProjects === [])) {
+            throw new RollcallException('Set ROLLCALL_GITLAB_URL and ROLLCALL_GITLAB_GROUPS (or ROLLCALL_GITLAB_PROJECTS) to scan GitLab. Set it in the environment, or install waynestate/playbook (see the README).');
+        }
+        $psr17 = new Psr17Factory();
+
+        return new GitLabRepositorySource(
+            new Psr18Client(HttpClient::create(['timeout' => 20, 'max_redirects' => 0]), $psr17, $psr17),
+            $psr17,
+            $this->config->gitlabUrl,
+            $this->config->gitlabToken(),
+            $this->config->gitlabGroups,
+            projects: $this->config->gitlabProjects,
+        );
     }
 
     /**
@@ -119,8 +127,23 @@ final class Factory
         return $this->config->imagesFile === null ? null : JsonFileImageSource::fromFile($this->config->imagesFile);
     }
 
-    private function reports(): ?ProctorReportSource
+    /**
+     * ROLLCALL_PROCTOR_SOURCE picks the reader: the shared directory (the
+     * default) or the proctor job's artifact in GitLab CI. The GitLab reader
+     * reuses the scan's own GitLab adapter when the repositories come from
+     * GitLab too, so the project list is read once; ROLLCALL_PROCTOR_DIR is not
+     * read then.
+     */
+    private function reports(RepositorySource $repositories): ?ProctorReportSource
     {
+        if ($this->config->proctorSource === 'gitlab') {
+            return new GitLabArtifactProctorReportSource(
+                $repositories instanceof GitLabRepositorySource ? $repositories : $this->gitlab(),
+                $this->config->proctorJob,
+                $this->config->proctorArtifact,
+            );
+        }
+
         return $this->config->proctorDir === null ? null : new DirectoryProctorReportSource($this->config->proctorDir);
     }
 }

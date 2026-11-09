@@ -19,7 +19,13 @@ return [
     'images_file' => env('ROLLCALL_IMAGES_FILE'),
     // Or Citadel's own registrations export (base images and forced upgrade dates). One image source, not both.
     'citadel_export' => env('ROLLCALL_CITADEL_EXPORT'),
+    // PROCTOR reports: a shared directory (the default), or "gitlab" to read each project's proctor job artifact
+    // from its newest finished default-branch pipeline with the same read_api token. The job and file default to
+    // Preflight's proctor job name and the file it keeps.
+    'proctor_source' => env('ROLLCALL_PROCTOR_SOURCE', 'directory'),
     'proctor_dir' => env('ROLLCALL_PROCTOR_DIR'),
+    'proctor_job' => env('ROLLCALL_PROCTOR_JOB', 'proctor'),
+    'proctor_artifact' => env('ROLLCALL_PROCTOR_ARTIFACT', 'proctor.json'),
     'auth_packages' => env('ROLLCALL_AUTH_PACKAGES'),
     'retention_days' => env('ROLLCALL_RETENTION_DAYS', 90),
 

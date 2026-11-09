@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waynestate\Rollcall;
 
+use Waynestate\Rollcall\Source\GitLab\GitLabArtifactProctorReportSource;
 use Waynestate\Rollcall\Support\Setting;
 
 /**
@@ -45,6 +46,9 @@ final class Config
         public readonly ?string $digestMailFrom = null,
         public readonly ?string $citadelExport = null,
         public readonly int $ownersConfirmDays = 365,
+        public readonly string $proctorSource = 'directory',
+        public readonly string $proctorJob = GitLabArtifactProctorReportSource::DEFAULT_JOB,
+        public readonly string $proctorArtifact = GitLabArtifactProctorReportSource::DEFAULT_ARTIFACT,
     ) {}
 
     /** @param  array<string, string|false|null>  $env */
@@ -56,6 +60,18 @@ final class Config
         $source = $get('ROLLCALL_SOURCE') ?? 'directory';
         if (! in_array($source, ['directory', 'gitlab'], true)) {
             throw new RollcallException('ROLLCALL_SOURCE must be "directory" or "gitlab".');
+        }
+        $proctorSource = $get('ROLLCALL_PROCTOR_SOURCE') ?? 'directory';
+        if (! in_array($proctorSource, ['directory', 'gitlab'], true)) {
+            throw new RollcallException('ROLLCALL_PROCTOR_SOURCE must be "directory" or "gitlab".');
+        }
+        $proctorJob = $get('ROLLCALL_PROCTOR_JOB') ?? GitLabArtifactProctorReportSource::DEFAULT_JOB;
+        if (! GitLabArtifactProctorReportSource::validJob($proctorJob)) {
+            throw new RollcallException('ROLLCALL_PROCTOR_JOB must be a GitLab job name: letters, digits, "_", "." and "-".');
+        }
+        $proctorArtifact = $get('ROLLCALL_PROCTOR_ARTIFACT') ?? GitLabArtifactProctorReportSource::DEFAULT_ARTIFACT;
+        if (! GitLabArtifactProctorReportSource::validArtifact($proctorArtifact)) {
+            throw new RollcallException('ROLLCALL_PROCTOR_ARTIFACT must be a relative path inside the artifact, such as proctor.json.');
         }
 
         return new self(
@@ -81,6 +97,9 @@ final class Config
             digestMailFrom: $get('ROLLCALL_DIGEST_MAIL_FROM'),
             citadelExport: $get('ROLLCALL_CITADEL_EXPORT'),
             ownersConfirmDays: self::days($get('ROLLCALL_OWNERS_CONFIRM_DAYS'), 365, 'ROLLCALL_OWNERS_CONFIRM_DAYS', 'turns the check off'),
+            proctorSource: $proctorSource,
+            proctorJob: $proctorJob,
+            proctorArtifact: $proctorArtifact,
         );
     }
 
