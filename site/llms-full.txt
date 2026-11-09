@@ -144,8 +144,9 @@ rollcall prune      [--days=N] [--dry-run] [--today=YYYY-MM-DD]
   only when something changed since the previous scan. It prints them; `--out=DIR` writes one text file each;
   `--send` mails them, and only when sending is switched on too.
 - `owners` reads the same owners file as `digest`, checks it against the latest scan, and names every scanned app
-  no entry lists. It exits 1 when there is one, and the weekly scan job runs it, so a new app without an owner
-  fails that job.
+  whose owner is unknown: no entry lists it, or no entry that lists it was confirmed (its `"confirmed"` date) in
+  the last `ROLLCALL_OWNERS_CONFIRM_DAYS` days (365 by default). It exits 1 when there is one, and the weekly scan
+  job runs it, so a new app without an owner, or an owner nobody has re-confirmed in a year, fails that job.
 - `drift` compares `policy.json` with a saved endoflife.date v1 product page (for example
   `https://endoflife.date/api/v1/products/php/` saved to a file). A difference is a flag for a person to look at; the
    policy stays the source of truth. Rollcall does not fetch that page itself.
@@ -236,6 +237,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_AUTH_PACKAGES` | Comma-separated Composer packages that count as an auth package. An entry without a slash matches that package under any vendor (`wayne-cas` matches `anyvendor/wayne-cas`); an entry with a slash matches exactly. First match in list order wins | `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas`, `simplecas` |
 | `ROLLCALL_RETENTION_DAYS` | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) |
 | `ROLLCALL_OWNERS_FILE` | Owners file for the digests: `{"owners": [{"contact": "team@example.test", "digest": true, "projects": ["group/project"]}]}`. Rollcall's own, for the stack's projects, is `owners.json` in the repo (roles only); keep another fleet's outside a public repo | none (no digests) |
+| `ROLLCALL_OWNERS_CONFIRM_DAYS` | How long an owners-file entry's `"confirmed"` date counts; past it, `rollcall owners` calls that owner unknown and exits 1 | `365` (0 turns the check off) |
 | `ROLLCALL_DIGEST_MAIL_ENABLED` | Allow `rollcall digest --send` to mail | `false` |
 | `ROLLCALL_DIGEST_MAIL_DSN` | Symfony Mailer DSN for sending, such as `smtp://mail.example.test:25`. A secret: never in git, never printed | none |
 | `ROLLCALL_DIGEST_MAIL_FROM` | The from address of the digests | none |
@@ -318,14 +320,15 @@ upgrade, a new drift flag, one cleared, a PROCTOR result that moved), then where
 no digest. Nobody gets one by default, and no owner is ever guessed from commit authors.
 
 1. Point `ROLLCALL_OWNERS_FILE` at an owners file that maps each scanned project to its contacts (a mail address,
-   a team alias or a role). An owner opts in with `"digest": true`; leaving the key out means no. The shape is
-   `contract/owners.schema.json`.
+   a team alias or a role). An owner opts in with `"digest": true`; leaving the key out means no. `"confirmed"` is
+   the day the contact last said it still answers for those apps; `rollcall owners` calls the owner unknown once
+   that day is older than `ROLLCALL_OWNERS_CONFIRM_DAYS`. The shape is `contract/owners.schema.json`.
 
    ```json
    {
        "$schema": "contract/owners.schema.json",
        "owners": [
-           {"contact": "team@example.test", "digest": true, "projects": ["group/project", "group/other-project"]}
+           {"contact": "team@example.test", "digest": true, "confirmed": "2026-11-01", "projects": ["group/project", "group/other-project"]}
        ]
    }
    ```
@@ -1119,6 +1122,26 @@ No owner on file for 1 of 14 apps in this scan, so no digest covers it. Add it t
 
 and `--format=json` lists it under `no_owner_on_file`. An owner who has not opted in still counts as its owner. Reports never read the owners file, so the report stays free of owners.
 
+#### Confirm owners on a schedule[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#confirm-owners-on-a-schedule)
+
+An owner on file is only as good as the last time somebody said it is still true. Give each entry a `"confirmed"` date, the day the contact last confirmed it answers for those apps:
+
+```json
+{"contact": "team@example.test", "digest": true, "confirmed": "2026-11-01", "projects": ["group/project"]}
+```
+
+`rollcall owners` checks the owners file against the latest scan and calls an app's owner unknown when no entry lists the app, or when no entry that lists it was confirmed in the last `ROLLCALL_OWNERS_CONFIRM_DAYS` days (365 by default; 0 turns the check off). An entry with no date was never confirmed, and a date after today is not trusted. One fresh entry is enough when an app sits under several contacts.
+
+```
+Owners file: 2 owners, 1 opted in to the digest
+An owner counts as confirmed for 365 days after its "confirmed" date.
+1 of 14 scanned apps have an owner on file that nobody confirmed in the last 365 days:
+- group/old-project (last confirmed 2025-06-01)
+Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-date it in the owners file.
+```
+
+It exits 1 while any owner is unknown, so the weekly scan job, which runs it after `scan`, goes red until someone asks the contact and writes the new date. `--format=json` gives the same answer to a script (`contract/owners-check.schema.json`). Rollcall never fills the gap by guessing an owner from commit authors.
+
 ### 2. Print them[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
 
 After a scan:
@@ -1376,7 +1399,7 @@ This page lists the commands (generated from the CLI) and what each one prints, 
 | `rollcall advisories` | Check locked package versions against a saved Packagist security-advisories response. |
 | `rollcall digest` | Print (or write, or send) each opted-in owner's digest of what changed in their apps. |
 | `rollcall drift` | Compare policy.json with a saved endoflife.date v1 product file. |
-| `rollcall owners` | List the scanned apps that no owners-file entry lists; exit 1 when there is one. |
+| `rollcall owners` | List the scanned apps whose owner is unknown (no owners-file entry, or none confirmed within ROLLCALL_OWNERS_CONFIRM_DAYS); exit 1 when there is one. |
 | `rollcall prune` | Delete snapshots older than the retention window; the newest is never deleted. |
 | `rollcall report` | Print the fleet report from the stored snapshots. |
 | `rollcall scan` | Scan the fleet read-only and store a snapshot. |
@@ -1423,7 +1446,7 @@ Usage: `rollcall drift [--today TODAY] [--feed FEED] [--component COMPONENT]`
 
 #### `rollcall owners` [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#rollcall-owners)
 
-List the scanned apps that no owners-file entry lists; exit 1 when there is one.
+List the scanned apps whose owner is unknown (no owners-file entry, or none confirmed within ROLLCALL_OWNERS_CONFIRM_DAYS); exit 1 when there is one.
 
 Usage: `rollcall owners [--today TODAY] [--format FORMAT]`
 
@@ -1519,6 +1542,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
+| ROLLCALL_OWNERS_CONFIRM_DAYS | How long an owners-file entry's "confirmed" date counts; past it, `rollcall owners` calls that owner unknown and exits 1 | `365` (0 turns the check off) | src/Config.php |
 | ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
 | ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group\_\_project.json | none | config/rollcall.php |
@@ -1553,15 +1577,17 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` | A person or a job, from Citadel |
 | `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE`: Rollcall's own `owners.json` (roles only) or a fleet's own (internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
+| `owners-check.schema.json` | `rollcall owners --format=json`, the latest scan checked against the owners file (internal: it names apps) | Rollcall |
 
 ### What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
 
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
 - Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
-- The image list, Citadel export and owners fixtures, and Rollcall's own `owners.json`, match their input schemas, a report and snapshot built from the Citadel export match theirs, and `rollcall digest --format=json` matches `digest.schema.json`.
+- The image list, Citadel export and owners fixtures, and Rollcall's own `owners.json`, match their input schemas, a report and snapshot built from the Citadel export match theirs, `rollcall digest --format=json` matches `digest.schema.json`, and `rollcall owners --format=json` matches `owners-check.schema.json`.
 - The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
-- The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
+- The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list. Every other schema refuses a case too: a snapshot of an unknown `schema_version` or with an `owner`, an image entry without its image, a Citadel upgrade whose date is not a date, an owner without a contact or with a project that is not a group/project path, a digest without `no_owner_on_file`, and an owners check with a `rank`.
+- Every schema in `contract/` is validated against real output or a fixture and has a case it must refuse, or the suite fails, so a new schema cannot land unchecked.
 
 It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with `vendor/bin/phpunit tests/ContractTest.php`; `composer ci` runs it with everything else.
 

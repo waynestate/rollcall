@@ -20,15 +20,17 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `citadel-export.schema.json` | The Citadel registrations export behind `ROLLCALL_CITADEL_EXPORT` | A person or a job, from Citadel |
 | `owners.schema.json` | The owners file behind `ROLLCALL_OWNERS_FILE`: Rollcall's own `owners.json` (roles only) or a fleet's own (internal) | The people who run Rollcall |
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
+| `owners-check.schema.json` | `rollcall owners --format=json`, the latest scan checked against the owners file (internal: it names apps) | Rollcall |
 
 ## What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
 
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
 - Every stored snapshot matches `snapshot.schema.json`, and its `schema_version` equals the code's.
-- The image list, Citadel export and owners fixtures, and Rollcall's own `owners.json`, match their input schemas, a report and snapshot built from the Citadel export match theirs, and `rollcall digest --format=json` matches `digest.schema.json`.
+- The image list, Citadel export and owners fixtures, and Rollcall's own `owners.json`, match their input schemas, a report and snapshot built from the Citadel export match theirs, `rollcall digest --format=json` matches `digest.schema.json`, and `rollcall owners --format=json` matches `owners-check.schema.json`.
 - The drift kinds in the schema are exactly the ones the report builder counts, in the same order.
-- The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list.
+- The schema has teeth: a public report with a per-app list, an `owner` field or a made-up drift kind is refused, and so is an internal report without its list. Every other schema refuses a case too: a snapshot of an unknown `schema_version` or with an `owner`, an image entry without its image, a Citadel upgrade whose date is not a date, an owner without a contact or with a project that is not a group/project path, a digest without `no_owner_on_file`, and an owners check with a `rank`.
+- Every schema in `contract/` is validated against real output or a fixture and has a case it must refuse, or the suite fails, so a new schema cannot land unchecked.
 
 It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with `vendor/bin/phpunit tests/ContractTest.php`; `composer ci` runs it with everything else.
 

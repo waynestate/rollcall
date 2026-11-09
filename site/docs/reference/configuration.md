@@ -30,6 +30,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
+| ROLLCALL_OWNERS_CONFIRM_DAYS | How long an owners-file entry's "confirmed" date counts; past it, `rollcall owners` calls that owner unknown and exits 1 | `365` (0 turns the check off) | src/Config.php |
 | ROLLCALL_OWNERS_FILE | Owners file for the digests: who answers for which apps, and who opted in with "digest": true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo | none (no digests) | src/Config.php |
 | ROLLCALL_POLICY_FILE | Path to CREED's policy.json | none (required for report, drift) | config/rollcall.php |
 | ROLLCALL_PROCTOR_DIR | PROCTOR JSON reports, one per app: group/project is read from group\_\_project.json | none | config/rollcall.php |

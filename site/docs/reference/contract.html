@@ -83,6 +83,11 @@ or a script should read Rollcall against these schemas, not against an example i
 <td><code>rollcall digest --format=json</code> (internal: it names apps)</td>
 <td>Rollcall</td>
 </tr>
+<tr>
+<td><code>owners-check.schema.json</code></td>
+<td><code>rollcall owners --format=json</code>, the latest scan checked against the owners file (internal: it names apps)</td>
+<td>Rollcall</td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="what-the-suite-checks">What the suite checks<a class="docs-heading-link" aria-label="Link to this section" href="#what-the-suite-checks">#</a></h2>
@@ -91,11 +96,16 @@ or a script should read Rollcall against these schemas, not against an example i
 <li><code>GET /report.json</code> from the raw-PHP endpoint matches the same schema.</li>
 <li>Every stored snapshot matches <code>snapshot.schema.json</code>, and its <code>schema_version</code> equals the code's.</li>
 <li>The image list, Citadel export and owners fixtures, and Rollcall's own <code>owners.json</code>, match their input schemas, a
-report and snapshot built from the Citadel export match theirs, and <code>rollcall digest --format=json</code> matches
-<code>digest.schema.json</code>.</li>
+report and snapshot built from the Citadel export match theirs, <code>rollcall digest --format=json</code> matches
+<code>digest.schema.json</code>, and <code>rollcall owners --format=json</code> matches <code>owners-check.schema.json</code>.</li>
 <li>The drift kinds in the schema are exactly the ones the report builder counts, in the same order.</li>
 <li>The schema has teeth: a public report with a per-app list, an <code>owner</code> field or a made-up drift kind is refused,
-and so is an internal report without its list.</li>
+and so is an internal report without its list. Every other schema refuses a case too: a snapshot of an unknown
+<code>schema_version</code> or with an <code>owner</code>, an image entry without its image, a Citadel upgrade whose date is not a date,
+an owner without a contact or with a project that is not a group/project path, a digest without
+<code>no_owner_on_file</code>, and an owners check with a <code>rank</code>.</li>
+<li>Every schema in <code>contract/</code> is validated against real output or a fixture and has a case it must refuse, or the
+suite fails, so a new schema cannot land unchecked.</li>
 </ul>
 <p>It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with
 <code>vendor/bin/phpunit tests/ContractTest.php</code>; <code>composer ci</code> runs it with everything else.</p>

@@ -149,6 +149,12 @@
 <td>config/rollcall.php</td>
 </tr>
 <tr>
+<td>ROLLCALL_OWNERS_CONFIRM_DAYS</td>
+<td>How long an owners-file entry's &quot;confirmed&quot; date counts; past it, <code>rollcall owners</code> calls that owner unknown and exits 1</td>
+<td><code>365</code> (0 turns the check off)</td>
+<td>src/Config.php</td>
+</tr>
+<tr>
 <td>ROLLCALL_OWNERS_FILE</td>
 <td>Owners file for the digests: who answers for which apps, and who opted in with &quot;digest&quot;: true. Rollcall's own, for the stack's projects, is owners.json in the repo (roles only); keep another fleet's outside a public repo</td>
 <td>none (no digests)</td>

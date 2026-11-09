@@ -67,6 +67,24 @@ fleet, keep that fleet's file next to its snapshots, outside a public repo, and 
 </code></pre>
 <p>and <code>--format=json</code> lists it under <code>no_owner_on_file</code>. An owner who has not opted in still counts as its owner.
 Reports never read the owners file, so the report stays free of owners.</p>
+<h3 id="confirm-owners-on-a-schedule">Confirm owners on a schedule<a class="docs-heading-link" aria-label="Link to this section" href="#confirm-owners-on-a-schedule">#</a></h3>
+<p>An owner on file is only as good as the last time somebody said it is still true. Give each entry a
+<code>&quot;confirmed&quot;</code> date, the day the contact last confirmed it answers for those apps:</p>
+<pre tabindex="0"><code class="language-json">{&quot;contact&quot;: &quot;team@example.test&quot;, &quot;digest&quot;: true, &quot;confirmed&quot;: &quot;2026-11-01&quot;, &quot;projects&quot;: [&quot;group/project&quot;]}
+</code></pre>
+<p><code>rollcall owners</code> checks the owners file against the latest scan and calls an app's owner unknown when no entry
+lists the app, or when no entry that lists it was confirmed in the last <code>ROLLCALL_OWNERS_CONFIRM_DAYS</code> days (365 by
+default; 0 turns the check off). An entry with no date was never confirmed, and a date after today is not trusted.
+One fresh entry is enough when an app sits under several contacts.</p>
+<pre tabindex="0"><code>Owners file: 2 owners, 1 opted in to the digest
+An owner counts as confirmed for 365 days after its &quot;confirmed&quot; date.
+1 of 14 scanned apps have an owner on file that nobody confirmed in the last 365 days:
+- group/old-project (last confirmed 2025-06-01)
+Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-date it in the owners file.
+</code></pre>
+<p>It exits 1 while any owner is unknown, so the weekly scan job, which runs it after <code>scan</code>, goes red until someone
+asks the contact and writes the new date. <code>--format=json</code> gives the same answer to a script
+(<code>contract/owners-check.schema.json</code>). Rollcall never fills the gap by guessing an owner from commit authors.</p>
 <h2 id="2-print-them">2. Print them<a class="docs-heading-link" aria-label="Link to this section" href="#2-print-them">#</a></h2>
 <p>After a scan:</p>
 <pre tabindex="0"><code>rollcall digest
@@ -104,7 +122,7 @@ action in Rollcall, so it stays behind both the flag and the settings.</p>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/guides/wsu-values.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">WSU values (Playbook)</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/guides/metrics.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Metrics</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#1-say-who-answers-for-which-apps">1. Say who answers for which apps</a></li><li class="docs-toc__item"><a href="#2-print-them">2. Print them</a></li><li class="docs-toc__item"><a href="#3-mail-them-only-if-you-want-rollcall-to">3. Mail them (only if you want Rollcall to)</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#1-say-who-answers-for-which-apps">1. Say who answers for which apps</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#confirm-owners-on-a-schedule">Confirm owners on a schedule</a></li><li class="docs-toc__item"><a href="#2-print-them">2. Print them</a></li><li class="docs-toc__item"><a href="#3-mail-them-only-if-you-want-rollcall-to">3. Mail them (only if you want Rollcall to)</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>0.1.10</span></span>
