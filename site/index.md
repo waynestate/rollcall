@@ -196,14 +196,14 @@ Apps present: 4 (scan notes: 0)
 
 PHP image
 VERSION  APPS  STATE          SECURITY UNTIL  DAYS TO EOL
-8.1      1     eol            2025-12-31      -301
-8.3      1     security_only  2027-12-31      429
-8.4      1     active         2028-12-31      795
+8.1      1     eol            2025-12-31      -313
+8.3      1     security_only  2027-12-31      417
+8.4      1     active         2028-12-31      783
 unknown  1     unknown        -               -
 
 EOL burn-down (state on each scan day)
 DATE        APPS  EOL  SUPPORTED  UNKNOWN
-2026-10-28  4     1    2          1
+2026-11-09  4     1    2          1
 ```
 
 **exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.

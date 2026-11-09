@@ -27,6 +27,9 @@ final class Policy
     /** @var array<string, mixed> */
     private array $rules;
 
+    /** @var array<string, mixed> */
+    private array $gate;
+
     /**
      * Where this policy came from: the file path for fromFile(), 'bundled'
      * for bundled(), 'array' for fromArray().
@@ -44,6 +47,7 @@ final class Policy
         $this->components = $data['components'] ?? [];
         $this->tools = $data['tools'] ?? [];
         $this->rules = $data['rules'] ?? [];
+        $this->gate = $data['gate'] ?? [];
         $this->origin = $origin;
     }
 
@@ -345,6 +349,28 @@ final class Policy
     }
 
     /**
+     * The oldest patch release the stack accepts in a version line, from the
+     * policy's minimum_patch field.
+     *
+     * The dates say a branch is supported until when; minimum_patch says
+     * which patch is the floor in it. Null when the line has no
+     * minimum_patch, or the component or version is unknown, because the
+     * field is optional and the reader does not guess.
+     */
+    public function minimumPatch(string $component, string $version): ?string
+    {
+        $versions = $this->components[$component]['versions'] ?? null;
+        if ($versions === null) {
+            return null;
+        }
+        if (!array_key_exists($version, $versions)) {
+            return null;
+        }
+        $minimum = $versions[$version]['minimum_patch'] ?? null;
+        return is_string($minimum) ? $minimum : null;
+    }
+
+    /**
      * The rules block, as an array.
      *
      * @return array<string, mixed>
@@ -374,6 +400,93 @@ final class Policy
             );
         }
         return $value;
+    }
+
+    /**
+     * How many days past today an override may run before PROCTOR fails it
+     * and refuses to apply it.
+     *
+     * From the rules block; 90 when the key is absent, so a policy shaped
+     * before the rule existed keeps the stack's default (CREED allows no
+     * permanent override). A value that is not a positive integer is
+     * refused: an override cap of zero or less would fail every override,
+     * and a non-integer one has no meaning in whole days.
+     *
+     * @throws InvalidArgumentException when the value is not a positive
+     *                                  integer
+     */
+    public function overrideMaxDays(): int
+    {
+        $value = $this->rules['override_max_days'] ?? 90;
+        if (!is_int($value) || $value < 1) {
+            throw new InvalidArgumentException(
+                'Policy rules carry an invalid "override_max_days" value: ' . var_export($value, true) . '; expected a positive integer.',
+            );
+        }
+        return $value;
+    }
+
+    /**
+     * What PROCTOR's override-approver check does with a self-approved
+     * override, and with one whose author it cannot read: warn or fail.
+     *
+     * From the rules block; 'warn' when the key is absent, so a policy
+     * shaped before the rule existed reports a self-approval without
+     * failing the run.
+     *
+     * @throws InvalidArgumentException when the value is neither warn nor
+     *                                  fail
+     */
+    public function overrideSelfApproval(): string
+    {
+        $value = $this->rules['override_self_approval'] ?? 'warn';
+        if ($value !== 'warn' && $value !== 'fail') {
+            throw new InvalidArgumentException(
+                'Policy rules carry an invalid "override_self_approval" value: ' . var_export($value, true) . '; expected "warn" or "fail".',
+            );
+        }
+        return $value;
+    }
+
+    /** The three deploy-gate stages, weakest first (ADR-0006 item 4). */
+    public const GATE_STAGES = ['report', 'warn', 'block'];
+
+    /**
+     * The deploy-gate stage of one PROCTOR check on a date.
+     *
+     * The entry in `gate.stages[$checkId]` with the latest `from` on or
+     * before $on wins; with none, `gate.default_stage`; with no gate block,
+     * 'block', so a policy shaped before stages existed keeps today's gate.
+     *
+     * @return 'report'|'warn'|'block'
+     *
+     * @throws InvalidArgumentException when the gate block is malformed
+     */
+    public function gateStage(string $checkId, DateTimeImmutable $on): string
+    {
+        $default = $this->gate['default_stage'] ?? 'block';
+        if (!in_array($default, self::GATE_STAGES, true)) {
+            throw new InvalidArgumentException('Policy "gate.default_stage" must be one of report, warn, block; got ' . var_export($default, true) . '.');
+        }
+        $entries = $this->gate['stages'][$checkId] ?? [];
+        if (!is_array($entries)) {
+            throw new InvalidArgumentException('Policy "gate.stages.' . $checkId . '" must be a list of {stage, from} entries.');
+        }
+        $day = $on->format('Y-m-d');
+        $best = null;
+        $bestFrom = '';
+        foreach ($entries as $entry) {
+            $stage = is_array($entry) ? ($entry['stage'] ?? null) : null;
+            $from = is_array($entry) ? ($entry['from'] ?? null) : null;
+            if (!in_array($stage, self::GATE_STAGES, true) || !is_string($from) || 1 !== preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
+                throw new InvalidArgumentException('Policy "gate.stages.' . $checkId . '" has an entry without a valid stage (report, warn, block) and from date (YYYY-MM-DD).');
+            }
+            if ($from <= $day && $from >= $bestFrom) {
+                $best = $stage;
+                $bestFrom = $from;
+            }
+        }
+        return $best ?? $default;
     }
 
     /**
@@ -435,11 +548,12 @@ final class Policy
     }
 
     /**
-     * One version line, with exactly the five fields the policy may carry.
+     * One version line, with exactly the five fields below.
      *
      * The date and patch fields are strings or null, as in the JSON. current
-     * is true when the line is marked current, null otherwise. Null when the
-     * component or version is unknown.
+     * is true when the line is marked current, null otherwise. A line may
+     * also carry minimum_patch, which this method does not report; read it
+     * with minimumPatch(). Null when the component or version is unknown.
      *
      * @return array{active_until: ?string, security_until: ?string, latest_patch: ?string, latest_patch_checked: ?string, current: ?bool}|null
      */
