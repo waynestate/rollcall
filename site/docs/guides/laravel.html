@@ -59,7 +59,7 @@ the Blade view. From a WELD app:</p>
 npm run build
 </code></pre>
 <p>The published page is short and it is yours. In essence it puts the component in WELD's <code>AppLayout</code> with a title
-and a <code>noindex</code> tag:</p>
+and a <code>noindex</code> tag (the full file adds breadcrumbs and a few lines of scoped CSS, in WayneUI's spacing tokens, that space the sections and set the three totals side by side):</p>
 <pre tabindex="0"><code class="language-vue">&lt;script setup lang=&quot;ts&quot;&gt;
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head } from '@inertiajs/vue3';

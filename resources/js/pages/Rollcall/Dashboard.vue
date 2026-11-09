@@ -37,6 +37,33 @@ const breadcrumbs: BreadcrumbItem[] = [
     </Head>
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <RollcallDashboard :report="report" :internal="internal" :scan-command="scanCommand" />
+        <div class="rollcall-page wsu-stack">
+            <RollcallDashboard :report="report" :internal="internal" :scan-command="scanCommand" />
+        </div>
     </AppLayout>
 </template>
+
+<style scoped>
+/*
+ * Spacing for the report inside this app's layout, in WayneUI's tokens. The
+ * component carries no styles of its own (it prints the PHP page's markup),
+ * so the room it sits in sets the rhythm. Vite bundles this into the app's
+ * stylesheet, so it needs no CSP nonce.
+ */
+.rollcall-page :deep(section) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wsu-space-3);
+    margin-block-start: var(--wsu-space-8);
+}
+
+/* The three totals sit side by side when there is room, one per row on a phone. */
+.rollcall-page :deep(section[aria-labelledby='totals']) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.rollcall-page :deep(section[aria-labelledby='totals'] > h2) {
+    grid-column: 1 / -1;
+}
+</style>

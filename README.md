@@ -478,7 +478,7 @@ npm run build
 ```
 
 The published page is short and it is yours. In essence it puts the component in WELD's `AppLayout` with a title
-and a `noindex` tag:
+and a `noindex` tag (the full file adds breadcrumbs and a few lines of scoped CSS, in WayneUI's spacing tokens, that space the sections and set the three totals side by side):
 
 ```vue
 <script setup lang="ts">
