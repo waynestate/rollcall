@@ -734,9 +734,8 @@ unknown  1     unknown        -               -
 EOL burn-down (state on each scan day)
 DATE        APPS  EOL  SUPPORTED  UNKNOWN
 2026-10-28  4     1    2          1
+          exit 0, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
 ```
-
-**exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
 
 - **`rollcall scan`**: Scans once and saves `<date>.json`. A second scan on the same day replaces it.
 - **`rollcall report`**: `--format=text|json|prometheus`. `--internal` adds the per-app list; keep that inside the project.

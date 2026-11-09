@@ -75,9 +75,13 @@
         "site:agent-ready-check": "php bin/agent-ready.php --check",
         "site:versions": [
             "php tools/versions-table.php",
+            "php bin/quickstart-versions.php",
             "@site:agent-ready"
         ],
-        "site:versions-check": "php tools/versions-table.php --check",
+        "site:versions-check": [
+            "php tools/versions-table.php --check",
+            "php bin/quickstart-versions.php --check"
+        ],
         "docs": "php bin/docs-site.php",
         "docs:check": "php bin/docs-site.php --check",
         "a11y": "echo \"Front page accessibility gate (axe-core in Playwright, needs Docker): run scripts/a11y.sh on Linux and macOS or scripts/a11y.ps1 on Windows. It stays out of composer ci because CI has no browser.\"",
@@ -93,12 +97,12 @@
         ]
     },
     "scripts-descriptions": {
-        "ci": "Run every CI check: manifest, tests, style, agent-ready files, docs site, versions table, static analysis, audit",
+        "ci": "Run every CI check: manifest, tests, style, agent-ready files, docs site, front page generated regions, static analysis, audit",
         "creed-copy:check": "Prove the generated CREED copy in src/Creed has not drifted (needs CREED_PATH set to a CREED checkout)",
         "site:agent-ready": "Rewrite the Markdown twins, llms.txt, llms-full.txt, robots.txt and sitemap.xml in site/ (Squire's agent-ready kit).",
         "site:agent-ready-check": "Fail when the agent-ready files are stale, a page lacks its Markdown link, a prompt drifts from the docs, or the kit was edited here.",
-        "site:versions": "Regenerate the front page versions table in site/index.html and site/index.md from CREED's policy.json, then rewrite the agent-ready twins.",
-        "site:versions-check": "Fail when the front page versions table is stale. Judged as of the date stored in the start marker unless --date is passed.",
+        "site:versions": "Regenerate the front page versions table and the quick-start printout's policy values in site/index.html and site/index.md from CREED's policy.json, then rewrite the agent-ready twins.",
+        "site:versions-check": "Fail when the front page versions table or the quick-start printout's policy values are stale. Judged as of the date stored in each start marker unless --date is passed.",
         "docs": "Build the docs site from docs/ into site/docs/ (Squire's docs builder): render the pages, fill the generated command and environment reference, and stamp the current version.",
         "docs:check": "Fail when the built docs site is stale or the generated command or environment reference has drifted from the CLI or source.",
         "a11y": "Print how to run the front page accessibility gate (scripts/a11y.sh, scripts/a11y.ps1); it needs a browser, so it is not part of composer ci"
