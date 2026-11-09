@@ -34,8 +34,8 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5",
         "symfony/mailer": "^7.4",
-        "waynestate/advisor": "^0.1.2",
-        "waynestate/pinstripe": "^0.1.4"
+        "waynestate/advisor": "^0.2",
+        "waynestate/pinstripe": "^0.3"
     },
     "suggest": {
         "inertiajs/inertia-laravel": "Only for the dashboard as one of an Inertia app's own Vue pages (ROLLCALL_DASHBOARD_INERTIA); the Blade and raw-PHP pages need nothing extra",

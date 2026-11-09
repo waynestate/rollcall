@@ -39,12 +39,17 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 | WayneUI (project 0) | The interface layer: tokens, components, four consumer paths |
 | CREED | The standards and `policy.json`, the dates Rollcall reads |
 | PROCTOR | Measures one app against the policy; Rollcall reads its JSON report and never re-runs a rule |
-| Preflight | CI templates |
 | SESAME | Protocol-neutral auth; Rollcall reports which auth package each app uses |
 | HELMET | Baseline runtime and its own optional `/metrics` |
+| Sourdough | Starters for every app shape |
+| Squire | The Citadel deploy kit; the layer that serves this repo's front page is one |
+| Preflight | CI templates |
 | Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
-| Sourdough | Starters |
+| Booster | The upgrade tool; Rollcall reads its hop record (`booster-hop.json`) to see who is catching up |
 | Rollcall | The fleet census and EOL burn-down |
+| Drawbridge | The one OpenID Connect front door for the Citadel |
+| ADVISOR | The stack's read-only MCP server; Rollcall's module gives it three fleet tools |
+| WELD | The Laravel starter app with most of the stack installed |
 
 ### How it is built
 
@@ -1514,12 +1519,17 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 | WayneUI (project 0) | The interface layer: tokens, components, four consumer paths |
 | CREED | The standards and `policy.json`, the dates Rollcall reads |
 | PROCTOR | Measures one app against the policy; Rollcall reads its JSON report and never re-runs a rule |
-| Preflight | CI templates |
 | SESAME | Protocol-neutral auth; Rollcall reports which auth package each app uses |
 | HELMET | Baseline runtime and its own optional `/metrics` |
+| Sourdough | Starters for every app shape |
+| Squire | The Citadel deploy kit; the layer that serves this repo's front page is one |
+| Preflight | CI templates |
 | Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
-| Sourdough | Starters |
+| Booster | The upgrade tool; Rollcall reads its hop record (`booster-hop.json`) to see who is catching up |
 | Rollcall | The fleet census and EOL burn-down |
+| Drawbridge | The one OpenID Connect front door for the Citadel |
+| ADVISOR | The stack's read-only MCP server; Rollcall's module gives it three fleet tools |
+| WELD | The Laravel starter app with most of the stack installed |
 
 **The whole class**
 WayneUI and the stack. Everyone is here today; the ones in the back row know who they are.

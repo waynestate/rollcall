@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff7e09bbeb971ccaadc31e70e0dad6ab",
+    "content-hash": "20bf79252ccb17da5ba7a2b8483054b6",
     "packages": [
         {
             "name": "composer/semver",
@@ -330,7 +330,8 @@
                 "issues": "https://github.com/php-fig/container/issues",
                 "source": "https://github.com/php-fig/container/tree/2.0.2"
             },
-            "time": "2021-11-05T16:47:00+00:00"
+            "time": "2021-11-05T16:47:00+00:00",
+            "published-time": "2021-11-05T16:53:27+00:00"
         },
         {
             "name": "psr/http-client",
@@ -540,7 +541,8 @@
             "support": {
                 "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
-            "time": "2024-09-11T13:17:53+00:00"
+            "time": "2024-09-11T13:17:53+00:00",
+            "published-time": "2024-09-11T13:21:14+00:00"
         },
         {
             "name": "symfony/console",
@@ -709,7 +711,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-16T14:15:10+00:00"
+            "time": "2026-09-16T14:15:10+00:00",
+            "published-time": "2026-11-04T11:25:34+00:00"
         },
         {
             "name": "symfony/http-client",
@@ -975,7 +978,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T16:19:22+00:00"
+            "time": "2026-04-10T16:19:22+00:00",
+            "published-time": "2026-04-26T14:44:50+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
@@ -1744,7 +1748,8 @@
                 "issues": "https://github.com/doctrine/deprecations/issues",
                 "source": "https://github.com/doctrine/deprecations/tree/1.1.6"
             },
-            "time": "2026-02-07T07:09:04+00:00"
+            "time": "2026-02-07T07:09:04+00:00",
+            "published-time": "2026-02-07T07:10:09+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -4071,7 +4076,8 @@
                 "issues": "https://github.com/modelcontextprotocol/php-sdk/issues",
                 "source": "https://github.com/modelcontextprotocol/php-sdk/tree/v0.9.0"
             },
-            "time": "2026-10-18T14:29:29+00:00"
+            "time": "2026-10-18T14:29:29+00:00",
+            "published-time": "2026-10-18T14:45:02+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -5690,7 +5696,8 @@
                 "issues": "https://github.com/php-http/discovery/issues",
                 "source": "https://github.com/php-http/discovery/tree/1.20.0"
             },
-            "time": "2024-10-02T11:20:13+00:00"
+            "time": "2024-10-02T11:20:13+00:00",
+            "published-time": "2024-10-02T11:21:00+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -5748,7 +5755,8 @@
                 "issues": "https://github.com/phpDocumentor/ReflectionCommon/issues",
                 "source": "https://github.com/phpDocumentor/ReflectionCommon/tree/2.2.1"
             },
-            "time": "2025-11-10T21:21:55+00:00"
+            "time": "2025-11-10T21:21:55+00:00",
+            "published-time": "2026-09-27T10:14:49+00:00"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -5813,7 +5821,8 @@
                 "issues": "https://github.com/phpDocumentor/ReflectionDocBlock/issues",
                 "source": "https://github.com/phpDocumentor/ReflectionDocBlock/tree/6.0.3"
             },
-            "time": "2026-03-18T20:49:53+00:00"
+            "time": "2026-03-18T20:49:53+00:00",
+            "published-time": "2026-03-18T20:51:16+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -5871,7 +5880,8 @@
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
                 "source": "https://github.com/phpDocumentor/TypeResolver/tree/2.1.0"
             },
-            "time": "2026-09-27T19:32:54+00:00"
+            "time": "2026-09-27T19:32:54+00:00",
+            "published-time": "2026-09-28T18:39:55+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -6042,7 +6052,8 @@
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
                 "source": "https://github.com/phpstan/phpdoc-parser/tree/2.4.1"
             },
-            "time": "2026-10-30T19:36:28+00:00"
+            "time": "2026-10-30T19:36:28+00:00",
+            "published-time": "2026-10-30T19:37:11+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -6702,7 +6713,8 @@
                 "issues": "https://github.com/php-fig/event-dispatcher/issues",
                 "source": "https://github.com/php-fig/event-dispatcher/tree/1.0.0"
             },
-            "time": "2019-01-08T18:20:26+00:00"
+            "time": "2019-01-08T18:20:26+00:00",
+            "published-time": "2019-03-25T15:31:44+00:00"
         },
         {
             "name": "psr/http-server-handler",
@@ -6758,7 +6770,8 @@
             "support": {
                 "source": "https://github.com/php-fig/http-server-handler/tree/1.0.2"
             },
-            "time": "2023-04-10T20:06:20+00:00"
+            "time": "2023-04-10T20:06:20+00:00",
+            "published-time": "2023-04-10T20:07:30+00:00"
         },
         {
             "name": "psr/http-server-middleware",
@@ -6815,7 +6828,8 @@
                 "issues": "https://github.com/php-fig/http-server-middleware/issues",
                 "source": "https://github.com/php-fig/http-server-middleware/tree/1.0.2"
             },
-            "time": "2023-04-11T06:14:47+00:00"
+            "time": "2023-04-11T06:14:47+00:00",
+            "published-time": "2023-04-11T06:15:22+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -8086,6 +8100,74 @@
                 }
             ],
             "time": "2024-10-09T05:16:32+00:00"
+        },
+        {
+            "name": "spaze/phpstan-disallowed-calls",
+            "version": "v4.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
+                "reference": "388075908225e22c46b9622177d1629203d41c1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/388075908225e22c46b9622177d1629203d41c1f",
+                "reference": "388075908225e22c46b9622177d1629203d41c1f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^1.12.6 || ^2.0"
+            },
+            "require-dev": {
+                "nette/neon": "^3.3.1",
+                "php-parallel-lint/php-console-highlighter": "^1.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^1.2 || ^2.0",
+                "phpunit/phpunit": "^9.6 || ^10.1 || ^11.0 || ^12.0 || ^13.0",
+                "shipmonk/dead-code-detector": "^1.1",
+                "spaze/coding-standard": "^1.8"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spaze\\PHPStan\\Rules\\Disallowed\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michal Špaček",
+                    "email": "mail@michalspacek.cz",
+                    "homepage": "https://www.michalspacek.cz"
+                }
+            ],
+            "description": "PHPStan rules to detect disallowed method & function calls, constant, namespace, attribute, property & superglobal usages, with powerful rules to re-allow a call or a usage in places where it should be allowed.",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v4.15.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spaze",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-10-13T00:31:30+00:00",
+            "published-time": "2026-10-13T00:56:49+00:00"
         },
         {
             "name": "staabm/side-effects-detector",
@@ -9630,7 +9712,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-24T05:20:52+00:00"
+            "time": "2026-09-24T05:20:52+00:00",
+            "published-time": "2026-09-30T10:23:49+00:00"
         },
         {
             "name": "symfony/process",
@@ -9695,7 +9778,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-25T14:40:16+00:00"
+            "time": "2026-10-25T14:40:16+00:00",
+            "published-time": "2026-10-28T18:21:18+00:00"
         },
         {
             "name": "symfony/routing",
@@ -10040,7 +10124,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-12T14:31:36+00:00"
+            "time": "2026-10-12T14:31:36+00:00",
+            "published-time": "2026-10-14T06:45:54+00:00"
         },
         {
             "name": "symfony/var-dumper",
@@ -10470,16 +10555,16 @@
         },
         {
             "name": "waynestate/advisor",
-            "version": "0.1.2",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/waynestate/advisor.git",
-                "reference": "2b853cf218f6fab2dd9e9ea8f77f33ca0d64133a"
+                "reference": "7818dae121cbcda23b96c24772150d4ac6e172ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/advisor/zipball/2b853cf218f6fab2dd9e9ea8f77f33ca0d64133a",
-                "reference": "2b853cf218f6fab2dd9e9ea8f77f33ca0d64133a",
+                "url": "https://api.github.com/repos/waynestate/advisor/zipball/7818dae121cbcda23b96c24772150d4ac6e172ea",
+                "reference": "7818dae121cbcda23b96c24772150d4ac6e172ea",
                 "shasum": ""
             },
             "require": {
@@ -10491,12 +10576,14 @@
                 "opis/json-schema": "^2.4",
                 "php": "^8.3",
                 "psr/log": "^3.0",
-                "symfony/console": "^7.4",
-                "symfony/process": "^7.4"
+                "symfony/console": "^7.4 || ^8.0",
+                "symfony/process": "^7.4 || ^8.0",
+                "waynestate/creed": "^0.1.8"
             },
             "require-dev": {
                 "laravel/mcp": "1.1.2",
                 "laravel/pint": "^1.32",
+                "league/commonmark": "^2.10",
                 "orchestra/testbench": "^10.0",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^11.5",
@@ -10515,6 +10602,9 @@
                     "providers": [
                         "Waynestate\\Advisor\\Laravel\\AdvisorServiceProvider"
                     ]
+                },
+                "proctor": {
+                    "wayneui.copies": "fail"
                 }
             },
             "autoload": {
@@ -10534,23 +10624,78 @@
             "description": "Wayne State's own MCP server: orients a developer and gives their coding agent read-only tools into every project of the app stack.",
             "homepage": "https://advisor.apps.wayne.edu/",
             "support": {
-                "issues": "https://github.com/waynestate/advisor/issues",
+                "issues": "https://git.wayne.edu/enterprise-apps/advisor/-/issues",
                 "source": "https://github.com/waynestate/advisor"
             },
-            "time": "2026-10-29T20:39:34+00:00"
+            "time": "2026-11-09T14:18:45+00:00",
+            "published-time": "2026-11-09T21:54:26+00:00"
         },
         {
-            "name": "waynestate/pinstripe",
-            "version": "0.1.4",
+            "name": "waynestate/creed",
+            "version": "0.1.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/waynestate/pinstripe.git",
-                "reference": "eb030787b2b9558e31b3e571a341675c34309c7f"
+                "url": "https://github.com/waynestate/creed.git",
+                "reference": "ec325a4619d0ec33afee02cd975c868e18435585"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/waynestate/pinstripe/zipball/eb030787b2b9558e31b3e571a341675c34309c7f",
-                "reference": "eb030787b2b9558e31b3e571a341675c34309c7f",
+                "url": "https://api.github.com/repos/waynestate/creed/zipball/ec325a4619d0ec33afee02cd975c868e18435585",
+                "reference": "ec325a4619d0ec33afee02cd975c868e18435585",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.32",
+                "league/commonmark": "^2.7",
+                "opis/json-schema": "^2.4",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^11.5",
+                "waynestate/pinstripe": "^0.1"
+            },
+            "type": "library",
+            "extra": {
+                "proctor": {
+                    "wayneui.copies": "fail"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waynestate\\Creed\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wayne State University, Enterprise Applications"
+                }
+            ],
+            "description": "The Wayne State app stack version policy as data, with a framework-free PHP reader.",
+            "homepage": "https://creed.apps.wayne.edu/",
+            "support": {
+                "issues": "https://git.wayne.edu/enterprise-apps/creed/-/issues",
+                "source": "https://github.com/waynestate/creed"
+            },
+            "time": "2026-11-09T07:41:10+00:00",
+            "published-time": "2026-11-09T07:58:31+00:00"
+        },
+        {
+            "name": "waynestate/pinstripe",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/waynestate/pinstripe.git",
+                "reference": "46963d88a179ddeaa899c39a04616267ca9527d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/waynestate/pinstripe/zipball/46963d88a179ddeaa899c39a04616267ca9527d3",
+                "reference": "46963d88a179ddeaa899c39a04616267ca9527d3",
                 "shasum": ""
             },
             "require": {
@@ -10560,7 +10705,8 @@
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.3",
                 "phpstan/phpstan-deprecation-rules": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0"
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "spaze/phpstan-disallowed-calls": "^4.15"
             },
             "require-dev": {
                 "larastan/larastan": "^3.13",
@@ -10594,11 +10740,11 @@
             "description": "The coding standard for the Wayne State app stack: shared Pint and PHPStan presets.",
             "homepage": "https://pinstripe.apps.wayne.edu/",
             "support": {
-                "issues": "https://nougat.snu.gs/enterprise-apps/pinstripe/-/issues",
-                "source": "https://nougat.snu.gs/enterprise-apps/pinstripe"
+                "issues": "https://git.wayne.edu/enterprise-apps/pinstripe/-/issues",
+                "source": "https://github.com/waynestate/pinstripe"
             },
-            "time": "2026-11-07T00:59:25+00:00",
-            "published-time": "2026-11-07T01:31:49+00:00"
+            "time": "2026-11-09T05:15:21+00:00",
+            "published-time": "2026-11-09T21:53:38+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -10664,7 +10810,8 @@
                 "issues": "https://github.com/webmozarts/assert/issues",
                 "source": "https://github.com/webmozarts/assert/tree/2.5.0"
             },
-            "time": "2026-10-05T23:14:19+00:00"
+            "time": "2026-10-05T23:14:19+00:00",
+            "published-time": "2026-10-05T23:14:25+00:00"
         }
     ],
     "aliases": [],

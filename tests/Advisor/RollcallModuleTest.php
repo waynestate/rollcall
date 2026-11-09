@@ -12,6 +12,7 @@ use Waynestate\Advisor\Content\ContentBundle;
 use Waynestate\Advisor\Exception\ToolInputError;
 use Waynestate\Advisor\Module\ModuleContext;
 use Waynestate\Advisor\Module\ToolDefinition;
+use Waynestate\Advisor\Playbook\Settings;
 use Waynestate\Advisor\Security\PathGuard;
 use Waynestate\Advisor\Security\SymfonyProcessRunner;
 use Waynestate\Advisor\Support\FixedClock;
@@ -53,6 +54,7 @@ final class RollcallModuleTest extends TestCase
             new FixedClock(self::TODAY),
             new PathGuard(sys_get_temp_dir()),
             new SymfonyProcessRunner(),
+            new Settings(),
         ));
     }
 
