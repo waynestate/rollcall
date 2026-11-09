@@ -92,6 +92,10 @@ composer require waynestate/rollcall
 
 Rollcall 1.0.0 is on Packagist. No extra repository needed. Requires PHP `^8.3`. The CLI is `vendor/bin/rollcall`.
 
+From 1.0 Rollcall follows SemVer against its contract ([`contract/`](contract/README.md)): inside 1.x the report,
+the stored snapshot and the image list may gain a field (a minor release) but never lose or retype one. Promoted
+to 1.0 with perfect attendance.
+
 ## Quick start
 
 This runs on the fixtures in the repo, so you need no network and no token. Run `composer install` once

@@ -16,7 +16,7 @@ question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is wo
 | 7 | Who may see the per-app list, and how is that decided? | Project owner / security owner | Turning on the internal page | Off. The Laravel per-app route needs `ROLLCALL_INTERNAL_ENABLED=true` and runs behind `auth.sesame`; no per-app access control beyond that |
 | 8 | May the public counts (`/report.json`, the dashboard) be published, and to whom? | Project owner | Serving them | `/report.json` is off by default; the Laravel dashboard is off by default and sends `noindex` |
 | 9 | How long are snapshots and per-app detail kept? | Project owner / records owner | Disk growth, privacy | Pruning is built: `ROLLCALL_RETENTION_DAYS` (default 90; 0 keeps forever), `rollcall scan --prune` and `rollcall prune [--dry-run]`. The newest snapshot is never deleted. The default window is still the owner's call |
-| 10 | CycloneDX or SPDX for a bill of materials, and is Dependency-Track wanted? | Security owner | The BOM feature | CycloneDX where a BOM is produced (lead decision); none is produced in 0.1 |
+| 10 | CycloneDX or SPDX for a bill of materials, and is Dependency-Track wanted? | Security owner | The BOM feature | CycloneDX where a BOM is produced (lead decision); none is produced in 1.0 |
 | 11 | Should Rollcall fetch endoflife.date itself? | Project owner | Automatic drift flags | No. `rollcall drift` reads a saved page, so no unattended outbound call exists |
 | 12 | Who confirms an app's owner, and where is that recorded? | Owner decided (2026-11-08): an owners file in Rollcall, because Rolodex is paused | A people source | Rollcall's own `owners.json` in the repo maps each of the 13 scanned stack projects to its owner, the stack maintainer (roles and teams only: the repo is public), checked against `contract/owners.schema.json`; `ROLLCALL_OWNERS_FILE` points at it or at another fleet's file. `rollcall digest` names every scanned app no entry lists as "no owner on file" (stderr, and `no_owner_on_file` in the JSON). The report still carries no owner field, and no owner is guessed from commit authors. Each entry carries a `"confirmed"` date; `rollcall owners` (run by the weekly scan job) calls the owner unknown and exits 1 once no entry listing an app was confirmed in the last `ROLLCALL_OWNERS_CONFIRM_DAYS` days (365 by default, chosen to match the yearly token rotation; the window is the owner's call). A people source (Rolodex) can replace the file later |
 | 13 | Does the dashboard need WayneUI's `app-shell` (public or internal template)? | WayneUI maintainer | Matching WayneUI exactly and the a11y gate | The Laravel page is plain HTML with WayneUI class names (`wsu-table`, `wsu-stat`, skip link) and links `ROLLCALL_WAYNEUI_CSS`. Swap to `<x-wsu::app-shell>` once WayneUI installs as a Composer dependency |
@@ -41,7 +41,7 @@ question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is wo
 
 ## Not built yet
 
-| Item | Why it is left for 0.2+ |
+| Item | Why it is left for after 1.0 |
 |---|---|
 | A scheduled Citadel export | The reader and the forced-upgrade date are built (`ROLLCALL_CITADEL_EXPORT`); producing the file on a schedule is the Citadel team's (question 2) |
 | PROCTOR reports from CI artifacts | Storage not decided (question 1); the reader and interface exist |
@@ -54,7 +54,7 @@ question moves to `DECISIONS.md` (and an ADR under `ADR/` when its context is wo
 | Quick-start and versions table generated from `policy.json`, a11y gate and `--check` for stale pages | Closed: the versions table and the quick-start printout's policy values are both generated from `policy.json` (`tools/versions-table.php`, `bin/quickstart-versions.php`; `composer site:versions`, checked by `composer site:versions-check` in `composer ci`), and the front page a11y gate (`scripts/a11y.sh`, `scripts/a11y.ps1`) runs in CI on the front page and the rendered dashboard pages (`a11y-site`, `dashboard-a11y`) |
 | Raw-PHP and Vue dashboards | The dashboard is Laravel only; a framework-free page would call the same report builder |
 | Secret-scan hooks | Question 3 |
-| Tag `1.0.0` and the GitHub mirror | The mirror exists: a push mirror from git.wayne.edu, which is canonical. Only the 1.0.0 tag is left, which is the owner's call |
+| Tag `1.0.0` and the GitHub mirror | Closed: `1.0.0` is tagged (2026-11-09) and on Packagist, and the mirror is a push mirror from git.wayne.edu, which is canonical |
 | A live trial against git.wayne.edu | Forbidden for the build; the GitLab adapter has only been run against recorded responses. Confirm `default_branch` is returned by `simple=true`, that `HEAD` returns `X-Gitlab-Blob-Id`, and the rate limit |
 
 ## Choices worth a second look

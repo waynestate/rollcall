@@ -9,13 +9,15 @@ type: Libre Caslon Display (display) and Courier Prime (typewriter); body text i
   (present, late, back row, inaudible), a gold highlighter, and the green cloth binding as the back cover.
 - **Magic:** the roll is taken. As the register scrolls in, Rollcall calls each name, the row is highlighted, a stamp
   thumps down in wet ink that dries, and the back row raises its hands. The burn-down chart rules itself by hand.
+  On the title page the release is a report card: a green PROMOTED stamp comes down beside the version, which the
+  docs builder stamps at every release (`data-docs-version`), with a link to the contract's SemVer promise.
 - **Built on WayneUI 2.0.8** (`assets/wayne-ui/`, copied, no CDN): tokens, Lato, skip link, `wsu-sr-only`. The
   look is overridden in `assets/rollcall.css`.
 - **Fonts** are self-hosted from `@fontsource` under the SIL Open Font License; licenses in `assets/fonts/`.
 - **Reduced motion:** with `prefers-reduced-motion: reduce` the page arrives with the roll already taken, every word
   at first paint.
 - **Sample data:** every app name on the page is fictional and labeled as sample data. The printout is real output
-   from Rollcall 0.1 against the bundled fixtures.
+   from Rollcall 1.0 against the bundled fixtures.
 - Screenshots: `screenshots/` (desktop 1440, mobile 390, reduced motion, motion GIF).
 
 ## Links between the stack sites

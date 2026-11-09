@@ -18,6 +18,8 @@ Rollcall is the stack's fleet scanner. For each app it records the PHP image, th
 
 `$ composer require waynestate/rollcall`
 
+Promoted to **1.0.0**, on Packagist. Inside 1.x the report, the snapshot and the image list never lose or retype a field: [the contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html) says so.
+
 **Works alongside [WELD](https://weld.apps.wayne.edu/).** Rollcall doesn't go inside your app. You run it on its own to see what every app in the fleet is running, WELD apps included.
 
 [Quick start](https://rollcall.apps.wayne.edu/#start-title) [Take the roll](https://rollcall.apps.wayne.edu/#roll-title)
@@ -184,7 +186,7 @@ php bin/rollcall scan
 php bin/rollcall report
 ```
 
-What comes back real output, Rollcall 0.1, bundled fixtures (four demo apps)
+What comes back real output, abridged, Rollcall 1.0, bundled fixtures (four demo apps)
 
 ```
 Present: 4 apps. Snapshot 2026-10-28 saved to var/snapshots.
