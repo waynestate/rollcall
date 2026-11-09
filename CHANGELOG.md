@@ -5,6 +5,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ## [Unreleased]
 
 - Changed: CI and the documented Docker lines run Composer 2.11.1, pinned by digest (was 2.10.3, no longer maintained; 2.11.1 fixes GHSA-c968-33g3-wh7p and GHSA-fm2w-xgf2-f9fh): the `wayneui-copies`, `composer-ci`, `dashboard-render`, `rollcall-scan` and `creed-copy-refresh` jobs, and `scripts/dashboard-a11y.sh` and `.ps1`. The `composer-audit` component's image input is left alone; Preflight moves its own pin.
+- Changed: the deploy kit is Squire 0.10.2 (was 0.10.1): the fallback and portable images name every base image in full (`docker.io/library/...`, so Buildah and Podman accept them) with Composer as its own build argument, the session cookie is `SameSite=Lax`, and the portable image drops `node_modules/` after the build. The front page is static, so nothing it serves changes.
 
 ## [1.1.0] - 2026-11-09
 
