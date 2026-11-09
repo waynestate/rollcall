@@ -66,7 +66,7 @@
 </tr>
 <tr>
 <td>ROLLCALL_DASHBOARD_ENABLED</td>
-<td>Laravel: serve the dashboard page</td>
+<td>Laravel and raw PHP: serve the dashboard page</td>
 <td><code>false</code></td>
 <td>config/rollcall.php</td>
 </tr>
@@ -126,7 +126,7 @@
 </tr>
 <tr>
 <td>ROLLCALL_INTERNAL_ENABLED</td>
-<td>Laravel: serve the per-app page at <code>&lt;path&gt;/apps</code> (needs your sign-in middleware)</td>
+<td>Laravel and raw PHP: serve the per-app page (Laravel at <code>&lt;path&gt;/apps</code> behind your sign-in middleware; raw PHP only where you call rollcall_dashboard(['internal' =&gt; true]) behind your sign-in)</td>
 <td><code>false</code></td>
 <td>config/rollcall.php</td>
 </tr>
@@ -204,7 +204,7 @@
 </tr>
 <tr>
 <td>ROLLCALL_WAYNEUI_CSS</td>
-<td>Laravel: https:// or absolute URL of WayneUI's stylesheet for the dashboard</td>
+<td>Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard</td>
 <td>none</td>
 <td>config/rollcall.php</td>
 </tr>

@@ -108,7 +108,7 @@
                     "`false`"
                 ],
                 "ROLLCALL_DASHBOARD_ENABLED": [
-                    "Laravel: serve the dashboard page",
+                    "Laravel and raw PHP: serve the dashboard page",
                     "`false`"
                 ],
                 "ROLLCALL_DASHBOARD_PATH": [
@@ -116,11 +116,11 @@
                     "`rollcall`"
                 ],
                 "ROLLCALL_INTERNAL_ENABLED": [
-                    "Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware)",
+                    "Laravel and raw PHP: serve the per-app page (Laravel at `<path>/apps` behind your sign-in middleware; raw PHP only where you call rollcall_dashboard(['internal' => true]) behind your sign-in)",
                     "`false`"
                 ],
                 "ROLLCALL_WAYNEUI_CSS": [
-                    "Laravel: https:// or absolute URL of WayneUI's stylesheet for the dashboard",
+                    "Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard",
                     "none"
                 ]
             }

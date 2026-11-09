@@ -52,7 +52,10 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
+- `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve (see "The dashboard in a raw PHP app").
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
+
+Both dashboards print the same renderer (`src/Dashboard/DashboardPage.php`) from the same report, so they cannot drift.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made
 by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`;
@@ -249,10 +252,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
 | `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |
 | `ROLLCALL_PUBLIC_REPORT_ENABLED` | Serve `GET /report.json` (public counts only) | `false` |
-| `ROLLCALL_DASHBOARD_ENABLED` | Laravel: serve the dashboard page | `false` |
+| `ROLLCALL_DASHBOARD_ENABLED` | Laravel and raw PHP: serve the dashboard page | `false` |
 | `ROLLCALL_DASHBOARD_PATH` | Laravel: dashboard URL path | `rollcall` |
-| `ROLLCALL_INTERNAL_ENABLED` | Laravel: serve the per-app page at `/apps` (needs your sign-in middleware) | `false` |
-| `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
+| `ROLLCALL_INTERNAL_ENABLED` | Laravel and raw PHP: serve the per-app page (Laravel at `/apps`, behind your sign-in middleware; raw PHP only where you call `rollcall_dashboard(['internal' => true])` behind your sign-in) | `false` |
+| `ROLLCALL_WAYNEUI_CSS` | Laravel and raw PHP: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
 To scan GitLab you need the token and either a group or the project allowlist. The narrow way is
 `ROLLCALL_GITLAB_PROJECTS`: name the exact `group/project` paths and Rollcall reads only those, never listing a
@@ -425,6 +428,31 @@ runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.se
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
 The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
 on a separate app or leave metrics off.
+
+### The dashboard in a raw PHP app
+
+The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same
+report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
+
+```php
+<?php
+// public/rollcall.php
+require __DIR__ . '/../vendor/autoload.php';
+
+$helmet = \Waynestate\Helmet\helmet_boot(['preset' => 'citadel']);
+rollcall_dashboard(['nonce' => $helmet['nonce']]);
+```
+
+It answers 404 until `ROLLCALL_DASHBOARD_ENABLED=true`, sends `X-Robots-Tag: noindex` with every answer, and never
+runs a scan: it reads the latest snapshot, so set `ROLLCALL_POLICY_FILE` and `ROLLCALL_STORE_DIR` as for the CLI
+and schedule `vendor/bin/rollcall scan`. The page has no script. Its one small style element takes HELMET's nonce;
+link WayneUI's stylesheet with `ROLLCALL_WAYNEUI_CSS` and the page keeps its look under HELMET's CSP even without
+one. No HELMET? Call `rollcall_dashboard()` with no options.
+
+The per-app page is a second file, behind your sign-in: call `rollcall_dashboard(['internal' => true])` after
+SESAME's `sesame_login()` has returned a user. It also needs `ROLLCALL_INTERNAL_ENABLED=true`; with either one
+missing it answers 404, so it fails closed. For a front controller of your own,
+`Waynestate\Rollcall\Dashboard\RawDashboard::response()` returns the same answer as data (status, headers, body).
 
 ### Use Rollcall from your coding agent (ADVISOR)
 
@@ -788,15 +816,15 @@ Output: the commands you ran, the report, then a short reading of it and your qu
 
 #### Rollcall as a plain PHP tool
 
-The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them.
+The CLI on a schedule, and the dashboard page and the /metrics and /report.json front controller only if you ask for them.
 
 A prompt for your coding agent. Copy it as it stands:
 
 ```text
-You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the /metrics and /report.json endpoints.
+You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the dashboard page of totals and the /metrics and /report.json endpoints.
 
 Read first:
-- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections.
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections, and The dashboard in a raw PHP app.
 - ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with permutation raw-php for the rules that apply, and policy_lookup for PHP. If it is not connected, say so and work from the pages.
 - This project's composer.json, and how this host runs scheduled jobs.
 
@@ -805,11 +833,12 @@ Task:
 2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once the read_api token exists (the stack maintainer makes it) and you have the group.
 3. Schedule the scan subcommand once a day with --prune, and show me the report subcommand in text and in json.
 4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
+5. Only if I ask for the dashboard: add one file under the served folder that calls rollcall_dashboard(), after helmet_boot() with its nonce when this app runs HELMET. Turn it on with ROLLCALL_DASHBOARD_ENABLED and give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED plus 'internal' => true) off unless I ask; it belongs only behind this app's sign-in.
 
 Constraints:
 - Rollcall is read-only toward every source and writes only its snapshot folder (plus digest files, when `rollcall digest --out` is asked for). Keep it that way.
 - The GitLab token is a read_api group or project access token (a GitLab bot) that the stack maintainer makes and rotates; it comes from the environment as ROLLCALL_GITLAB_TOKEN. Never commit it, log it or print it.
-- Metrics and the public report stay off unless I turn them on.
+- Metrics, the public report and the dashboard stay off unless I turn them on.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
 - Ask me before you guess, and before you touch a deploy or a scheduler.
 
@@ -877,7 +906,7 @@ Rollcall scans and compares
 - Terminal`text` and `json` reports
 - /metricsPrometheus text, off by default
 - Grafanathe bundled burn-down dashboard
-- Laravel pagea WayneUI dashboard of totals
+- Dashboard pageWayneUI totals, in Laravel or raw PHP
 
 Rollcall's place in the stack
 
@@ -912,6 +941,7 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
+- `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve. It prints the same renderer (`src/Dashboard/DashboardPage.php`) as the Laravel page, so the two cannot drift.
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`; until Rollcall switches, the copy stays. To refresh it, run `php <creed>/bin/export.php --namespace='Waynestate\Rollcall\Creed' --to=src/Creed` from a CREED checkout. `composer creed-copy:check` proves the copy has not drifted (it reads the checkout from `CREED_PATH`); a hand edit to `src/Creed/` fails that check.
@@ -1187,9 +1217,28 @@ Source: https://rollcall.apps.wayne.edu/docs/guides/laravel.html
 
 ## Laravel[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
 
-This page wires Rollcall into a Laravel app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
+This page wires Rollcall into a Laravel app, and shows the same dashboard in a raw PHP app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
 
 The package registers itself (`extra.laravel.providers`). Publish the config with `php artisan vendor:publish --tag=rollcall-config`, set the variables in [the configuration reference](https://rollcall.apps.wayne.edu/docs/reference/configuration.html), and schedule `rollcall:scan`. The dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`. The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.
+
+### The dashboard in a raw PHP app[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
+
+The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
+
+```php
+<?php
+// public/rollcall.php
+require __DIR__ . '/../vendor/autoload.php';
+
+$helmet = \Waynestate\Helmet\helmet_boot(['preset' => 'citadel']);
+rollcall_dashboard(['nonce' => $helmet['nonce']]);
+```
+
+It answers 404 until `ROLLCALL_DASHBOARD_ENABLED=true`, sends `X-Robots-Tag: noindex` with every answer, and never runs a scan: it reads the latest snapshot, so set `ROLLCALL_POLICY_FILE` and `ROLLCALL_STORE_DIR` as for the CLI and schedule `vendor/bin/rollcall scan`. The page has no script. Its one small style element takes HELMET's nonce; link WayneUI's stylesheet with `ROLLCALL_WAYNEUI_CSS` and the page keeps its look under HELMET's CSP even without one. No HELMET? Call `rollcall_dashboard()` with no options. It carries the same status line as the Laravel page.
+
+The per-app page is a second file, behind your sign-in: call `rollcall_dashboard(['internal' => true])` after SESAME's `sesame_login()` has returned a user. It also needs `ROLLCALL_INTERNAL_ENABLED=true`; with either one missing it answers 404, so it fails closed. For a front controller of your own, `Waynestate\Rollcall\Dashboard\RawDashboard::response()` returns the same answer as data (status, headers, body).
+
+Both pages go through the same accessibility gate: `DashboardRenderTest` writes the Laravel and the raw-PHP pages, and `dashboard-a11y` checks all six in light and dark at 320 and 1280 px.
 
 ---
 
@@ -1538,7 +1587,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | --- | --- | --- | --- |
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
 | ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
-| ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
+| ROLLCALL_DASHBOARD_ENABLED | Laravel and raw PHP: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
 | ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
 | ROLLCALL_DIGEST_MAIL_ENABLED | Allow `rollcall digest --send` to mail | `false` | src/Config.php |
@@ -1548,7 +1597,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_GITLAB_TOKEN | A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed | none | config/rollcall.php |
 | ROLLCALL_GITLAB_URL | https:// base URL of the GitLab instance | none | config/rollcall.php |
 | ROLLCALL_IMAGES_FILE | Export of the app list: {"apps": \[{"project": "group/project", "image": "php:8.4-apache"}\]} | none | config/rollcall.php |
-| ROLLCALL_INTERNAL_ENABLED | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` | config/rollcall.php |
+| ROLLCALL_INTERNAL_ENABLED | Laravel and raw PHP: serve the per-app page (Laravel at `<path>/apps` behind your sign-in middleware; raw PHP only where you call rollcall_dashboard(\['internal' => true\]) behind your sign-in) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
@@ -1561,7 +1610,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_RETENTION_DAYS | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) | config/rollcall.php |
 | ROLLCALL_SOURCE | directory (fixtures) or gitlab | `directory` | config/rollcall.php |
 | ROLLCALL_STORE_DIR | Snapshot directory, the only place Rollcall writes | `var/snapshots` | config/rollcall.php |
-| ROLLCALL_WAYNEUI_CSS | Laravel: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
+| ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 
 #### Auth packages[#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#auth-packages)
 
@@ -1750,7 +1799,7 @@ Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is
 | Windows (PowerShell) | Linux and macOS (bash) | What they do |
 | --- | --- | --- |
 | `scripts/a11y.ps1` | `scripts/a11y.sh` | The front page accessibility gate: Preflight's a11y checker (vendored in `tools/a11y/check.mjs`, pinned by `tests/A11yCheckerPinTest.php`) in Docker, the same image and inputs as the `a11y-site` CI job |
-| `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit (styled with the bundled WayneUI stylesheet), then runs the same axe-core check on all three, in Docker |
+| `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), then runs the same axe-core check on all six, in Docker |
 | `deploy/scripts/parity.ps1` | `deploy/scripts/parity.sh` | Runs the front page locally on the Citadel PHP image behind a proxy (Squire's) |
 
 `scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.

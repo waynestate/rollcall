@@ -2,14 +2,15 @@
 # Dashboard accessibility gate: Preflight's a11y checker (vendored in
 # tools/a11y/check.mjs from Preflight 0.3.1, pinned by tests/A11yCheckerPinTest.php),
 # run in Docker so no host browser is needed. Renders the public, internal
-# and empty-state dashboard pages with PHPUnit, then checks all three with the
+# and empty-state dashboard pages with PHPUnit, from Laravel and from the
+# raw-PHP entry point (six pages), then checks all six with the
 # same image, tags, color schemes and widths as the dashboard-a11y CI job, so a
 # page that passes here passes CI. Needs only Docker. Linux and macOS; on
 # Windows use scripts/dashboard-a11y.ps1, or this script from Git Bash (the
 # MSYSTEM block below handles its path conversion).
 #
 # The render step copies the repo into a container workdir (never the host
-# checkout) and writes the three pages to build/dashboard-a11y on the host; the
+# checkout) and writes the six pages to build/dashboard-a11y on the host; the
 # check step reuses the same image and named volume as scripts/a11y.sh, so
 # npm installs once and later runs reuse it. The reports (gl-a11y-junit.xml,
 # gl-a11y-report.json) land next to the rendered pages, in build/dashboard-a11y
@@ -17,8 +18,8 @@
 # tool or configuration error.
 #
 # The substitute takes the register three times, once for the class, once for
-# the office and once for the empty room, and marks everybody present on every
-# roll.
+# the office and once for the empty room, then does it all again in the raw-PHP
+# room down the hall, and marks everybody present on every roll.
 set -eu
 
 cd "$(dirname "$0")/.."
@@ -47,7 +48,7 @@ mkdir -p "$OUT_DIR"
 
 # Render: the repo is mounted read-only at /src and copied to /w, so vendor
 # lands in the copy, never in the host checkout. Composer's cache stays in a
-# named volume; the three pages come out through /out, bound to $OUT_DIR here.
+# named volume; the six pages come out through /out, bound to $OUT_DIR here.
 docker run --rm \
   -e ROLLCALL_WAYNEUI_CSS="$WAYNEUI_CSS" \
   -v "${REPO}:/src:ro" \
@@ -70,7 +71,7 @@ cp -R site/assets/wayne-ui "$OUT_DIR/assets/"
 mkdir -p tools/a11y/node_modules
 
 # The dashboard-a11y CI job's inputs, as JSON for the checker.
-CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
+CONFIG='{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html", "raw.html", "raw-apps.html", "raw-empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
 
 # The checker reads its inputs from a JSON file next to its reports.
 printf '%s\n' "$CONFIG" > "$OUT_DIR/config.json"

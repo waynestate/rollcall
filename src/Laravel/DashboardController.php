@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Laravel;
 
 use Illuminate\Contracts\View\View;
-use Waynestate\Rollcall\Clock\SystemClock;
+use Waynestate\Rollcall\Dashboard\DashboardPage;
 use Waynestate\Rollcall\Factory;
-use Waynestate\Rollcall\RollcallException;
 
-/** Renders the report the core built. No rule lives here. */
+/**
+ * Renders the report the core built. No rule lives here, and no markup: the
+ * view prints DashboardPage, the same renderer the raw-PHP page uses.
+ */
 class DashboardController
 {
     public function show(Factory $factory): View
@@ -24,19 +26,10 @@ class DashboardController
 
     private function page(Factory $factory, bool $internal): View
     {
-        $css = config('rollcall.wayneui_css');
-        $css = is_string($css) && preg_match('#^(https://|/)[^\s"<>]+$#', $css) === 1 ? $css : null;
-
-        try {
-            $store = $factory->store();
-            $latest = $store->latest();
-            $report = $latest === null
-                ? null
-                : $factory->reportBuilder()->build($latest, $store->all(), (new SystemClock())->now(), $internal);
-        } catch (RollcallException) {
-            $report = null;
-        }
-
-        return view('rollcall::dashboard', ['report' => $report, 'internal' => $internal, 'css' => $css]);
+        return view('rollcall::dashboard', [
+            'report' => DashboardPage::report($factory, $internal),
+            'internal' => $internal,
+            'css' => DashboardPage::stylesheet(config('rollcall.wayneui_css')),
+        ]);
     }
 }

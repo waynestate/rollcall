@@ -14,7 +14,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | --- | --- | --- | --- |
 | ROLLCALL_AUTH_PACKAGES | Comma-separated Composer packages that count as an auth package | the built-in list | config/rollcall.php |
 | ROLLCALL_CITADEL_EXPORT | Citadel's saved registrations export, used instead of ROLLCALL_IMAGES_FILE (not both): base images plus forced upgrade dates. See the Citadel guide | none | config/rollcall.php |
-| ROLLCALL_DASHBOARD_ENABLED | Laravel: serve the dashboard page | `false` | config/rollcall.php |
+| ROLLCALL_DASHBOARD_ENABLED | Laravel and raw PHP: serve the dashboard page | `false` | config/rollcall.php |
 | ROLLCALL_DASHBOARD_PATH | Laravel: dashboard URL path | `rollcall` | config/rollcall.php |
 | ROLLCALL_DIGEST_MAIL_DSN | Symfony Mailer DSN for sending, such as smtp://mail.example.test:25. A secret: never in git, never printed | none | src/Config.php |
 | ROLLCALL_DIGEST_MAIL_ENABLED | Allow `rollcall digest --send` to mail | `false` | src/Config.php |
@@ -24,7 +24,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_GITLAB_TOKEN | A GitLab group or project access token (a bot), or a service account's token, with the read_api scope only, the Reporter role and an expiry. The stack's is the group token rollcall-scanner, rotated by the stack maintainer (docs/security.md). Never in git, never logged, never printed | none | config/rollcall.php |
 | ROLLCALL_GITLAB_URL | https:// base URL of the GitLab instance | none | config/rollcall.php |
 | ROLLCALL_IMAGES_FILE | Export of the app list: {"apps": [{"project": "group/project", "image": "php:8.4-apache"}]} | none | config/rollcall.php |
-| ROLLCALL_INTERNAL_ENABLED | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` | config/rollcall.php |
+| ROLLCALL_INTERNAL_ENABLED | Laravel and raw PHP: serve the per-app page (Laravel at `<path>/apps` behind your sign-in middleware; raw PHP only where you call rollcall_dashboard(['internal' => true]) behind your sign-in) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_ALLOW | Comma-separated scraper IP addresses (exact match) | none | config/rollcall.php |
 | ROLLCALL_METRICS_ENABLED | Turn metrics on (CLI report --format=prometheus and /metrics) | `false` | config/rollcall.php |
 | ROLLCALL_METRICS_TOKEN | Bearer token a scraper must present | none | config/rollcall.php |
@@ -37,7 +37,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_RETENTION_DAYS | How many days of snapshots to keep; the newest is never deleted | `90` (0 keeps everything) | config/rollcall.php |
 | ROLLCALL_SOURCE | directory (fixtures) or gitlab | `directory` | config/rollcall.php |
 | ROLLCALL_STORE_DIR | Snapshot directory, the only place Rollcall writes | `var/snapshots` | config/rollcall.php |
-| ROLLCALL_WAYNEUI_CSS | Laravel: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
+| ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 <!-- /generated -->
 
 ### Auth packages

@@ -41,12 +41,15 @@
         "symfony/mailer": "Only to mail the opt-in owner digests (rollcall digest --send); printing them needs nothing extra",
         "waynestate/advisor": "ADVISOR's MCP server loads the Rollcall module (src/Advisor/RollcallModule.php) with its three read-only tools",
         "waynestate/playbook": "WSU's shared values (CAS, Entra, gateway); private, git.wayne.edu",
-        "waynestate/wayne-ui": "WayneUI styles the Laravel dashboard page. Install it, or link its stylesheet with ROLLCALL_WAYNEUI_CSS"
+        "waynestate/wayne-ui": "WayneUI styles the dashboard page (Laravel or raw PHP). Install it, or link its stylesheet with ROLLCALL_WAYNEUI_CSS"
     },
     "autoload": {
         "psr-4": {
             "Waynestate\\Rollcall\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

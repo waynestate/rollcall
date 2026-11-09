@@ -213,8 +213,8 @@ page that passes locally passes CI. No host browser is needed:
 
 - Front page: `scripts/a11y.sh` on Linux and macOS, or `scripts/a11y.ps1` on Windows (PowerShell 5.1 and 7);
   checks every HTML page under `site/`.
-- Dashboard: `scripts/dashboard-a11y.sh` or `scripts/dashboard-a11y.ps1`; renders the public and internal
-  dashboard pages first, then checks both.
+- Dashboard: `scripts/dashboard-a11y.sh` or `scripts/dashboard-a11y.ps1`; renders the public, internal and
+  empty-state dashboard pages from Laravel and from the raw-PHP entry point first (six pages), then checks all six.
 
 At 320 px the checker also fails a page whose content overflows its viewport (reflow, violation id
 `preflight-reflow`). Any violation, or a page that does not load, fails the run (exit 1; exit 2 on a tool or
@@ -222,7 +222,7 @@ configuration error). The reports (`gl-a11y-junit.xml`, `gl-a11y-report.json`) l
 `build/dashboard-a11y/` (gitignored). The checker's npm packages live in a named Docker volume
 (`rollcall-a11y-node-modules`), installed once and reused, so the first run is slow and later ones are fast.
 
-Run the gates after any change under `site/` or the dashboard views, and before every release. They mirror the
+Run the gates after any change under `site/`, the dashboard view or its renderer (`src/Dashboard/`), and before every release. They mirror the
 `a11y-site` and `dashboard-a11y` CI jobs, which run the same checker from the Preflight component.
 
 ## Who maintains it

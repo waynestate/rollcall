@@ -458,13 +458,13 @@ Output: the commands you ran, the report, then a short reading of it and your qu
             <div>
               <p class="ar-prompt__kicker">Note 2 · Raw PHP, no framework</p>
               <h3 class="ar-prompt__title" id="prompt-raw-php-title">Rollcall as a plain PHP tool</h3>
-              <p class="ar-prompt__desc">The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them.</p>
+              <p class="ar-prompt__desc">The CLI on a schedule, and the dashboard page and the /metrics and /report.json front controller only if you ask for them.</p>
             </div>
           </header>
-          <pre class="ar-prompt__text"><code>You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the /metrics and /report.json endpoints.
+          <pre class="ar-prompt__text"><code>You are a coding agent setting up Rollcall, the fleet scanner of WELD, the Wayne State application stack, as a plain PHP tool with no framework: a scan on a schedule from the command line and, only if I ask, the dashboard page of totals and the /metrics and /report.json endpoints.
 
 Read first:
-- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections.
+- https://rollcall.apps.wayne.edu/llms.txt, then the README it links: the Commands, Configuration and Metrics sections, and The dashboard in a raw PHP app.
 - ADVISOR, the stack's MCP server, if it is connected: list_stack_rules with permutation raw-php for the rules that apply, and policy_lookup for PHP. If it is not connected, say so and work from the pages.
 - This project's composer.json, and how this host runs scheduled jobs.
 
@@ -473,11 +473,12 @@ Task:
 2. Write the settings as environment variables from the README's Configuration table: the policy file, the store folder and the source. Start with directory fixtures; switch to GitLab only once the read_api token exists (the stack maintainer makes it) and you have the group.
 3. Schedule the scan subcommand once a day with --prune, and show me the report subcommand in text and in json.
 4. Only if I ask for metrics: serve the package's public/index.php front controller, with ROLLCALL_METRICS_ENABLED and either ROLLCALL_METRICS_TOKEN or ROLLCALL_METRICS_ALLOW set.
+5. Only if I ask for the dashboard: add one file under the served folder that calls rollcall_dashboard(), after helmet_boot() with its nonce when this app runs HELMET. Turn it on with ROLLCALL_DASHBOARD_ENABLED and give it WayneUI's stylesheet with ROLLCALL_WAYNEUI_CSS. Leave the per-app page (ROLLCALL_INTERNAL_ENABLED plus 'internal' =&gt; true) off unless I ask; it belongs only behind this app's sign-in.
 
 Constraints:
 - Rollcall is read-only toward every source and writes only its snapshot folder (plus digest files, when `rollcall digest --out` is asked for). Keep it that way.
 - The GitLab token is a read_api group or project access token (a GitLab bot) that the stack maintainer makes and rotates; it comes from the environment as ROLLCALL_GITLAB_TOKEN. Never commit it, log it or print it.
-- Metrics and the public report stay off unless I turn them on.
+- Metrics, the public report and the dashboard stay off unless I turn them on.
 - Give separate commands for Windows (PowerShell), macOS and Linux wherever they differ, schedules included.
 - Ask me before you guess, and before you touch a deploy or a scheduler.
 
@@ -565,7 +566,7 @@ Output: the files you changed, the scheduler entry, then your questions.</code><
             <li class="card"><span class="card__k">Terminal</span><span class="card__v"><code>text</code> and <code>json</code> reports</span></li>
             <li class="card"><span class="card__k">/metrics</span><span class="card__v">Prometheus text, off by default</span></li>
             <li class="card"><span class="card__k">Grafana</span><span class="card__v">the bundled burn-down dashboard</span></li>
-            <li class="card"><span class="card__k">Laravel page</span><span class="card__v">a WayneUI dashboard of totals</span></li>
+            <li class="card"><span class="card__k">Dashboard page</span><span class="card__v">WayneUI totals, in Laravel or raw PHP</span></li>
           </ul>
         </div>
       </div>

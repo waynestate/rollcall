@@ -84,7 +84,8 @@ final class Config
         );
     }
 
-    private static function truthy(?string $value): bool
+    /** One reading of an on/off setting for every entry point: 1, true, yes and on are on. */
+    public static function truthy(?string $value): bool
     {
         return in_array(strtolower($value ?? ''), ['1', 'true', 'yes', 'on'], true);
     }

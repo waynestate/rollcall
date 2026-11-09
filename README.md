@@ -56,7 +56,10 @@ A framework-free core (`src/`) plus thin entry points that hold no rules:
 
 - `bin/rollcall`: the CLI (`scan`, `report`, `digest`, `drift`, `advisories`, `prune`). One PHP command, so it works the same on Windows, macOS and Linux.
 - `public/index.php`: a raw-PHP front controller for `GET /metrics` and `GET /report.json`.
+- `rollcall_dashboard()`: the dashboard page for a raw PHP app, one call in a file you serve (see "The dashboard in a raw PHP app").
 - `src/Laravel/`: a Laravel adapter with a dashboard page, a `/metrics` route and `php artisan rollcall:scan` and `rollcall:prune`.
+
+Both dashboards print the same renderer (`src/Dashboard/DashboardPage.php`) from the same report, so they cannot drift.
 
 CREED's policy reader lives under `src/Creed/` (namespace `Waynestate\Rollcall\Creed`) as a generated copy, made
 by CREED's `bin/export.php`. CREED is on Packagist now, so the copy can become a `require` of `waynestate/creed`;
@@ -255,10 +258,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | `ROLLCALL_METRICS_TOKEN` | Bearer token a scraper must present | none |
 | `ROLLCALL_METRICS_ALLOW` | Comma-separated scraper IP addresses (exact match) | none |
 | `ROLLCALL_PUBLIC_REPORT_ENABLED` | Serve `GET /report.json` (public counts only) | `false` |
-| `ROLLCALL_DASHBOARD_ENABLED` | Laravel: serve the dashboard page | `false` |
+| `ROLLCALL_DASHBOARD_ENABLED` | Laravel and raw PHP: serve the dashboard page | `false` |
 | `ROLLCALL_DASHBOARD_PATH` | Laravel: dashboard URL path | `rollcall` |
-| `ROLLCALL_INTERNAL_ENABLED` | Laravel: serve the per-app page at `<path>/apps` (needs your sign-in middleware) | `false` |
-| `ROLLCALL_WAYNEUI_CSS` | Laravel: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
+| `ROLLCALL_INTERNAL_ENABLED` | Laravel and raw PHP: serve the per-app page (Laravel at `<path>/apps`, behind your sign-in middleware; raw PHP only where you call `rollcall_dashboard(['internal' => true])` behind your sign-in) | `false` |
+| `ROLLCALL_WAYNEUI_CSS` | Laravel and raw PHP: `https://` or absolute URL of WayneUI's stylesheet for the dashboard | none |
 
 To scan GitLab you need the token and either a group or the project allowlist. The narrow way is
 `ROLLCALL_GITLAB_PROJECTS`: name the exact `group/project` paths and Rollcall reads only those, never listing a
@@ -431,6 +434,31 @@ runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.se
 middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`.
 The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's
 on a separate app or leave metrics off.
+
+## The dashboard in a raw PHP app
+
+The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same
+report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
+
+```php
+<?php
+// public/rollcall.php
+require __DIR__ . '/../vendor/autoload.php';
+
+$helmet = \Waynestate\Helmet\helmet_boot(['preset' => 'citadel']);
+rollcall_dashboard(['nonce' => $helmet['nonce']]);
+```
+
+It answers 404 until `ROLLCALL_DASHBOARD_ENABLED=true`, sends `X-Robots-Tag: noindex` with every answer, and never
+runs a scan: it reads the latest snapshot, so set `ROLLCALL_POLICY_FILE` and `ROLLCALL_STORE_DIR` as for the CLI
+and schedule `vendor/bin/rollcall scan`. The page has no script. Its one small style element takes HELMET's nonce;
+link WayneUI's stylesheet with `ROLLCALL_WAYNEUI_CSS` and the page keeps its look under HELMET's CSP even without
+one. No HELMET? Call `rollcall_dashboard()` with no options.
+
+The per-app page is a second file, behind your sign-in: call `rollcall_dashboard(['internal' => true])` after
+SESAME's `sesame_login()` has returned a user. It also needs `ROLLCALL_INTERNAL_ENABLED=true`; with either one
+missing it answers 404, so it fails closed. For a front controller of your own,
+`Waynestate\Rollcall\Dashboard\RawDashboard::response()` returns the same answer as data (status, headers, body).
 
 ## Use Rollcall from your coding agent (ADVISOR)
 

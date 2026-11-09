@@ -30,12 +30,12 @@ include:
       site_dir: site
       pages: ["index.html", "docs/**/*.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
-  # The dashboard pages, rendered by the dashboard-render job below.
+  # The dashboard pages, rendered by the dashboard-render job below: Laravel (index, apps, empty) and raw PHP (raw-*).
   - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.4.0
     inputs:
       job_name: dashboard-a11y
       site_dir: build/dashboard-a11y
-      pages: ["index.html", "apps.html", "empty.html"]
+      pages: ["index.html", "apps.html", "empty.html", "raw.html", "raw-apps.html", "raw-empty.html"]
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 # Dependency caching: images already come through the Dependency Proxy, and
@@ -67,8 +67,9 @@ composer-ci:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
 
-# dashboard-render: renders the public, internal and empty-state dashboard pages
-# with PHPUnit (DashboardRenderTest) and hands them to dashboard-a11y as an artifact.
+# dashboard-render: renders the public, internal and empty-state dashboard pages, from
+# Laravel and from the raw-PHP entry point, with PHPUnit (DashboardRenderTest) and hands
+# them to dashboard-a11y as an artifact.
 dashboard-render:
   extends: .composer-cache
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
@@ -77,6 +78,7 @@ dashboard-render:
     - ROLLCALL_WAYNEUI_CSS=/assets/wayne-ui/wayne-ui.css ROLLCALL_DASHBOARD_OUT="$CI_PROJECT_DIR/build/dashboard-a11y" vendor/bin/phpunit --filter DashboardRender
     - mkdir -p build/dashboard-a11y/assets && cp -r site/assets/wayne-ui build/dashboard-a11y/assets/
     - test -s build/dashboard-a11y/index.html && test -s build/dashboard-a11y/apps.html && test -s build/dashboard-a11y/empty.html
+    - test -s build/dashboard-a11y/raw.html && test -s build/dashboard-a11y/raw-apps.html && test -s build/dashboard-a11y/raw-empty.html
   artifacts:
     paths:
       - build/dashboard-a11y/

@@ -40,6 +40,26 @@ abstract class LaravelTestCase extends TestCase
     /** Lets a test set its own switches before the provider's routes are registered. */
     protected function tune(\Illuminate\Contracts\Config\Repository $config): void {}
 
+    /**
+     * The same settings as environment variables, for the raw-PHP page, so
+     * both paths read the same store, policy and fixtures.
+     *
+     * @param  array<string, string>  $extra
+     * @return array<string, string>
+     */
+    protected function rawEnv(array $extra = []): array
+    {
+        return $extra + [
+            'ROLLCALL_POLICY_FILE' => Fleet::FIXTURES . '/policy.json',
+            'ROLLCALL_STORE_DIR' => $this->store,
+            'ROLLCALL_REPOS_DIR' => Fleet::FIXTURES . '/repos',
+            'ROLLCALL_IMAGES_FILE' => Fleet::FIXTURES . '/images.json',
+            'ROLLCALL_PROCTOR_DIR' => Fleet::FIXTURES . '/proctor',
+            'ROLLCALL_DASHBOARD_ENABLED' => 'true',
+            'ROLLCALL_INTERNAL_ENABLED' => 'true',
+        ];
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();

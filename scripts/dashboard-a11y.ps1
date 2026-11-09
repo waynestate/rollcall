@@ -1,13 +1,14 @@
 # Dashboard accessibility gate: Preflight's a11y checker (vendored in
 # tools/a11y/check.mjs from Preflight 0.3.1, pinned by tests/A11yCheckerPinTest.php),
 # run in Docker so no host browser is needed. Renders the public, internal
-# and empty-state dashboard pages with PHPUnit, then checks all three with the
+# and empty-state dashboard pages with PHPUnit, from Laravel and from the
+# raw-PHP entry point (six pages), then checks all six with the
 # same image, tags, color schemes and widths as the dashboard-a11y CI job, so a
 # page that passes here passes CI. Needs only Docker. Windows PowerShell 5.1
 # and PowerShell 7; on Linux and macOS use scripts/dashboard-a11y.sh.
 #
 # The render step copies the repo into a container workdir (never the host
-# checkout) and writes the three pages to build\dashboard-a11y on the host; the
+# checkout) and writes the six pages to build\dashboard-a11y on the host; the
 # check step reuses the same image and named volume as scripts/a11y.ps1, so
 # npm installs once and later runs reuse it. The reports (gl-a11y-junit.xml,
 # gl-a11y-report.json) land next to the rendered pages, in
@@ -15,8 +16,8 @@
 # that did not load, 2 a tool or configuration error.
 #
 # The substitute takes the register three times, once for the class, once for
-# the office and once for the empty room, and marks everybody present on every
-# roll.
+# the office and once for the empty room, then does it all again in the raw-PHP
+# room down the hall, and marks everybody present on every roll.
 $ErrorActionPreference = "Stop"
 
 Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
@@ -36,7 +37,7 @@ New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 # Render: the repo is mounted read-only at /src and copied to /w, so vendor
 # lands in the copy, never in the host checkout. Composer's cache stays in a
-# named volume; the three pages come out through /out, bound to $outDir here.
+# named volume; the six pages come out through /out, bound to $outDir here.
 $inner = 'cp -r /src /w && cd /w && composer install -q --no-progress && ROLLCALL_DASHBOARD_OUT=/out vendor/bin/phpunit --filter DashboardRender'
 
 docker run --rm `
@@ -65,7 +66,7 @@ Copy-Item -Recurse (Join-Path $PWD "site/assets/wayne-ui") (Join-Path $PWD "$out
 New-Item -ItemType Directory -Force -Path (Join-Path $PWD "tools/a11y/node_modules") | Out-Null
 
 # The dashboard-a11y CI job's inputs, as JSON for the checker.
-$config = '{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
+$config = '{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.html", "empty.html", "raw.html", "raw-apps.html", "raw-empty.html"], "tags": ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"], "colorSchemes": ["light", "dark"], "widths": [320, 1280], "axeCoreVersion": "4.14.0"}'
 
 # The checker reads its inputs from a JSON file next to its reports.
 [System.IO.File]::WriteAllText((Join-Path $PWD "$outDir/config.json"), $config, (New-Object System.Text.UTF8Encoding($false)))
@@ -79,6 +80,11 @@ $config = '{"siteDir": "build/dashboard-a11y", "pages": ["index.html", "apps.htm
 # line, and the .ps1 twin passes this very text through.
 $inner = 'if [ ! -f tools/a11y/node_modules/.a11y-pw-stamp ] || [ $(cat tools/a11y/node_modules/.a11y-pw-stamp) != $A11Y_PW ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund && printf %s $A11Y_PW > node_modules/.a11y-pw-stamp); fi
 A11Y_REPORT_DIR=/work/build/dashboard-a11y node tools/a11y/check.mjs /work/build/dashboard-a11y/config.json'
+
+# .gitattributes checks this file out with CRLF line endings, so the two lines
+# above reach sh with a carriage return each, and sh stops at "expecting fi".
+# Strip it; sh wants LF.
+$inner = $inner.Replace("`r", "")
 
 docker run --rm `
     -v "${PWD}:/work:ro" `

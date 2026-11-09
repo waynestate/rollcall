@@ -31,7 +31,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 - [Citadel's registrations export | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/citadel.md): Read base images and forced upgrade dates from a saved Citadel export, in Citadel's own field names. Rollcall never calls Citadel.
 - [Run the collector in Docker | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.md): Build the collector image and run a scan with docker run, with no PHP on the machine.
 - [Owner digests | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/digest.md): An opt-in digest per owner, about only their apps and only when something changed; printed by default, mailed only behind a flag and three settings.
-- [Laravel | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/laravel.md): Register the package, publish the config, schedule the scan, and enable the dashboard routes.
+- [Laravel | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/laravel.md): Register the package, publish the config, schedule the scan, and enable the dashboard routes; or serve the same dashboard from a raw PHP app with one call.
 - [Metrics | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/metrics.md): Metrics are off by default; with ROLLCALL_METRICS_ENABLED=true, /metrics serves Prometheus text from the latest snapshot.
 - [Quick start | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/quick-start.md): Scan and report on the fixtures in the repo, with no network and no token.
 - [What the report says | Rollcall docs](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.md): The sections of a Rollcall report: versions, states, drift kinds, progress, the EOL burn-down and forced upgrades.
@@ -48,7 +48,7 @@ Every page below is Markdown. The HTML pages send the same Markdown to a client 
 ## Prompts
 
 - [Get started with Rollcall](https://rollcall.apps.wayne.edu/#prompt-get-started): Call the sample roll from a checkout, with the bundled fixtures, and have the agent read the report back to you. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
-- [Rollcall as a plain PHP tool](https://rollcall.apps.wayne.edu/#prompt-raw-php): The CLI on a schedule, and the /metrics and /report.json front controller only if you ask for them. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
+- [Rollcall as a plain PHP tool](https://rollcall.apps.wayne.edu/#prompt-raw-php): The CLI on a schedule, and the dashboard page and the /metrics and /report.json front controller only if you ask for them. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
 - [Rollcall in a Laravel app](https://rollcall.apps.wayne.edu/#prompt-laravel): The scheduled scan and the dashboard of totals. The dashboard is the package's own Blade page, whatever your app renders with. The prompt itself is in https://rollcall.apps.wayne.edu/index.md.
 
 ## Source

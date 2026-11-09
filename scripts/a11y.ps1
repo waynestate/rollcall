@@ -39,6 +39,11 @@ New-Item -ItemType Directory -Force -Path (Join-Path $PWD "build/a11y") | Out-Nu
 $inner = 'if [ ! -f tools/a11y/node_modules/.a11y-pw-stamp ] || [ $(cat tools/a11y/node_modules/.a11y-pw-stamp) != $A11Y_PW ]; then (cd tools/a11y && npm ci --ignore-scripts --no-audit --no-fund && printf %s $A11Y_PW > node_modules/.a11y-pw-stamp); fi
 A11Y_REPORT_DIR=/report node tools/a11y/check.mjs /report/config.json'
 
+# .gitattributes checks this file out with CRLF line endings, so the two lines
+# above reach sh with a carriage return each, and sh stops at "expecting fi".
+# Strip it; sh wants LF.
+$inner = $inner.Replace("`r", "")
+
 docker run --rm `
     -v "${PWD}:/work:ro" `
     -v "${PWD}/build/a11y:/report" `
