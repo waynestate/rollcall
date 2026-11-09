@@ -8,8 +8,9 @@ declare(strict_types=1);
  * The region between the quickstart-versions markers in site/index.html (and
  * the same lines in site/index.md) is generated data: the PHP image table and
  * the EOL burn-down, exactly as rollcall report prints them for the bundled
- * fixtures. Every state and end date comes from the policy file, judged by
- * src/Creed/Policy.php, so no support date is typed by hand.
+ * fixtures, ending with the pre's closing tag. Every state and end date comes
+ * from the policy file, judged by src/Creed/Policy.php, so no support date is
+ * typed by hand.
  *
  * The rest of the printout stays hand-written: the ROLLCALL version line is
  * the release process's, the scan dates are the fixture's, and the lede's PHP
@@ -25,9 +26,12 @@ declare(strict_types=1);
  *   php bin/quickstart-versions.php --check [--policy=<file>] [--date=YYYY-MM-DD] [--root=<dir>] [--fixtures=<dir>]
  *
  * Without --policy the bundled copy in src/Creed/policy.json is used, without
- * --date today (UTC), and without --fixtures <root>/tests/fixtures. The
- * markers sit inside the pre tag, glued to the region's first and last lines,
- * because a comment on its own line would render as a blank line. The Squire
+ * --date today (UTC), and without --fixtures <root>/tests/fixtures. The start
+ * marker sits inside the pre tag, glued to the region's first line, and the
+ * end marker sits right after the pre's closing tag: a comment on its own
+ * line would render as a blank line, and a marker inside the pre breaks the
+ * agent-ready converter's code fence. The region between the markers ends
+ * with </pre>, which the generator writes back unchanged. The Squire
  * agent-ready kit strips HTML comments from the Markdown twin, so
  * site/index.md carries the region without markers; the check compares the
  * region bytes instead.
@@ -148,10 +152,11 @@ foreach (QUICKSTART_PAGES as $page) {
         continue;
     }
 
-    [$regionStart, $regionEnd] = quickstart_marker_offsets($content);
+    [$markerStart, $regionStart, $regionEnd] = quickstart_marker_offsets($content);
     if ($regionStart !== null) {
+        $expected = $region . '</pre>';
         $old = substr($content, $regionStart, $regionEnd - $regionStart);
-        if ($old === $region) {
+        if ($old === $expected) {
             if (!$options['check']) {
                 fwrite(STDOUT, "current {$page}\n");
             }
@@ -161,7 +166,15 @@ foreach (QUICKSTART_PAGES as $page) {
             $stale[] = $page;
             continue;
         }
-        $newContent = substr($content, 0, $regionStart) . $region . substr($content, $regionEnd);
+        $writeEnd = $regionEnd;
+        if (str_starts_with(substr($content, $regionEnd), '</pre>')) {
+            // Older layout: the end marker sat inside the pre, so the closing
+            // tag follows it; fold it into the rewrite to heal the page.
+            $writeEnd += strlen('</pre>');
+        }
+        // The rewrite starts at the start marker so its stored date moves
+        // with the region it heads.
+        $newContent = substr($content, 0, $markerStart) . quickstart_start_marker($date) . $expected . substr($content, $writeEnd);
         if (file_put_contents($page, $newContent) === false) {
             quickstart_fail("Cannot write {$page}.");
         }
@@ -181,6 +194,9 @@ foreach (QUICKSTART_PAGES as $page) {
     if ($start === null) {
         quickstart_fail("Cannot find the quick-start region in {$page}. Add the quickstart-versions markers around it and re-run.");
     }
+    if (!str_ends_with($lines[$end], '</pre>')) {
+        quickstart_fail('The quick-start region in site/index.html does not end with </pre>; the page layout changed.');
+    }
     $first = $regionLines[0];
     $last = $regionLines[count($regionLines) - 1];
     $middle = array_slice($regionLines, 1, count($regionLines) - 2);
@@ -188,7 +204,7 @@ foreach (QUICKSTART_PAGES as $page) {
         array_slice($lines, 0, $start),
         [quickstart_start_marker($date) . $first],
         $middle,
-        [$last . quickstart_end_marker()],
+        [$last . '</pre>' . quickstart_end_marker()],
         array_slice($lines, $end + 1),
     ));
     if (file_put_contents($page, $newContent) === false) {
@@ -209,26 +225,29 @@ if ($options['check']) {
 exit(0);
 
 /**
- * The byte offsets of the marked region in the HTML page: [start, end) of the
- * text between the markers, or [null, null] when a marker is missing.
+ * The byte offsets of the marked region in the HTML page: [markerStart,
+ * regionStart, regionEnd), where regionStart..regionEnd is the text between
+ * the markers and markerStart is the beginning of the start marker, or nulls
+ * when a marker is missing.
  *
- * @return array{0: int|null, 1: int|null}
+ * @return array{0: int|null, 1: int|null, 2: int|null}
  */
 function quickstart_marker_offsets(string $content): array
 {
     if (!preg_match(QUICKSTART_START, $content, $sm, PREG_OFFSET_CAPTURE)) {
-        return [null, null];
+        return [null, null, null];
     }
     if (!preg_match(QUICKSTART_END, $content, $em, PREG_OFFSET_CAPTURE)) {
-        return [null, null];
+        return [null, null, null];
     }
-    $start = $sm[0][1] + strlen($sm[0][0]);
-    $end = $em[0][1];
-    if ($end < $start) {
-        return [null, null];
+    $markerStart = $sm[0][1];
+    $regionStart = $sm[0][1] + strlen($sm[0][0]);
+    $regionEnd = $em[0][1];
+    if ($regionEnd < $regionStart) {
+        return [null, null, null];
     }
 
-    return [$start, $end];
+    return [$markerStart, $regionStart, $regionEnd];
 }
 
 /**

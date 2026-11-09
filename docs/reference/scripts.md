@@ -21,6 +21,8 @@ shell on the host.
 | `php bin/docs-site.php` (`composer docs`) | Builds the docs site from `docs/` |
 | `php bin/agent-ready.php` (`composer site:agent-ready`) | Writes the Markdown twins, `llms.txt` and the sitemap |
 | `php tools/versions-table.php` (`composer site:versions`) | Regenerates the front page versions table from CREED's policy |
+| `php bin/quickstart-versions.php` (`composer site:versions`) | Regenerates the quick-start printout's policy values in `site/index.html` and `site/index.md` from CREED's policy, between the `quickstart-versions` markers |
+| `composer site:versions-check` | Fails when the front page versions table or the quick-start printout's policy values are stale; runs in `composer ci` |
 | `php tools/creed-copy-check.php` (`composer creed-copy:check`) | Proves the CREED copy has not drifted |
 
 ## A pair per OS

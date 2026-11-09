@@ -33,7 +33,7 @@ Development happens on git.wayne.edu, the canonical repository ([enterprise-apps
 | Fix code style | `composer fix` |
 | Check the CREED copy, Windows | `$env:CREED_PATH = "..\creed"; composer creed-copy:check` |
 | Check the CREED copy, Linux and macOS | `CREED_PATH=../creed composer creed-copy:check` |
-| Regenerate the front page versions table | `composer site:versions` |
+| Regenerate the front page versions table | `composer site:versions`; it also regenerates the quick-start printout's policy values in `site/index.html` (between the `quickstart-versions` markers), and `composer site:versions-check` fails when either the versions table or the quick-start printout is stale |
 | Front page accessibility gate | `scripts/a11y.sh` (Linux and macOS) or `scripts/a11y.ps1` (Windows); both run in Docker |
 | Dashboard accessibility gate | `scripts/dashboard-a11y.sh` (Linux and macOS) or `scripts/dashboard-a11y.ps1` (Windows); both run in Docker and write the rendered pages to `build/dashboard-a11y/` |
 

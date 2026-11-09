@@ -5,6 +5,15 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
+use Waynestate\Rollcall\Clock\FixedClock;
+use Waynestate\Rollcall\Creed\Policy;
+use Waynestate\Rollcall\Parse\ComposerReader;
+use Waynestate\Rollcall\Report\ReportBuilder;
+use Waynestate\Rollcall\Report\TextRenderer;
+use Waynestate\Rollcall\Scan\Scanner;
+use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
+use Waynestate\Rollcall\Source\DirectoryRepositorySource;
+use Waynestate\Rollcall\Source\JsonFileImageSource;
 
 /**
  * The front page quick-start versions generator (bin/quickstart-versions.php),
@@ -51,9 +60,11 @@ final class QuickstartVersionsTest extends TestCase
         $this->assertStringContainsString('wrote site/index.md', $out);
 
         $html = (string) file_get_contents($this->root . '/site/index.html');
-        // The markers glue to the region's first and last lines inside the pre.
+        // The start marker glues to the region's first line inside the pre;
+        // the end marker sits right after the closing tag, so the text before
+        // </pre> is the generated region alone, byte for byte.
         $this->assertStringContainsString('<!-- quickstart-versions:start date="' . self::DATE . '" -->PHP image', $html);
-        $this->assertStringContainsString('<!-- quickstart-versions:end -->', $html);
+        $this->assertSame(self::expectedRegion() . '</pre>', self::regionOf($html));
         // The seeded wrong values are gone, and the middle sections stay off the front page.
         $this->assertStringNotContainsString(self::STALE_ROW, $html);
         $this->assertStringNotContainsString('Declared PHP floor', $html);
@@ -120,6 +131,14 @@ final class QuickstartVersionsTest extends TestCase
 
         $second = self::regionOf((string) file_get_contents($this->root . '/site/index.html'));
         $this->assertNotSame($first, $second, 'the states and days must move with the judged date');
+
+        // The rewrite moves the stored date with the region, so a check that
+        // reuses the stored date passes again.
+        $html = (string) file_get_contents($this->root . '/site/index.html');
+        $this->assertStringContainsString('<!-- quickstart-versions:start date="2020-01-01" -->', $html);
+        [$code, $out] = $this->runTool(['--policy=' . self::FIXTURES . '/policy.json', '--check', '--root=' . $this->root]);
+        $this->assertSame(0, $code, $out);
+        $this->assertStringContainsString('Judged as of 2020-01-01', $out);
     }
 
     public function test_an_unknown_argument_is_a_tool_error(): void
@@ -171,6 +190,8 @@ final class QuickstartVersionsTest extends TestCase
 
     /**
      * The text between the quickstart-versions markers, or '' when unmarked.
+     * The match only succeeds when the end marker follows the captured text
+     * directly, so a non-empty result also proves the marker placement.
      */
     private static function regionOf(string $html): string
     {
@@ -179,6 +200,44 @@ final class QuickstartVersionsTest extends TestCase
         }
 
         return $match[1];
+    }
+
+    /**
+     * The region the pipeline prints for the fixture fleet at the pinned
+     * date, computed here straight from the policy instead of from the tool's
+     * own output, so the test compares bytes against the policy.
+     */
+    private static function expectedRegion(): string
+    {
+        $clock = new FixedClock(self::DATE);
+        $scanner = new Scanner(
+            new DirectoryRepositorySource(self::FIXTURES . '/repos'),
+            JsonFileImageSource::fromFile(self::FIXTURES . '/images.json'),
+            new DirectoryProctorReportSource(self::FIXTURES . '/proctor'),
+            $clock,
+            new ComposerReader(),
+        );
+        $snapshot = $scanner->scan();
+        $report = (new ReportBuilder(Policy::fromFile(self::FIXTURES . '/policy.json')))
+            ->build($snapshot, [$snapshot], $clock->now(), false);
+        $lines = explode("\n", (new TextRenderer())->render($report));
+
+        $php = array_search('PHP image', $lines, true);
+        $floor = array_search('Declared PHP floor', $lines, true);
+        $burn = array_search('EOL burn-down (state on each scan day)', $lines, true);
+        if ($php === false || $floor === false || $burn === false || $php >= $floor || $floor >= $burn) {
+            self::fail('The fixture report layout no longer matches the section titles.');
+        }
+        $image = array_slice($lines, $php, $floor - $php);
+        while ($image !== [] && end($image) === '') {
+            array_pop($image);
+        }
+        $burnDown = array_slice($lines, $burn);
+        while ($burnDown !== [] && end($burnDown) === '') {
+            array_pop($burnDown);
+        }
+
+        return implode("\n", $image) . "\n\n" . implode("\n", $burnDown);
     }
 
     private static function htmlShell(): string
