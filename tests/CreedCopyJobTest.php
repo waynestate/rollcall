@@ -91,7 +91,7 @@ final class CreedCopyJobTest extends TestCase
         $block = $this->jobBlock('creed-copy-refresh');
 
         $this->assertStringContainsString('extends: .composer-cache', $block);
-        $this->assertStringContainsString('image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3', $block);
+        $this->assertStringContainsString('image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0', $block);
         $this->assertStringContainsString('GIT_DEPTH: "0"', $block);
         $this->assertStringContainsString('- sh ' . self::SCRIPT, $block);
     }

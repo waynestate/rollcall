@@ -56,14 +56,14 @@ variables:
 
 wayneui-copies:
   extends: .composer-cache
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   script:
     - composer install --working-dir=deploy --no-interaction --no-progress --prefer-dist
     - deploy/vendor/bin/proctor check --path=.
 
 composer-ci:
   extends: .composer-cache
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - composer ci
@@ -74,7 +74,7 @@ composer-ci:
 # dashboard-a11y as an artifact.
 dashboard-render:
   extends: .composer-cache
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   script:
     - composer install --no-interaction --no-progress --prefer-dist
     - ROLLCALL_WAYNEUI_CSS=/assets/wayne-ui/wayne-ui.css ROLLCALL_DASHBOARD_OUT="$CI_PROJECT_DIR/build/dashboard-a11y" vendor/bin/phpunit --filter DashboardRender
@@ -119,7 +119,7 @@ dashboard-a11y:
 # ROLLCALL_GITLAB_TOKEN it skips green.
 rollcall-scan:
   extends: .composer-cache
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $ROLLCALL_JOB == "scan"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
@@ -151,7 +151,7 @@ rollcall-scan:
 # week's run tries again. The steps live in tools/creed-copy-refresh.sh.
 creed-copy-refresh:
   extends: .composer-cache
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.10.3
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0
   variables:
     GIT_DEPTH: "0"
   rules:

@@ -27,7 +27,7 @@ $ErrorActionPreference = "Stop"
 
 Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
 
-$composerImage = "composer:2.10.3"
+$composerImage = "composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0"
 # The a11y component's image default, digest included (templates/a11y/template.yml
 # of Preflight 0.3.1). Its tag sets the playwright npm version, so the package
 # and the image's browsers always match.
