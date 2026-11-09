@@ -206,6 +206,10 @@ DATE        APPS  EOL  SUPPORTED  UNKNOWN
 2026-11-09  4     1    2          1
 ```
 
+**exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
+
+2026-10-28 4 1 2 1
+
 **exit 0**, however the fleet looks. Neither command exits 1: Rollcall takes attendance, it does not hand out detention.
 
 - **`rollcall scan`**: Scans once and saves `<date>.json`. A second scan on the same day replaces it.
