@@ -108,10 +108,12 @@ final class PublicSurfaceTest extends TestCase
                 if ($lower !== 'wayne.edu' && !str_ends_with($lower, '.wayne.edu')) {
                     continue;
                 }
+                // Citadel production (*.apps) and pre-production (*.appstest) hosts are public addresses.
                 $allowed = $lower === 'wayne.edu'
                     || $lower === 'ui.wayne.edu'
                     || $lower === 'git.wayne.edu'
-                    || str_ends_with($lower, '.apps.wayne.edu');
+                    || str_ends_with($lower, '.apps.wayne.edu')
+                    || str_ends_with($lower, '.appstest.wayne.edu');
                 $this->assertTrue($allowed, $file . ' names the internal hostname ' . $host);
             }
         }
