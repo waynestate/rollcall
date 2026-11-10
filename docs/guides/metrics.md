@@ -21,6 +21,9 @@ rest: `rollcall_forced_upgrades_pending_apps` (apps with one pending, overdue on
 one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and
 overdue as two stat panels.
 
+PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`,
+`missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
+
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
 

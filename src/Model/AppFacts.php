@@ -15,7 +15,9 @@ namespace Waynestate\Rollcall\Model;
  * runtimePhp and runtimeHttpd are the versions inside the running container,
  * when the image source reports them (a Citadel export); null until then.
  * boosterResult, boosterVersion and boosterAt are Booster's hop record, when
- * the app commits a readable booster-hop.json; null until then.
+ * the app commits a readable booster-hop.json; null until then. mysql56 is the
+ * app's MySQL 5.6 CI job state from PROCTOR's mysql56-ci findings (held,
+ * missing, not_applicable or unknown); null until a report says.
  */
 final class AppFacts
 {
@@ -44,6 +46,7 @@ final class AppFacts
         public readonly ?string $boosterResult = null,
         public readonly ?string $boosterVersion = null,
         public readonly ?string $boosterAt = null,
+        public readonly ?string $mysql56 = null,
     ) {}
 
     /** The Laravel major, such as "12", or null. */
@@ -69,6 +72,7 @@ final class AppFacts
         ?string $boosterResult = null,
         ?string $boosterVersion = null,
         ?string $boosterAt = null,
+        ?string $mysql56 = null,
     ): self {
         return new self(
             $this->id,
@@ -90,6 +94,7 @@ final class AppFacts
             $boosterResult ?? $this->boosterResult,
             $boosterVersion ?? $this->boosterVersion,
             $boosterAt ?? $this->boosterAt,
+            $mysql56 ?? $this->mysql56,
         );
     }
 
@@ -116,6 +121,7 @@ final class AppFacts
             'booster_result' => $this->boosterResult,
             'booster_version' => $this->boosterVersion,
             'booster_at' => $this->boosterAt,
+            'mysql56' => $this->mysql56,
         ];
     }
 
@@ -163,6 +169,7 @@ final class AppFacts
             $str('booster_result'),
             $str('booster_version'),
             $str('booster_at'),
+            $str('mysql56'),
         );
     }
 }

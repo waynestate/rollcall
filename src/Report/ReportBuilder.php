@@ -78,6 +78,7 @@ final class ReportBuilder
         $drift = array_fill_keys(self::DRIFT_KINDS, 0);
         $states = $this->emptyStates();
         $proctor = ['pass' => 0, 'fail' => 0, 'none' => 0];
+        $mysql56 = ['held' => 0, 'missing' => 0, 'not_applicable' => 0, 'unknown' => 0];
         $auth = [];
         $perApp = [];
         $upgradedOn = $internal ? $this->upgradeDates($history) : [];
@@ -90,6 +91,11 @@ final class ReportBuilder
             $imageState = $this->state('php', $app->phpImage, $today);
             $states[$imageState->value]++;
             $proctor[$app->proctorResult ?? 'none']++;
+            $mysql56State = $app->mysql56;
+            if ($mysql56State === null || ! array_key_exists($mysql56State, $mysql56)) {
+                $mysql56State = 'unknown';
+            }
+            $mysql56[$mysql56State]++;
             $authKey = $app->authPackage ?? 'none';
             $auth[$authKey] = ($auth[$authKey] ?? 0) + 1;
 
@@ -107,6 +113,7 @@ final class ReportBuilder
                     'auth_package' => $app->authPackage,
                     'auth_version' => $app->authVersion,
                     'proctor' => $app->proctorResult,
+                    'mysql56_ci' => $app->mysql56 ?? 'unknown',
                     'overrides' => array_map(static fn($o): array => $o->toArray(), $app->overrides),
                     'drift' => $flags,
                     'upgraded_on' => $upgradedOn[$app->id] ?? null,
@@ -130,6 +137,7 @@ final class ReportBuilder
             'laravel' => $this->tally('laravel', array_map(static fn(AppFacts $a): ?string => $a->laravelMajor(), $apps), $today),
             'auth_package' => $auth,
             'proctor' => $proctor,
+            'mysql56_ci' => $mysql56,
             'drift' => $drift,
             'progress' => $this->progress($current, $previous, $today),
             'forced_upgrades' => $this->forcedUpgrades($apps, $today),

@@ -1376,6 +1376,8 @@ Metrics are off by default (the stack's metrics rule). With `ROLLCALL_METRICS_EN
 
 Forced image upgrades from a Citadel export come through as three gauges, counts only, in the same style as the rest: `rollcall_forced_upgrades_pending_apps` (apps with one pending, overdue ones included), `rollcall_forced_upgrades_overdue_apps` (due today or earlier) and `rollcall_forced_upgrades_next_due_timestamp_seconds` (midnight of the next date still ahead, only while there is one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and overdue as two stat panels.
 
+PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`, `missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
+
 **Watch the back row empty (the burn-down, sample data)**
 
 ![Rollcall's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.](https://rollcall.apps.wayne.edu/docs/readme/burn-down.jpg)
@@ -1429,6 +1431,7 @@ This page explains each part of the report. Next: [Citadel's registrations expor
 - **Apps present and scan notes**: the first line counts the apps the scan read, then the notes it printed and carried on past (`totals.scan_errors` in JSON, `rollcall_scan_errors` in metrics). Today a note means a source is not configured: with no image export the PHP image column is `unknown`, with no PROCTOR reports every app is `none`. `scan` prints each note as it saves the snapshot, and `report --format=json --internal` lists them. A note is not a failed scan; a source that refuses (a bad token) stops the scan instead.
 - **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`, `eol`, `unknown`), the date security support ends and the days left (negative once past).
 - **Auth package and PROCTOR**: apps per auth package, and per PROCTOR result (`pass`, `fail`, `none`).
+- **MySQL 5.6 CI job**: apps by the state of PROCTOR's `mysql56-ci` finding (CREED's `databases.md` rule says an app's migrations must run in CI against MySQL 5.6): `held` when the report carries a `held` finding, `missing` when it carries a `no-job` finding, `not_applicable` when it carries neither and came from PROCTOR 0.15.1 or newer (the check ran and had nothing to say: no migrations), and `unknown` for an app with no report, one that could not be read, or a report from PROCTOR below 0.15.1, which cannot tell `held` from `not_applicable`.
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`, `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`, `proctor_failing`, `override_expired`.
 - **Progress**: apps that moved since the previous scan and apps that went from an EOL image to a supported one. In the internal view each upgraded app carries the day it landed.
 - **EOL burn-down**: for each scan day, how many apps ran an EOL image on that day. It reads the image, not the declared floor, so until an image export is configured every app is `unknown` here even when the floor table already shows EOL versions.

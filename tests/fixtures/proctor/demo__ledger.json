@@ -5,6 +5,8 @@
     "today": "2026-10-28",
     "result": "pass",
     "exit": 0,
-    "findings": [],
+    "findings": [
+        {"check_id": "mysql56-ci", "status": "warning", "message": "Migrations do not run in CI against MySQL 5.6", "rule_id": "proctor/mysql56-ci/no-job", "path": null, "line": null}
+    ],
     "overrides": []
 }

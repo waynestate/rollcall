@@ -46,6 +46,7 @@ final class RollcallModule implements Module
         'laravel',
         'auth_package',
         'proctor',
+        'mysql56_ci',
         'drift',
         'progress',
         'forced_upgrades',

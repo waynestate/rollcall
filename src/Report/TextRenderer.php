@@ -44,6 +44,14 @@ final class TextRenderer
         $out[] = '';
         $out[] = 'PROCTOR';
         $out[] = self::table(['RESULT', 'APPS'], self::pairs($report['proctor'] ?? []));
+        $mysql56 = self::arr($report['mysql56_ci'] ?? []);
+        $out[] = sprintf(
+            'MySQL 5.6 CI job: %s held, %s missing, %s not applicable, %s unknown',
+            self::cell($mysql56['held'] ?? 0),
+            self::cell($mysql56['missing'] ?? 0),
+            self::cell($mysql56['not_applicable'] ?? 0),
+            self::cell($mysql56['unknown'] ?? 0),
+        );
         $out[] = '';
         $out[] = 'Drift';
         $out[] = self::table(['KIND', 'APPS'], self::pairs($report['drift'] ?? []));

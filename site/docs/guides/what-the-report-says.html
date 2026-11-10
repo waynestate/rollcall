@@ -56,6 +56,13 @@ source that refuses (a bad token) stops the scan instead.</p>
 <p><strong>Auth package and PROCTOR</strong>: apps per auth package, and per PROCTOR result (<code>pass</code>, <code>fail</code>, <code>none</code>).</p>
 </li>
 <li>
+<p><strong>MySQL 5.6 CI job</strong>: apps by the state of PROCTOR's <code>mysql56-ci</code> finding (CREED's <code>databases.md</code> rule says an app's
+migrations must run in CI against MySQL 5.6): <code>held</code> when the report carries a <code>held</code> finding, <code>missing</code> when it
+carries a <code>no-job</code> finding, <code>not_applicable</code> when it carries neither and came from PROCTOR 0.15.1 or newer (the check
+ran and had nothing to say: no migrations), and <code>unknown</code> for an app with no report, one that could not be read, or a
+report from PROCTOR below 0.15.1, which cannot tell <code>held</code> from <code>not_applicable</code>.</p>
+</li>
+<li>
 <p><strong>Drift</strong>, counted per kind: <code>image_eol</code>, <code>image_unknown</code>, <code>image_below_floor</code>, <code>floor_allows_eol</code>,
 <code>floor_unbounded</code>, <code>eol_past_grace</code> (past the policy's grace days), <code>laravel_eol</code>, <code>proctor_missing</code>,
 <code>proctor_failing</code>, <code>override_expired</code>.</p>

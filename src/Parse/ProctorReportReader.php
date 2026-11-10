@@ -17,7 +17,7 @@ final class ProctorReportReader
     private const MAX_OVERRIDES = 50;
 
     /**
-     * @return array{result: string, version: ?string, overrides: list<OverrideNote>}
+     * @return array{result: string, version: ?string, overrides: list<OverrideNote>, mysql56: string}
      */
     public function read(string $json): array
     {
@@ -53,6 +53,27 @@ final class ProctorReportReader
             }
         }
 
-        return ['result' => $result, 'version' => $version, 'overrides' => $overrides];
+        $missing = false;
+        $held = false;
+        foreach (is_array($data['findings'] ?? null) ? $data['findings'] : [] as $finding) {
+            if (! is_array($finding) || ! is_string($finding['rule_id'] ?? null)) {
+                continue;
+            }
+            if ($finding['rule_id'] === 'proctor/mysql56-ci/no-job') {
+                $missing = true;
+            } elseif ($finding['rule_id'] === 'proctor/mysql56-ci/held') {
+                $held = true;
+            }
+        }
+        $mysql56 = 'unknown';
+        if ($missing) {
+            $mysql56 = 'missing';
+        } elseif ($held) {
+            $mysql56 = 'held';
+        } elseif ($version !== null && preg_match('/^(\d+\.\d+\.\d+)/', $version, $core) === 1 && version_compare($core[1], '0.15.1', '>=') === true) {
+            $mysql56 = 'not_applicable';
+        }
+
+        return ['result' => $result, 'version' => $version, 'overrides' => $overrides, 'mysql56' => $mysql56];
     }
 }

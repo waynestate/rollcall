@@ -14,6 +14,8 @@ Metrics are off by default (the stack's metrics rule). With `ROLLCALL_METRICS_EN
 
 Forced image upgrades from a Citadel export come through as three gauges, counts only, in the same style as the rest: `rollcall_forced_upgrades_pending_apps` (apps with one pending, overdue ones included), `rollcall_forced_upgrades_overdue_apps` (due today or earlier) and `rollcall_forced_upgrades_next_due_timestamp_seconds` (midnight of the next date still ahead, only while there is one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and overdue as two stat panels.
 
+PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`, `missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
+
 **Watch the back row empty (the burn-down, sample data)**
 
 ![Rollcall's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.](https://rollcall.apps.wayne.edu/docs/readme/burn-down.jpg)

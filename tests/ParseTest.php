@@ -91,10 +91,64 @@ final class ParseTest extends TestCase
         $report = (new ProctorReportReader())->read((string) file_get_contents(self::FIXTURES . '/proctor/demo__atlas.json'));
 
         $this->assertSame('fail', $report['result']);
-        $this->assertSame('0.1.3', $report['version']);
+        $this->assertSame('0.15.1', $report['version']);
         $this->assertCount(1, $report['overrides']);
         $this->assertTrue($report['overrides'][0]->expired);
         $this->assertSame('Upgrade scheduled', $report['overrides'][0]->reason);
+        $this->assertSame('held', $report['mysql56']);
+    }
+
+    public function test_mysql56_ci_no_job_finding_counts_missing_even_on_a_new_proctor(): void
+    {
+        $json = (string) json_encode([
+            'tool' => 'proctor',
+            'version' => '0.15.0',
+            'result' => 'fail',
+            'findings' => [['check_id' => 'mysql56-ci', 'status' => 'warning', 'message' => 'Migrations do not run in CI against MySQL 5.6', 'rule_id' => 'proctor/mysql56-ci/no-job']],
+        ]);
+
+        $this->assertSame('missing', (new ProctorReportReader())->read($json)['mysql56']);
+    }
+
+    public function test_mysql56_ci_held_note_counts_held(): void
+    {
+        $json = (string) json_encode([
+            'tool' => 'proctor',
+            'version' => '0.15.1',
+            'result' => 'pass',
+            'findings' => [['check_id' => 'mysql56-ci', 'status' => 'info', 'message' => 'Migrations run in CI against MySQL 5.6', 'rule_id' => 'proctor/mysql56-ci/held']],
+        ]);
+
+        $this->assertSame('held', (new ProctorReportReader())->read($json)['mysql56']);
+    }
+
+    public function test_mysql56_ci_says_not_applicable_when_a_new_proctor_has_nothing_to_say(): void
+    {
+        $json = (string) json_encode(['tool' => 'proctor', 'version' => '0.15.1', 'result' => 'pass', 'findings' => []]);
+
+        $this->assertSame('not_applicable', (new ProctorReportReader())->read($json)['mysql56']);
+    }
+
+    public function test_mysql56_ci_is_unknown_below_0_15_1_and_without_a_version(): void
+    {
+        $reader = new ProctorReportReader();
+        $old = (string) json_encode(['tool' => 'proctor', 'version' => '0.15.0', 'result' => 'pass', 'findings' => []]);
+        $none = (string) json_encode(['tool' => 'proctor', 'result' => 'pass', 'findings' => []]);
+
+        $this->assertSame('unknown', $reader->read($old)['mysql56']);
+        $this->assertSame('unknown', $reader->read($none)['mysql56']);
+    }
+
+    public function test_mysql56_ci_skips_malformed_findings_entries(): void
+    {
+        $json = (string) json_encode([
+            'tool' => 'proctor',
+            'version' => '0.15.1',
+            'result' => 'pass',
+            'findings' => ['not an array', ['check_id' => 'mysql56-ci'], ['rule_id' => 7], ['rule_id' => 'proctor/mysql56-ci/held']],
+        ]);
+
+        $this->assertSame('held', (new ProctorReportReader())->read($json)['mysql56']);
     }
 
     /** @return iterable<string, array{string}> */

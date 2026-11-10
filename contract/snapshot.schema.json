@@ -76,6 +76,10 @@
                     "description": "When Booster finished the hop, from the app's booster-hop.json, or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
                     "type": ["string", "null"],
                     "maxLength": 40
+                },
+                "mysql56": {
+                    "description": "The state of the app's MySQL 5.6 CI job from PROCTOR's mysql56-ci findings (held, missing, not_applicable or unknown), when a report says, or null. Optional: snapshots written before it existed have no key, and schema_version stays 1.",
+                    "enum": ["held", "missing", "not_applicable", "unknown", null]
                 }
             }
         }

@@ -15,6 +15,11 @@ This page explains each part of the report. Next: [Citadel's registrations expor
 - **PHP image, declared PHP floor, Laravel**: apps per version, the state from the policy (`active`, `security_only`,
   `eol`, `unknown`), the date security support ends and the days left (negative once past).
 - **Auth package and PROCTOR**: apps per auth package, and per PROCTOR result (`pass`, `fail`, `none`).
+- **MySQL 5.6 CI job**: apps by the state of PROCTOR's `mysql56-ci` finding (CREED's `databases.md` rule says an app's
+  migrations must run in CI against MySQL 5.6): `held` when the report carries a `held` finding, `missing` when it
+  carries a `no-job` finding, `not_applicable` when it carries neither and came from PROCTOR 0.15.1 or newer (the check
+  ran and had nothing to say: no migrations), and `unknown` for an app with no report, one that could not be read, or a
+  report from PROCTOR below 0.15.1, which cannot tell `held` from `not_applicable`.
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`,
   `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`,
   `proctor_failing`, `override_expired`.

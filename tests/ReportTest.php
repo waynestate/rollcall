@@ -49,6 +49,7 @@ final class ReportTest extends TestCase
 
         $this->assertSame(['apereo/phpcas' => 1, 'none' => 2, 'waynestate/sesame' => 1], $report['auth_package']);
         $this->assertSame(['pass' => 1, 'fail' => 1, 'none' => 2], $report['proctor']);
+        $this->assertSame(['held' => 1, 'missing' => 1, 'not_applicable' => 0, 'unknown' => 2], $report['mysql56_ci']);
     }
 
     public function test_a_version_ahead_of_the_policy_is_shown_as_treated_as_current(): void
@@ -99,6 +100,10 @@ final class ReportTest extends TestCase
         $this->assertTrue($apps['demo/atlas']['overrides'][0]['expired'], 'an expired override stays listed, marked expired');
         $this->assertContains('override_expired', $apps['demo/atlas']['drift']);
         $this->assertContains('composer.lock not found', $apps['demo/relic']['notes']);
+        $this->assertSame('held', $apps['demo/atlas']['mysql56_ci']);
+        $this->assertSame('missing', $apps['demo/ledger']['mysql56_ci']);
+        $this->assertSame('unknown', $apps['demo/relic']['mysql56_ci'], 'no report at all is unknown');
+        $this->assertSame('unknown', $apps['demo/broken']['mysql56_ci'], 'an unreadable report is unknown too');
     }
 
     public function test_progress_and_the_upgrade_credit_across_two_scans(): void
@@ -218,7 +223,7 @@ final class ReportTest extends TestCase
     public function test_text_output_has_the_public_sections(): void
     {
         $text = (new TextRenderer())->render($this->report());
-        foreach (['PHP image', 'Declared PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'Drift', 'EOL burn-down'] as $heading) {
+        foreach (['PHP image', 'Declared PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI job', 'Drift', 'EOL burn-down'] as $heading) {
             $this->assertStringContainsString($heading, $text);
         }
         $this->assertStringNotContainsString('demo/', $text);
@@ -247,6 +252,10 @@ final class ReportTest extends TestCase
         $this->assertStringContainsString('rollcall_php_image_apps{version="8.1",state="eol"} 1', $text);
         $this->assertStringContainsString('rollcall_php_image_days_to_eol{version="8.1"} -301', $text);
         $this->assertStringContainsString('rollcall_drift_apps{kind="image_eol"} 1', $text);
+        $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="held"} 1', $text);
+        $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="missing"} 1', $text);
+        $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="not_applicable"} 0', $text);
+        $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="unknown"} 2', $text);
         $this->assertStringNotContainsString('demo/', $text);
         $this->assertStringNotContainsString('Upgrade scheduled', $text);
     }

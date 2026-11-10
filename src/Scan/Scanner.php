@@ -124,7 +124,7 @@ final class Scanner
             return $this->note($facts, 'PROCTOR report could not be read');
         }
 
-        return $facts->with(proctorResult: $report['result'], proctorVersion: $report['version'], overrides: $report['overrides']);
+        return $facts->with(proctorResult: $report['result'], proctorVersion: $report['version'], overrides: $report['overrides'], mysql56: $report['mysql56']);
     }
 
     private function withImage(AppFacts $facts): AppFacts
@@ -189,6 +189,7 @@ final class Scanner
             $facts->boosterResult,
             $facts->boosterVersion,
             $facts->boosterAt,
+            $facts->mysql56,
         );
     }
 }

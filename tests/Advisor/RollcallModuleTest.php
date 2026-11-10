@@ -112,7 +112,7 @@ final class RollcallModuleTest extends TestCase
         $this->assertSame('Rollcall snapshot store (ROLLCALL_STORE_DIR)', $out['source']);
         $this->assertSame(self::TODAY, $out['as_of']);
         $this->assertSame(self::TODAY, $out['scan_date']);
-        foreach (['totals', 'image_states', 'php_image', 'php_floor', 'laravel', 'auth_package', 'proctor', 'drift', 'progress', 'forced_upgrades'] as $field) {
+        foreach (['totals', 'image_states', 'php_image', 'php_floor', 'laravel', 'auth_package', 'proctor', 'mysql56_ci', 'drift', 'progress', 'forced_upgrades'] as $field) {
             $this->assertSame($expected[$field], $out[$field], $field);
         }
         $this->assertSame(4, $out['totals']['apps']);
