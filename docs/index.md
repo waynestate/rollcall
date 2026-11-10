@@ -41,6 +41,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 | HELMET | Baseline runtime and its own optional `/metrics` |
 | Sourdough | Starters for every app shape |
 | Squire | The Citadel deploy kit; the layer that serves this repo's front page is one |
+| Parity | Citadel on your computer: its PHP image, its proxy and MySQL 5.6, so an app that works here works on Citadel (0.1.0 coming) |
 | Preflight | CI templates |
 | Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
 | Booster | The upgrade tool; Rollcall reads its hop record (`booster-hop.json`) to see who is catching up |
@@ -59,6 +60,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
   <a href="https://github.com/waynestate/helmet" title="HELMET"><img src="readme/cast/helmet.png" width="40" alt="HELMET"></a>
   <a href="https://github.com/waynestate/sourdough" title="Sourdough"><img src="readme/cast/sourdough.png" width="40" alt="Sourdough"></a>
   <a href="https://github.com/waynestate/squire" title="Squire"><img src="readme/cast/squire.png" width="40" alt="Squire"></a>
+  <a href="https://git.wayne.edu/enterprise-apps/parity" title="Parity"><img src="readme/cast/parity.png" width="40" alt="Parity"></a>
   <a href="https://github.com/waynestate/preflight" title="Preflight"><img src="readme/cast/preflight.png" width="40" alt="Preflight"></a>
   <a href="https://github.com/waynestate/pinstripe" title="Pinstripe"><img src="readme/cast/pinstripe.png" width="40" alt="Pinstripe"></a>
   <a href="https://github.com/waynestate/booster" title="Booster"><img src="readme/cast/booster.png" width="40" alt="Booster"></a>

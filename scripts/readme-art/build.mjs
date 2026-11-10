@@ -56,7 +56,7 @@ function fail(msg) {
 // One 96x96 PNG per stack part (shown at 48 px in the README). The marks are
 // copied and resized only, never redrawn. WayneUI is composed instead: its
 // reverse mark (white frame, gold tab) set on a Wayne State green tile, so it
-// reads as a sibling of the other thirteen.
+// reads as a sibling of the other fourteen.
 const CAST = [
   "creed",
   "proctor",
@@ -64,6 +64,7 @@ const CAST = [
   "helmet",
   "sourdough",
   "squire",
+  "parity",
   "preflight",
   "pinstripe",
   "booster",
