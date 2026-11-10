@@ -41,7 +41,7 @@ The parts of the Wayne State application stack, and their jobs. WELD is the Lara
 | HELMET | Baseline runtime and its own optional `/metrics` |
 | Sourdough | Starters for every app shape |
 | Squire | The Citadel deploy kit; the layer that serves this repo's front page is one |
-| Parity | Citadel on your computer: its PHP image, its proxy and MySQL 5.6, so an app that works here works on Citadel (0.1.0 coming) |
+| Parity | Citadel on your computer: its PHP image, its proxy and MySQL 5.6, so an app that works here works on Citadel (0.1.0; site: [parity.apps.wayne.edu](https://parity.apps.wayne.edu/)) |
 | Preflight | CI templates |
 | Pinstripe | The coding standard this repo includes for its Pint and PHPStan settings |
 | Booster | The upgrade tool; Rollcall reads its hop record (`booster-hop.json`) to see who is catching up |

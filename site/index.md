@@ -366,6 +366,6 @@ These are the parts of the Wayne State application stack, and what each one has 
 10. Rollcallyou are here: the fleet census and EOL burn-down
 11. [Booster](https://booster.apps.wayne.edu/)moves the back row forward
 12. [Squire](https://squire.apps.wayne.edu/)carries the release to Citadel
-13. ParityCitadel on your computer; site coming
+13. [Parity](https://parity.apps.wayne.edu/)Citadel on your computer, so the dress rehearsal counts
 14. [Drawbridge](https://drawbridge.apps.wayne.edu/)the planned sign-in gateway for Citadel
 15. [ADVISOR](https://advisor.apps.wayne.edu/)the MCP server your agent asks about the stack

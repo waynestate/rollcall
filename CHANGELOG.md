@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Site: Parity is out; the party list links its site.
 - Deploy kit refreshed to Squire 0.10.5; requires waynestate/advisor ^0.3.
 
 ## [1.1.1] - 2026-11-09
