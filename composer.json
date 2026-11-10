@@ -34,7 +34,7 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5",
         "symfony/mailer": "^7.4",
-        "waynestate/advisor": "^0.2",
+        "waynestate/advisor": "^0.3",
         "waynestate/pinstripe": "^0.3"
     },
     "suggest": {
