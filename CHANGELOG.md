@@ -1,10 +1,10 @@
 # Changelog
-- Changed: the deploy kit is Squire 0.10.7 (was 0.10.6): it ships a `.gitattributes` that pins line endings, so the deploy layer clears PROCTOR's line-ending warnings.
 
 All notable changes to Rollcall. The format follows Keep a Changelog; versions follow SemVer.
 
 ## [Unreleased]
 
+- Changed: the deploy kit is Squire 0.10.7 (was 0.10.6): it ships a `.gitattributes` that pins line endings, so the deploy layer clears PROCTOR's line-ending warnings.
 - Changed: the PROCTOR job on the deploy layer blocks; it was allowed to fail, but PROCTOR passes deploy/ (its notes are warnings, which never fail the job).
 - Fixed: the public-surface test allows Citadel pre-production hosts (*.appstest.wayne.edu), which the site README names; composer ci failed on them.
 - Changed: the docs, agent-ready and deploy kits are Squire 0.10.6 (was 0.10.5): the docs builder and agent-ready generator see every file on Docker Desktop mounts.
