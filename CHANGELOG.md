@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Changed: the deploy layer requires PROCTOR ^0.15 (locked 0.15.0, was ^0.12): 0.13 checks the release cooldown against the CREED policy, 0.14 adds `script-pair` and 0.15 adds `mysql56-ci`; all only warn, nothing breaks.
 - Changed: the deploy layer requires PROCTOR ^0.12 (locked 0.12.0, was ^0.11): two new warning-only checks, nothing breaks.
 - Site: the front page's stale facts are current (the class list calls Drawbridge the sign-in gateway for Citadel, not the planned one; 0.6.1 is released).
 - Changed: the deploy kit is Squire 0.10.7 (was 0.10.6): it ships a `.gitattributes` that pins line endings, so the deploy layer clears PROCTOR's line-ending warnings.
