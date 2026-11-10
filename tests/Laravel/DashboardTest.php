@@ -24,6 +24,8 @@ final class DashboardTest extends LaravelTestCase
         $response->assertSee('Apps present');
         $response->assertSee('EOL burn-down');
         $response->assertSee('Security support ends');
+        $response->assertSee('<h2 id="h-mysql56">MySQL 5.6 CI job</h2>', false);
+        $response->assertSee('<span class="wsu-stat__label">not applicable</span>', false);
         $response->assertSee('<link rel="stylesheet" href="https://example.test/wayne-ui.css">', false);
         $response->assertDontSee('demo/ledger');
         $response->assertSee('lang="en"', false);

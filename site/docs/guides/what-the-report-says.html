@@ -60,7 +60,10 @@ source that refuses (a bad token) stops the scan instead.</p>
 migrations must run in CI against MySQL 5.6): <code>held</code> when the report carries a <code>held</code> finding, <code>missing</code> when it
 carries a <code>no-job</code> finding, <code>not_applicable</code> when it carries neither and came from PROCTOR 0.15.1 or newer (the check
 ran and had nothing to say: no migrations), and <code>unknown</code> for an app with no report, one that could not be read, or a
-report from PROCTOR below 0.15.1, which cannot tell <code>held</code> from <code>not_applicable</code>.</p>
+report from PROCTOR below 0.15.1, which cannot tell <code>held</code> from <code>not_applicable</code>. The dashboard shows the four
+counts as panels under &quot;Apps present&quot; (held, missing, not applicable, unknown); <code>missing</code> wears a red badge with
+the word in it while any app is missing the job, and the internal page's table has each app's state in a
+&quot;MySQL 5.6 CI&quot; column beside PROCTOR's.</p>
 </li>
 <li>
 <p><strong>Drift</strong>, counted per kind: <code>image_eol</code>, <code>image_unknown</code>, <code>image_below_floor</code>, <code>floor_allows_eol</code>,

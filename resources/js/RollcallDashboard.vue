@@ -20,12 +20,15 @@ import { computed } from 'vue';
 
 type Report = Record<string, unknown>;
 
+/** A table cell: plain words, or a state that needs a person, shown in its badge. */
+type Cell = string | { badge: string };
+
 interface Table {
     key: string;
     title: string;
     caption: string;
     columns: string[];
-    rows: string[][];
+    rows: [string, ...Cell[]][];
 }
 
 const props = withDefaults(
@@ -46,6 +49,17 @@ const VERSION_TABLES: [string, string][] = [
     ['php_floor', 'Declared PHP floor'],
     ['laravel', 'Laravel'],
 ];
+
+/** The MySQL 5.6 CI job states, in page order: report key => label (DashboardPage::MYSQL56_STATES). */
+const MYSQL56_STATES: [string, string][] = [
+    ['held', 'held'],
+    ['missing', 'missing'],
+    ['not_applicable', 'not applicable'],
+    ['unknown', 'unknown'],
+];
+
+/** The one state that needs a person: an app with migrations and no MySQL 5.6 job (DashboardPage::MYSQL56_BAD). */
+const MYSQL56_BAD = 'missing';
 
 /** PHP's is_scalar(). */
 function isScalar(value: unknown): value is string | number | boolean {
@@ -94,6 +108,13 @@ function list(value: unknown): unknown[] {
     return entries(value).map(([, item]) => item);
 }
 
+/** An app's MySQL 5.6 CI job state in words; "missing" in its badge (DashboardPage::mysql56State()). */
+function mysql56State(value: unknown): Cell {
+    const state = words(text(value, 'unknown'));
+
+    return state === MYSQL56_BAD ? { badge: state } : state;
+}
+
 const totals = computed(() => obj(props.report?.totals));
 const progress = computed(() => obj(props.report?.progress));
 const scanDate = computed(() => e(props.report?.scan_date));
@@ -110,6 +131,17 @@ const stats = computed((): [string, string][] => [
     [`Apps that moved since ${text(progress.value.since, 'the first scan')}`, e(progress.value.moved)],
     ['Apps upgraded from an EOL image to a supported one', e(progress.value.upgraded_to_supported)],
 ]);
+
+/** CREED's database rule, counted: [label, count, wears the badge]. "missing" does while any app is missing the job. */
+const mysql56 = computed((): [string, string, boolean][] => {
+    const counts = obj(props.report?.mysql56_ci);
+
+    return MYSQL56_STATES.map(([key, label]) => {
+        const count = counts[key];
+
+        return [label, e(count), key === MYSQL56_BAD && typeof count === 'number' && Number.isInteger(count) && count > 0];
+    });
+});
 
 const tables = computed((): Table[] => {
     const report = props.report ?? {};
@@ -155,8 +187,8 @@ const tables = computed((): Table[] => {
         out.push({
             key: 'apps',
             title: 'Apps',
-            caption: "Each app's versions, PROCTOR result and drift",
-            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'Drift'],
+            caption: "Each app's versions, PROCTOR result, MySQL 5.6 CI job and drift",
+            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
             rows: list(report.apps).map((item) => {
                 const app = obj(item);
                 const drift = list(app.drift).map(words);
@@ -174,6 +206,7 @@ const tables = computed((): Table[] => {
                     text(app.laravel, 'none'),
                     auth,
                     text(app.proctor, 'no report'),
+                    mysql56State(app.mysql56_ci),
                     drift.length === 0 ? 'none' : drift.join(', '),
                 ];
             }),
@@ -205,6 +238,20 @@ const tables = computed((): Table[] => {
             </div>
         </section>
 
+        <section aria-labelledby="h-mysql56">
+            <h2 id="h-mysql56">MySQL 5.6 CI job</h2>
+            <p>
+                CREED says migrations run in CI against MySQL 5.6.51, the version of Citadel's shared server; PROCTOR reports
+                which apps hold the job. Unknown means no PROCTOR report, or one older than 0.15.1.
+            </p>
+            <div v-for="[label, value, warn] in mysql56" :key="label" class="wsu-stat">
+                <span class="wsu-stat__label"
+                    ><span v-if="warn" class="wsu-badge wsu-badge--danger">{{ label }}</span
+                    ><template v-else>{{ label }}</template></span
+                ><span class="wsu-stat__value">{{ value }}</span>
+            </div>
+        </section>
+
         <!-- Each table sits in its own keyboard-reachable scroll region (WCAG 1.4.10, 2.1.1). -->
         <section v-for="table in tables" :key="table.key" :aria-labelledby="`h-${table.key}`">
             <h2 :id="`h-${table.key}`">{{ table.title }}</h2>
@@ -219,7 +266,10 @@ const tables = computed((): Table[] => {
                     <tbody>
                         <tr v-for="(row, index) in table.rows" :key="index">
                             <th scope="row">{{ row[0] }}</th>
-                            <td v-for="(cell, column) in row.slice(1)" :key="column">{{ cell }}</td>
+                            <td v-for="(cell, column) in row.slice(1)" :key="column">
+                                <span v-if="typeof cell === 'object'" class="wsu-badge wsu-badge--danger">{{ cell.badge }}</span
+                                ><template v-else>{{ cell }}</template>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

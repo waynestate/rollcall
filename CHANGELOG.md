@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: the dashboard shows the MySQL 5.6 CI job counts (held, missing, not applicable, unknown) under the totals, and the internal table has the per-app state (D-079).
 - Changed: the deploy layer requires PROCTOR ^0.15 (locked 0.15.0, was ^0.12): 0.13 checks the release cooldown against the CREED policy, 0.14 adds `script-pair` and 0.15 adds `mysql56-ci`; all only warn, nothing breaks.
 - Added: the report counts apps by MySQL 5.6 CI job state (`mysql56_ci`: held, missing, not applicable, unknown) from PROCTOR's `mysql56-ci` findings, with a `mysql56_ci_apps` gauge and the same field in ADVISOR's fleet summary (D-078, D-079).
 - Changed: the deploy layer requires PROCTOR ^0.12 (locked 0.12.0, was ^0.11): two new warning-only checks, nothing breaks.

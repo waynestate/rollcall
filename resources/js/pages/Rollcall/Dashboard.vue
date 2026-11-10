@@ -57,13 +57,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     margin-block-start: var(--wsu-space-8);
 }
 
-/* The three totals sit side by side when there is room, one per row on a phone. */
-.rollcall-page :deep(section[aria-labelledby='totals']) {
+/*
+ * The totals and the four MySQL 5.6 CI job counts sit side by side when there
+ * is room, one per row on a phone. Their heading and note span the row.
+ */
+.rollcall-page :deep(section[aria-labelledby='totals']),
+.rollcall-page :deep(section[aria-labelledby='h-mysql56']) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
 }
 
-.rollcall-page :deep(section[aria-labelledby='totals'] > h2) {
+.rollcall-page :deep(section[aria-labelledby='totals'] > h2),
+.rollcall-page :deep(section[aria-labelledby='h-mysql56'] > :is(h2, p)) {
     grid-column: 1 / -1;
 }
 </style>

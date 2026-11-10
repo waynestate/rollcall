@@ -31,6 +31,12 @@ final class DashboardPage
     /** The version tables, in page order: report key => title. */
     private const VERSION_TABLES = ['php_image' => 'PHP image', 'php_floor' => 'Declared PHP floor', 'laravel' => 'Laravel'];
 
+    /** The MySQL 5.6 CI job states, in page order: report key => label. */
+    private const MYSQL56_STATES = ['held' => 'held', 'missing' => 'missing', 'not_applicable' => 'not applicable', 'unknown' => 'unknown'];
+
+    /** The one state that needs a person: an app with migrations and no MySQL 5.6 job. */
+    private const MYSQL56_BAD = 'missing';
+
     /** @param  string  $scanCommand  the command the empty state names: the only line that differs between the two paths */
     public function __construct(private readonly string $scanCommand = self::CLI_SCAN) {}
 
@@ -137,6 +143,21 @@ final class DashboardPage
         $h[] = self::stat('Apps upgraded from an EOL image to a supported one', $progress['upgraded_to_supported'] ?? '');
         $h[] = '    </section>';
 
+        // CREED's database rule, counted: four panels, and "missing" wears a badge while any app is missing the job.
+        $mysql56 = self::arr($report['mysql56_ci'] ?? []);
+        $h[] = '';
+        $h[] = '    <section aria-labelledby="h-mysql56">';
+        $h[] = '        <h2 id="h-mysql56">MySQL 5.6 CI job</h2>';
+        $h[] = '        <p>CREED says migrations run in CI against MySQL 5.6.51, the version of Citadel\'s shared server; PROCTOR reports'
+            . ' which apps hold the job. Unknown means no PROCTOR report, or one older than 0.15.1.</p>';
+        foreach (self::MYSQL56_STATES as $key => $label) {
+            $count = $mysql56[$key] ?? '';
+            $h[] = '        <div class="wsu-stat"><span class="wsu-stat__label">'
+                . ($key === self::MYSQL56_BAD && is_int($count) && $count > 0 ? self::badge($label) : self::e($label)) . '</span>'
+                . '<span class="wsu-stat__value">' . self::e($count) . '</span></div>';
+        }
+        $h[] = '    </section>';
+
         foreach (self::VERSION_TABLES as $key => $title) {
             $rows = [];
             foreach (self::arr($report[$key] ?? []) as $row) {
@@ -201,14 +222,15 @@ final class DashboardPage
                     . '<td>' . self::e(self::text($app['laravel'] ?? null, 'none')) . '</td>'
                     . '<td>' . self::e($auth) . '</td>'
                     . '<td>' . self::e(self::text($app['proctor'] ?? null, 'no report')) . '</td>'
+                    . '<td>' . self::mysql56State($app['mysql56_ci'] ?? null) . '</td>'
                     . '<td>' . self::e($drift === [] ? 'none' : implode(', ', $drift)) . '</td></tr>';
             }
             array_push($h, ...self::table(
                 'h-apps',
                 'Apps',
                 'cap-apps',
-                "Each app's versions, PROCTOR result and drift",
-                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'Drift'],
+                "Each app's versions, PROCTOR result, MySQL 5.6 CI job and drift",
+                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
                 $rows,
             ));
         }
@@ -254,6 +276,20 @@ final class DashboardPage
     {
         return '        <div class="wsu-stat"><span class="wsu-stat__label">' . self::e($label) . '</span>'
             . '<span class="wsu-stat__value">' . self::e($value) . '</span></div>';
+    }
+
+    /** An app's MySQL 5.6 CI job state in words, escaped; "missing" in its badge. */
+    private static function mysql56State(mixed $state): string
+    {
+        $words = self::words(self::text($state, 'unknown'));
+
+        return $words === self::MYSQL56_BAD ? self::badge($words) : self::e($words);
+    }
+
+    /** A state that needs a person: the word carries it, the badge's color only backs it up (WCAG 1.4.1). */
+    private static function badge(string $words): string
+    {
+        return '<span class="wsu-badge wsu-badge--danger">' . self::e($words) . '</span>';
     }
 
     /** A state or drift kind in words: security_only reads "security only". */

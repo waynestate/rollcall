@@ -19,7 +19,10 @@ This page explains each part of the report. Next: [Citadel's registrations expor
   migrations must run in CI against MySQL 5.6): `held` when the report carries a `held` finding, `missing` when it
   carries a `no-job` finding, `not_applicable` when it carries neither and came from PROCTOR 0.15.1 or newer (the check
   ran and had nothing to say: no migrations), and `unknown` for an app with no report, one that could not be read, or a
-  report from PROCTOR below 0.15.1, which cannot tell `held` from `not_applicable`.
+  report from PROCTOR below 0.15.1, which cannot tell `held` from `not_applicable`. The dashboard shows the four
+  counts as panels under "Apps present" (held, missing, not applicable, unknown); `missing` wears a red badge with
+  the word in it while any app is missing the job, and the internal page's table has each app's state in a
+  "MySQL 5.6 CI" column beside PROCTOR's.
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`,
   `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`,
   `proctor_failing`, `override_expired`.
