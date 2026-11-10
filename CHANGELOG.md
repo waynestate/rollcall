@@ -4,6 +4,10 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-09
+
+- Changed: `ReportBuilder::VERSION`, the fallback a dev checkout prints, is 1.1.1; the README, Install and the front page say 1.1.1.
+- Changed: CI pins the Preflight components to 0.5.0 (was 0.4.0), and the composer-audit job now takes the component's own image instead of naming one; the a11y pin test expects 0.5.0 (the a11y template is the same in both).
 - Docs: Parity joins the party. The README cast and "Where it sits in the stack" table, the docs overview's table and cast, and the front page's class list carry Parity next to Squire, with its spirit-level mark: the stack's new tool that runs Citadel on your computer (its PHP image, its proxy and MySQL 5.6). 0.1.0 is coming and it has no site yet, so its entries link nowhere. Present, and level.
 - Changed: refreshed version mentions. The "Where it sits in the stack" table in the README and the docs overview calls the whole class now, in the cast's order (Squire, Booster, Drawbridge, ADVISOR and WELD were absent without a note); MAINTAINING names Preflight 0.5.0, the pin CI uses; the front page notes say the printout is Rollcall 1.1.0's, as the page shows. The dev dependencies move to ADVISOR ^0.2 and Pinstripe ^0.3 (Pinstripe 0.3.0 bans joined SQL and turned-off TLS checks); the module test hands ADVISOR 0.2.0's `ModuleContext` its new sixth argument, the Playbook `Settings`. The module itself is unchanged.
 - Changed: CI and the documented Docker lines run Composer 2.11.1, pinned by digest (was 2.10.3, no longer maintained; 2.11.1 fixes GHSA-c968-33g3-wh7p and GHSA-fm2w-xgf2-f9fh): the `wayneui-copies`, `composer-ci`, `dashboard-render`, `rollcall-scan` and `creed-copy-refresh` jobs, and `scripts/dashboard-a11y.sh` and `.ps1`. The `composer-audit` component's image input is left alone; Preflight moves its own pin.
