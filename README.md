@@ -235,7 +235,9 @@ The canonical copy of this table is in WELD's docs: [Which command when](https:/
   upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The same counts reach
   `/metrics` (`rollcall_forced_upgrades_pending_apps`, `rollcall_forced_upgrades_overdue_apps` and
   `rollcall_forced_upgrades_next_due_timestamp_seconds`) and ADVISOR's `rollcall_fleet_summary`. The internal
-  per-app list carries each app's `upgrade_due`. Zero with any other image source. See
+  per-app list carries each app's `upgrade_due`. Zero with any other image source. The dashboard shows the three
+  counts under its totals, and its internal table has an "Upgrade due" column, badged "date has come" once a date
+  arrives. See
   [docs/guides/citadel.md](docs/guides/citadel.md).
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the

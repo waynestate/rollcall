@@ -61,6 +61,9 @@ const MYSQL56_STATES: [string, string][] = [
 /** The one state that needs a person: an app with migrations and no MySQL 5.6 job (DashboardPage::MYSQL56_BAD). */
 const MYSQL56_BAD = 'missing';
 
+/** What a row's Citadel date says once it is the report's day or earlier (DashboardPage::DUE_COME). */
+const DUE_COME = 'date has come';
+
 /** PHP's is_scalar(). */
 function isScalar(value: unknown): value is string | number | boolean {
     return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
@@ -115,6 +118,19 @@ function mysql56State(value: unknown): Cell {
     return state === MYSQL56_BAD ? { badge: state } : state;
 }
 
+/**
+ * An app's forced upgrade date: "none" without one, and in its badge once the report's
+ * day has reached it, the rule behind the report's overdue count (DashboardPage::upgradeDue()).
+ * Dates are YYYY-MM-DD, so comparing them as strings is comparing the days.
+ */
+function upgradeDue(due: unknown, asOf: unknown): Cell {
+    if (typeof due !== 'string' || due === '') {
+        return 'none';
+    }
+
+    return typeof asOf === 'string' && asOf !== '' && due <= asOf ? { badge: `${due}, ${DUE_COME}` } : due;
+}
+
 const totals = computed(() => obj(props.report?.totals));
 const progress = computed(() => obj(props.report?.progress));
 const scanDate = computed(() => e(props.report?.scan_date));
@@ -131,6 +147,18 @@ const stats = computed((): [string, string][] => [
     [`Apps that moved since ${text(progress.value.since, 'the first scan')}`, e(progress.value.moved)],
     ['Apps upgraded from an EOL image to a supported one', e(progress.value.upgraded_to_supported)],
 ]);
+
+/** Citadel's forced image upgrades, counted: [label, value, wears the badge]. "Due today or earlier" does while any is. */
+const forced = computed((): [string, string, boolean][] => {
+    const counts = obj(props.report?.forced_upgrades);
+    const overdue = counts.overdue;
+
+    return [
+        ['Apps with an upgrade pending', e(counts.pending), false],
+        ['Due today or earlier', e(overdue), typeof overdue === 'number' && Number.isInteger(overdue) && overdue > 0],
+        ['Next date ahead', text(counts.next_due, 'none'), false],
+    ];
+});
 
 /** CREED's database rule, counted: [label, count, wears the badge]. "missing" does while any app is missing the job. */
 const mysql56 = computed((): [string, string, boolean][] => {
@@ -187,8 +215,8 @@ const tables = computed((): Table[] => {
         out.push({
             key: 'apps',
             title: 'Apps',
-            caption: "Each app's versions, PROCTOR result, MySQL 5.6 CI job and drift",
-            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
+            caption: "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift",
+            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
             rows: list(report.apps).map((item) => {
                 const app = obj(item);
                 const drift = list(app.drift).map(words);
@@ -202,6 +230,7 @@ const tables = computed((): Table[] => {
                     e(app.runtime_php),
                     e(app.runtime_httpd),
                     words(app.image_state),
+                    upgradeDue(app.upgrade_due, report.as_of),
                     text(app.php_floor, 'unbounded'),
                     text(app.laravel, 'none'),
                     auth,
@@ -235,6 +264,20 @@ const tables = computed((): Table[] => {
             <h2 id="totals">Apps present</h2>
             <div v-for="[label, value] in stats" :key="label" class="wsu-stat">
                 <span class="wsu-stat__label">{{ label }}</span><span class="wsu-stat__value">{{ value }}</span>
+            </div>
+        </section>
+
+        <section aria-labelledby="h-forced">
+            <h2 id="h-forced">Forced image upgrades</h2>
+            <p>
+                On each date in Citadel's registrations export, Citadel moves an app to a newer base image, ready or not. The
+                counts come from that export, so with any other image source they stay at zero.
+            </p>
+            <div v-for="[label, value, warn] in forced" :key="label" class="wsu-stat">
+                <span class="wsu-stat__label"
+                    ><span v-if="warn" class="wsu-badge wsu-badge--danger">{{ label }}</span
+                    ><template v-else>{{ label }}</template></span
+                ><span class="wsu-stat__value">{{ value }}</span>
             </div>
         </section>
 

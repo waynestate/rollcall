@@ -37,6 +37,9 @@ final class DashboardPage
     /** The one state that needs a person: an app with migrations and no MySQL 5.6 job. */
     private const MYSQL56_BAD = 'missing';
 
+    /** What a row's Citadel date says once it is the report's day or earlier: Citadel may move the app any time now. */
+    private const DUE_COME = 'date has come';
+
     /** @param  string  $scanCommand  the command the empty state names: the only line that differs between the two paths */
     public function __construct(private readonly string $scanCommand = self::CLI_SCAN) {}
 
@@ -143,6 +146,21 @@ final class DashboardPage
         $h[] = self::stat('Apps upgraded from an EOL image to a supported one', $progress['upgraded_to_supported'] ?? '');
         $h[] = '    </section>';
 
+        // Citadel's forced image upgrades, counted: the dates the fleet moves whether it is ready or not.
+        $forced = self::arr($report['forced_upgrades'] ?? []);
+        $overdue = $forced['overdue'] ?? '';
+        $h[] = '';
+        $h[] = '    <section aria-labelledby="h-forced">';
+        $h[] = '        <h2 id="h-forced">Forced image upgrades</h2>';
+        $h[] = '        <p>On each date in Citadel\'s registrations export, Citadel moves an app to a newer base image, ready or not.'
+            . ' The counts come from that export, so with any other image source they stay at zero.</p>';
+        $h[] = self::stat('Apps with an upgrade pending', $forced['pending'] ?? '');
+        $h[] = '        <div class="wsu-stat"><span class="wsu-stat__label">'
+            . (is_int($overdue) && $overdue > 0 ? self::badge('Due today or earlier') : 'Due today or earlier') . '</span>'
+            . '<span class="wsu-stat__value">' . self::e($overdue) . '</span></div>';
+        $h[] = self::stat('Next date ahead', self::text($forced['next_due'] ?? null, 'none'));
+        $h[] = '    </section>';
+
         // CREED's database rule, counted: four panels, and "missing" wears a badge while any app is missing the job.
         $mysql56 = self::arr($report['mysql56_ci'] ?? []);
         $h[] = '';
@@ -218,6 +236,7 @@ final class DashboardPage
                     . '<td>' . self::e($app['runtime_php'] ?? '') . '</td>'
                     . '<td>' . self::e($app['runtime_httpd'] ?? '') . '</td>'
                     . '<td>' . self::e(self::words($app['image_state'] ?? '')) . '</td>'
+                    . '<td>' . self::upgradeDue($app['upgrade_due'] ?? null, $report['as_of'] ?? null) . '</td>'
                     . '<td>' . self::e(self::text($app['php_floor'] ?? null, 'unbounded')) . '</td>'
                     . '<td>' . self::e(self::text($app['laravel'] ?? null, 'none')) . '</td>'
                     . '<td>' . self::e($auth) . '</td>'
@@ -229,8 +248,8 @@ final class DashboardPage
                 'h-apps',
                 'Apps',
                 'cap-apps',
-                "Each app's versions, PROCTOR result, MySQL 5.6 CI job and drift",
-                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
+                "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift",
+                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
                 $rows,
             ));
         }
@@ -284,6 +303,19 @@ final class DashboardPage
         $words = self::words(self::text($state, 'unknown'));
 
         return $words === self::MYSQL56_BAD ? self::badge($words) : self::e($words);
+    }
+
+    /**
+     * An app's forced upgrade date, escaped: "none" without one, and in its badge once the
+     * report's day has reached it (the same rule as the report's overdue count).
+     */
+    private static function upgradeDue(mixed $due, mixed $asOf): string
+    {
+        if (! is_string($due) || $due === '') {
+            return self::e('none');
+        }
+
+        return is_string($asOf) && $asOf !== '' && strcmp($due, $asOf) <= 0 ? self::badge($due . ', ' . self::DUE_COME) : self::e($due);
     }
 
     /** A state that needs a person: the word carries it, the badge's color only backs it up (WCAG 1.4.1). */

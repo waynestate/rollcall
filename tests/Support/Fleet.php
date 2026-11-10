@@ -8,6 +8,7 @@ use Waynestate\Rollcall\Clock\FixedClock;
 use Waynestate\Rollcall\Model\Snapshot;
 use Waynestate\Rollcall\Parse\ComposerReader;
 use Waynestate\Rollcall\Scan\Scanner;
+use Waynestate\Rollcall\Source\CitadelExportSource;
 use Waynestate\Rollcall\Source\DirectoryProctorReportSource;
 use Waynestate\Rollcall\Source\DirectoryRepositorySource;
 use Waynestate\Rollcall\Source\JsonFileImageSource;
@@ -37,6 +38,18 @@ final class Fleet
     public static function snapshot(string $date): Snapshot
     {
         return self::scanner($date)->scan();
+    }
+
+    /** The same fleet with Citadel's registrations export as its image source: forced upgrade dates and running versions. */
+    public static function citadelSnapshot(string $date): Snapshot
+    {
+        return (new Scanner(
+            self::repositories(),
+            CitadelExportSource::fromFile(self::FIXTURES . '/citadel-export.json'),
+            new DirectoryProctorReportSource(self::FIXTURES . '/proctor'),
+            new FixedClock($date),
+            new ComposerReader(),
+        ))->scan();
     }
 
     /** A temporary directory that the test removes in tearDown through remove(). */

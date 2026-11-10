@@ -48,7 +48,11 @@ This page explains each part of the report. Next: [Citadel's registrations expor
 - **Forced image upgrades**: with [Citadel's export](citadel.md) as the image source, how many apps have a forced
   base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only).
   The same counts reach [metrics](metrics.md) and ADVISOR's `rollcall_fleet_summary` ([ADVISOR](advisor.md)). The
-  internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source.
+  internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source. The
+  dashboard shows the three as panels under "Apps present" (apps with an upgrade pending, due today or earlier, the
+  next date ahead); "Due today or earlier" wears a red badge with the words in it while any app's date has come, and
+  the internal page's table has each app's date in an "Upgrade due" column beside its image state, in the same badge
+  once the report's day has reached it ("2026-11-01, date has come").
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
 policy does not list is `unknown`.

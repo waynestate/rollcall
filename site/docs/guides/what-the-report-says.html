@@ -99,7 +99,11 @@ apps.</p>
 <p><strong>Forced image upgrades</strong>: with <a href="citadel.html">Citadel's export</a> as the image source, how many apps have a forced
 base-image upgrade pending, how many are due today or earlier, and the next date (<code>forced_upgrades</code>, counts only).
 The same counts reach <a href="metrics.html">metrics</a> and ADVISOR's <code>rollcall_fleet_summary</code> (<a href="advisor.html">ADVISOR</a>). The
-internal per-app list carries each app's <code>upgrade_due</code>. All three are zero with any other image source.</p>
+internal per-app list carries each app's <code>upgrade_due</code>. All three are zero with any other image source. The
+dashboard shows the three as panels under &quot;Apps present&quot; (apps with an upgrade pending, due today or earlier, the
+next date ahead); &quot;Due today or earlier&quot; wears a red badge with the words in it while any app's date has come, and
+the internal page's table has each app's date in an &quot;Upgrade due&quot; column beside its image state, in the same badge
+once the report's day has reached it (&quot;2026-11-01, date has come&quot;).</p>
 </li>
 </ul>
 <p>State is never decided in code: it is derived from the dates in <code>policy.json</code> by CREED's reader. A version the

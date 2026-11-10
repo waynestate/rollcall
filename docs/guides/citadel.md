@@ -80,6 +80,9 @@ stops with a plain message if both are set. In Laravel, the setting is `rollcall
   [ADVISOR](advisor.md)).
 - **Per app, internally**: the internal report's per-app list carries `upgrade_due`, and the stored snapshot keeps it.
   Snapshots written before it existed load as `null`.
+- **The dashboard**: a "Forced image upgrades" section under the totals with the three counts (the due one in a red
+  badge while any date has come), and on the internal page an "Upgrade due" column with each app's date, badged
+  "date has come" from that day on. The public page never names an app.
 - **Owner digests**: a new forced upgrade date is news, and so is one that went away. See
   [owner digests](digest.md).
 

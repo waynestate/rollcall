@@ -6,6 +6,8 @@ namespace Waynestate\Rollcall\Tests\Laravel;
 
 use Illuminate\Contracts\Config\Repository;
 use Waynestate\Rollcall\Dashboard\RawDashboard;
+use Waynestate\Rollcall\Storage\JsonFileSnapshotStore;
+use Waynestate\Rollcall\Tests\Support\Fleet;
 
 /**
  * Writes the rendered dashboard pages (public, internal and the empty state,
@@ -17,11 +19,18 @@ use Waynestate\Rollcall\Dashboard\RawDashboard;
  * (tools/vue-dashboard/parity.mjs) renders the component from exactly the
  * report the Blade page printed. The substitute takes the register once per
  * page and keeps a copy of every roll; the raw-PHP room gets its own copy.
+ *
+ * The stored scan reads Citadel's registrations export, so the pages carry
+ * forced upgrade dates (one come, one ahead, the rest none) and running
+ * versions, and the parity check and the axe gate see every cell the twins
+ * can print, badges included.
  */
 final class DashboardRenderTest extends LaravelTestCase
 {
     protected function tune(Repository $config): void
     {
+        // The same fleet and day as the base case, scanned through Citadel's export instead of the image list.
+        (new JsonFileSnapshotStore($this->store))->save(Fleet::citadelSnapshot('2026-10-28'));
         $config->set('rollcall.dashboard.enabled', true);
         $config->set('rollcall.dashboard.internal_enabled', true);
         // The test app has no sign-in middleware; a plain 'web' stands in for the app's own.

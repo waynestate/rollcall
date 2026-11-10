@@ -127,6 +127,9 @@ stops with a plain message if both are set. In Laravel, the setting is <code>rol
 <a href="advisor.html">ADVISOR</a>).</li>
 <li><strong>Per app, internally</strong>: the internal report's per-app list carries <code>upgrade_due</code>, and the stored snapshot keeps it.
 Snapshots written before it existed load as <code>null</code>.</li>
+<li><strong>The dashboard</strong>: a &quot;Forced image upgrades&quot; section under the totals with the three counts (the due one in a red
+badge while any date has come), and on the internal page an &quot;Upgrade due&quot; column with each app's date, badged
+&quot;date has come&quot; from that day on. The public page never names an app.</li>
 <li><strong>Owner digests</strong>: a new forced upgrade date is news, and so is one that went away. See
 <a href="digest.html">owner digests</a>.</li>
 </ul>

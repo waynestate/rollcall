@@ -229,7 +229,9 @@ The canonical copy of this table is in WELD's docs: [Which command when](https:/
   upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`). The same counts reach
   `/metrics` (`rollcall_forced_upgrades_pending_apps`, `rollcall_forced_upgrades_overdue_apps` and
   `rollcall_forced_upgrades_next_due_timestamp_seconds`) and ADVISOR's `rollcall_fleet_summary`. The internal
-  per-app list carries each app's `upgrade_due`. Zero with any other image source. See
+  per-app list carries each app's `upgrade_due`. Zero with any other image source. The dashboard shows the three
+  counts under its totals, and its internal table has an "Upgrade due" column, badged "date has come" once a date
+  arrives. See
   [docs/guides/citadel.md](https://github.com/waynestate/rollcall/blob/HEAD/docs/guides/citadel.md).
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the
@@ -1183,6 +1185,7 @@ Set `ROLLCALL_CITADEL_EXPORT` or `ROLLCALL_IMAGES_FILE`, not both: each is a com
 - **Forced image upgrades**: the text report prints `Forced image upgrades pending: 2 (1 due today or earlier), next due 2026-12-15.` and the JSON report carries `forced_upgrades` with `pending`, `overdue` (due today or earlier) and `next_due` (the next future date, or `null`). Counts only, so it is public. With the image list, or no image source, all three are zero.
 - **Metrics and ADVISOR**: the same counts reach `/metrics` as `rollcall_forced_upgrades_pending_apps`, `rollcall_forced_upgrades_overdue_apps` and `rollcall_forced_upgrades_next_due_timestamp_seconds` (see [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html)), and ADVISOR's `rollcall_fleet_summary` tool answers with `forced_upgrades` (see [ADVISOR](https://rollcall.apps.wayne.edu/docs/guides/advisor.html)).
 - **Per app, internally**: the internal report's per-app list carries `upgrade_due`, and the stored snapshot keeps it. Snapshots written before it existed load as `null`.
+- **The dashboard**: a "Forced image upgrades" section under the totals with the three counts (the due one in a red badge while any date has come), and on the internal page an "Upgrade due" column with each app's date, badged "date has come" from that day on. The public page never names an app.
 - **Owner digests**: a new forced upgrade date is news, and so is one that went away. See [owner digests](https://rollcall.apps.wayne.edu/docs/guides/digest.html).
 
 The export names applications, so keep it where you keep the snapshots: on the host, outside git.
@@ -1440,7 +1443,7 @@ This page explains each part of the report. Next: [Citadel's registrations expor
   - `php_image`: per PHP minor of the image, in version order with `unknown` last, such as `{"8.1": 3, "8.4": 9, "unknown": 2}`.
   - `laravel`: per Laravel major, the same way. An app with no Laravel, or one Rollcall could not read, is `unknown`.
   The breakdown is worked out from each stored snapshot when the report is built, so snapshots written before it existed (Rollcall 0.1.9 and older) get one too, and the stored snapshot format is unchanged (`schema_version` 1). It reaches back as far as `rollcall prune` keeps snapshots (`ROLLCALL_RETENTION_DAYS`). A report written by 0.1.9 or older has no `states`, `php_image` or `laravel` on its burn-down days: read that as "no breakdown", not as zero apps.
-- **Forced image upgrades**: with [Citadel's export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) as the image source, how many apps have a forced base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only). The same counts reach [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html) and ADVISOR's `rollcall_fleet_summary` ([ADVISOR](https://rollcall.apps.wayne.edu/docs/guides/advisor.html)). The internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source.
+- **Forced image upgrades**: with [Citadel's export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) as the image source, how many apps have a forced base-image upgrade pending, how many are due today or earlier, and the next date (`forced_upgrades`, counts only). The same counts reach [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html) and ADVISOR's `rollcall_fleet_summary` ([ADVISOR](https://rollcall.apps.wayne.edu/docs/guides/advisor.html)). The internal per-app list carries each app's `upgrade_due`. All three are zero with any other image source. The dashboard shows the three as panels under "Apps present" (apps with an upgrade pending, due today or earlier, the next date ahead); "Due today or earlier" wears a red badge with the words in it while any app's date has come, and the internal page's table has each app's date in an "Upgrade due" column beside its image state, in the same badge once the report's day has reached it ("2026-11-01, date has come").
 
 State is never decided in code: it is derived from the dates in `policy.json` by CREED's reader. A version the policy does not list is `unknown`.
 
