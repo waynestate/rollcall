@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Deploy kit refreshed to Squire 0.10.5; requires waynestate/advisor ^0.3.
+
 ## [1.1.1] - 2026-11-09
 
 - Changed: `ReportBuilder::VERSION`, the fallback a dev checkout prints, is 1.1.1; the README, Install and the front page say 1.1.1.

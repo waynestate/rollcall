@@ -17,7 +17,7 @@ type: Libre Caslon Display (display) and Courier Prime (typewriter); body text i
 - **Reduced motion:** with `prefers-reduced-motion: reduce` the page arrives with the roll already taken, every word
   at first paint.
 - **Sample data:** every app name on the page is fictional and labeled as sample data. The printout is real output
-   from Rollcall 1.1.0 against the bundled fixtures.
+    from Rollcall 1.1.1 against the bundled fixtures.
 - Screenshots: `screenshots/` (desktop 1440, mobile 390, reduced motion, motion GIF).
 
 ## Links between the stack sites
