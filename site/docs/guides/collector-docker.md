@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Run the collector in Docker[#](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html#run-the-collector-in-docker)
+# Run the collector in Docker [#](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html#run-the-collector-in-docker)
 
 This page builds the collector image and runs a scan in Docker. Next: [WSU values (Playbook)](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html) for where the GitLab URL comes from.
 

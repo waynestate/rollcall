@@ -6,13 +6,13 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Laravel[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
+# Laravel [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
 
 This page wires Rollcall into a Laravel app, and shows the same dashboard as a Vue page in an Inertia app and in a raw PHP app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
 
 The package registers itself (`extra.laravel.providers`). Publish the config with `php artisan vendor:publish --tag=rollcall-config`, set the variables in [the configuration reference](https://rollcall.apps.wayne.edu/docs/reference/configuration.html), and schedule `rollcall:scan`. The dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`. In an Inertia app it can be one of your own Vue pages instead (below). The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.
 
-## The dashboard in an Inertia app (Vue)[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-an-inertia-app-vue)
+## The dashboard in an Inertia app (Vue) [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-an-inertia-app-vue)
 
 In a Laravel + Inertia + Vue app (WELD's shape) the dashboard can be one of the app's own pages, inside its own layout. Same routes, same switches, same report: with `ROLLCALL_DASHBOARD_INERTIA=true` the controller hands what `DashboardPage::report()` built to an Inertia page as props (`report`, `internal`, `scanCommand`) instead of printing the Blade view. From a WELD app:
 
@@ -45,7 +45,7 @@ Why this shape: the page is published because the layout is the app's, and the c
 
 The component renders what the Blade page shows inside `<main>`: the same WayneUI classes, the `role="status"` line, the captions and headers, and the per-app table only on the internal page (`<path>/apps`, still behind `rollcall.dashboard.internal_middleware` and `ROLLCALL_INTERNAL_ENABLED`). It has no style block, no style attribute and no script of its own, so it works under HELMET's CSP, and it takes its look from the app's WayneUI stylesheet. Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms together: `dashboard-vue` server-renders the component with the props the route sends and fails on any difference from the Blade page (elements, attributes and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y` checks the three Vue pages with the other six.
 
-## The dashboard in a raw PHP app[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
+## The dashboard in a raw PHP app [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
 
 The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
 

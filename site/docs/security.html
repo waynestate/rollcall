@@ -38,7 +38,7 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../docs/index.html">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/quick-start.html">Quick start</a></li><li><a href="../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../docs/guides/digest.html">Owner digests</a></li><li><a href="../docs/guides/metrics.html">Metrics</a></li><li><a href="../docs/guides/laravel.html">Laravel</a></li><li><a href="../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/configuration.html">Configuration</a></li><li><a href="../docs/reference/scripts.html">Scripts on every OS</a></li><li><a href="../docs/reference/contract.html">Contract</a></li><li><a href="../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../docs/architecture.html">Architecture</a></li><li><a href="../docs/security.html" aria-current="page">Security</a></li><li><a href="../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="security-notes">Security notes<a class="docs-heading-link" aria-label="Link to this section" href="#security-notes">#</a></h1>
+      <article class="docs-article"><h1 id="security-notes">Security <span class="docs-heading-tail"><span>notes</span><a class="docs-heading-link" aria-label="Link to this section" href="#security-notes">#</a></span></h1>
 <p>This page lists how Rollcall keeps itself and the fleet safe, and exactly what its GitLab token needs. Next: <a href="checks.html">run the checks</a>.</p>
 <ul>
 <li>Read-only toward GitLab and everything else: one gate in the GitLab adapter allows only <code>GET</code> and <code>HEAD</code>, and a test
@@ -56,11 +56,11 @@ token value never appears in output.</li>
 <li>PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output
 strips control characters.</li>
 </ul>
-<h2 id="the-gitlab-token-exactly">The GitLab token, exactly<a class="docs-heading-link" aria-label="Link to this section" href="#the-gitlab-token-exactly">#</a></h2>
+<h2 id="the-gitlab-token-exactly">The GitLab token, <span class="docs-heading-tail"><span>exactly</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-gitlab-token-exactly">#</a></span></h2>
 <p>Rollcall needs one scope, <code>read_api</code>, and one role, Reporter, on each project it scans. Nothing else. GitLab
 describes <code>read_api</code> as read access to the API for the token's scope, and every call Rollcall makes is a read
 through the REST API.</p>
-<h3 id="every-call-rollcall-makes">Every call Rollcall makes<a class="docs-heading-link" aria-label="Link to this section" href="#every-call-rollcall-makes">#</a></h3>
+<h3 id="every-call-rollcall-makes">Every call Rollcall <span class="docs-heading-tail"><span>makes</span><a class="docs-heading-link" aria-label="Link to this section" href="#every-call-rollcall-makes">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -122,7 +122,7 @@ through the REST API.</p>
 </tbody>
 </table></div>
 <p><code>tests/TokenScopeDocsTest.php</code> fails if the GitLab adapter calls an API path this table does not list.</p>
-<h3 id="scopes-it-must-not-have">Scopes it must not have<a class="docs-heading-link" aria-label="Link to this section" href="#scopes-it-must-not-have">#</a></h3>
+<h3 id="scopes-it-must-not-have">Scopes it must not <span class="docs-heading-tail"><span>have</span><a class="docs-heading-link" aria-label="Link to this section" href="#scopes-it-must-not-have">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -161,7 +161,7 @@ through the REST API.</p>
 </tr>
 </tbody>
 </table></div>
-<h3 id="role-membership-and-expiry">Role, membership and expiry<a class="docs-heading-link" aria-label="Link to this section" href="#role-membership-and-expiry">#</a></h3>
+<h3 id="role-membership-and-expiry">Role, membership and <span class="docs-heading-tail"><span>expiry</span><a class="docs-heading-link" aria-label="Link to this section" href="#role-membership-and-expiry">#</a></span></h3>
 <ul>
 <li><strong>Reporter, on each project to scan, and nothing more.</strong> Reporter is the lowest role that can read a private
 project's files; Guest cannot. Developer and above add powers Rollcall never uses.</li>
@@ -181,7 +181,7 @@ produces a flattering partial roll. One <code>403</code> is not the token: with 
 a project's pipeline list means CI/CD is off for that project (the same token has just read its files), so that
 app has no PROCTOR report and the scan carries on.</li>
 </ul>
-<h2 id="the-scanner-token-and-how-to-rotate-it">The scanner token and how to rotate it<a class="docs-heading-link" aria-label="Link to this section" href="#the-scanner-token-and-how-to-rotate-it">#</a></h2>
+<h2 id="the-scanner-token-and-how-to-rotate-it">The scanner token and how to rotate <span class="docs-heading-tail"><span>it</span><a class="docs-heading-link" aria-label="Link to this section" href="#the-scanner-token-and-how-to-rotate-it">#</a></span></h2>
 <p>The stack's weekly scan on git.wayne.edu reads with one token. Everything about it except its value is here.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>

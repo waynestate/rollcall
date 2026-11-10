@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Contract[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#contract)
+# Contract [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#contract)
 
 This page covers the shapes Rollcall promises to anyone who reads its output. Next: the [Proof](https://rollcall.apps.wayne.edu/docs/reference/proof.html) of a real run.
 
@@ -22,7 +22,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 | `owners-check.schema.json` | `rollcall owners --format=json`, the latest scan checked against the owners file (internal: it names apps) | Rollcall |
 
-## What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
+## What the suite checks [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
 
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
@@ -34,7 +34,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 
 It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with `vendor/bin/phpunit tests/ContractTest.php`; `composer ci` runs it with everything else.
 
-## Rules[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#rules)
+## Rules [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#rules)
 
 - **Closed objects.** Rollcall's own output uses `additionalProperties: false` throughout, so a new field is a contract change made in the same commit as the code. Inputs stay open: a producer may add fields of its own, and Rollcall ignores them.
 - **Public means counts.** The public report may never carry `apps` or `scan_errors`, and no field holds an owner, a rank or a score.

@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Security notes[#](https://rollcall.apps.wayne.edu/docs/security.html#security-notes)
+# Security notes [#](https://rollcall.apps.wayne.edu/docs/security.html#security-notes)
 
 This page lists how Rollcall keeps itself and the fleet safe, and exactly what its GitLab token needs. Next: [run the checks](https://rollcall.apps.wayne.edu/docs/checks.html).
 
@@ -15,11 +15,11 @@ This page lists how Rollcall keeps itself and the fleet safe, and exactly what i
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output strips control characters.
 
-## The GitLab token, exactly[#](https://rollcall.apps.wayne.edu/docs/security.html#the-gitlab-token-exactly)
+## The GitLab token, exactly [#](https://rollcall.apps.wayne.edu/docs/security.html#the-gitlab-token-exactly)
 
 Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it scans. Nothing else. GitLab describes `read_api` as read access to the API for the token's scope, and every call Rollcall makes is a read through the REST API.
 
-### Every call Rollcall makes[#](https://rollcall.apps.wayne.edu/docs/security.html#every-call-rollcall-makes)
+### Every call Rollcall makes [#](https://rollcall.apps.wayne.edu/docs/security.html#every-call-rollcall-makes)
 
 | Call | When | Why | Covered by |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 
 `tests/TokenScopeDocsTest.php` fails if the GitLab adapter calls an API path this table does not list.
 
-### Scopes it must not have[#](https://rollcall.apps.wayne.edu/docs/security.html#scopes-it-must-not-have)
+### Scopes it must not have [#](https://rollcall.apps.wayne.edu/docs/security.html#scopes-it-must-not-have)
 
 | Scope | Why not |
 | --- | --- |
@@ -46,7 +46,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 | `self_rotate` | Lets the token rotate itself. The stack maintainer rotates the token, never Rollcall |
 | `create_runner`, `manage_runner`, `k8s_proxy`, `ai_features` and any admin scope | Nothing Rollcall does |
 
-### Role, membership and expiry[#](https://rollcall.apps.wayne.edu/docs/security.html#role-membership-and-expiry)
+### Role, membership and expiry [#](https://rollcall.apps.wayne.edu/docs/security.html#role-membership-and-expiry)
 
 - **Reporter, on each project to scan, and nothing more.** Reporter is the lowest role that can read a private project's files; Guest cannot. Developer and above add powers Rollcall never uses.
 - **Membership is the real fence.** `ROLLCALL_GITLAB_PROJECTS` limits what Rollcall asks for, not what the token can read. A group token reads every project in its group. For the tightest fence, the token's user is a member of just the projects to scan: a service account, or a bot on a small group made for the purpose. The stack's own token takes the wider road on purpose (below), and the scan job's project list keeps the asking narrow.
@@ -55,7 +55,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 - **Who rotates it.** A role, not a person: the stack maintainer creates the replacement, updates the variable and revokes the old token before the expiry date. Rollcall only reminds.
 - **A refused token stops the scan.** A `401` or `403` ends the scan loudly with exit `2`, so a dead token never produces a flattering partial roll. One `403` is not the token: with `ROLLCALL_PROCTOR_SOURCE=gitlab`, a `403` on a project's pipeline list means CI/CD is off for that project (the same token has just read its files), so that app has no PROCTOR report and the scan carries on.
 
-## The scanner token and how to rotate it[#](https://rollcall.apps.wayne.edu/docs/security.html#the-scanner-token-and-how-to-rotate-it)
+## The scanner token and how to rotate it [#](https://rollcall.apps.wayne.edu/docs/security.html#the-scanner-token-and-how-to-rotate-it)
 
 The stack's weekly scan on git.wayne.edu reads with one token. Everything about it except its value is here.
 

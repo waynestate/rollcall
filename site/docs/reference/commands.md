@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Commands[#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#commands)
+# Commands [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#commands)
 
 This page lists the commands (generated from the CLI) and what each one prints, plus the exit codes.
 
@@ -110,7 +110,7 @@ Usage: `rollcall scan [--today TODAY] [--prune [PRUNE]]`
 | `--prune=VALUE` | After saving, delete snapshots older than this many days (default: ROLLCALL_RETENTION_DAYS, 90; 0 keeps everything). |  |
 | `--silent` | Do not output any message |  |
 
-### Options every command accepts[#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#options-every-command-accepts)
+### Options every command accepts [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#options-every-command-accepts)
 
 | Option | Meaning | Default |
 | --- | --- | --- |

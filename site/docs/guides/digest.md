@@ -6,13 +6,13 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Owner digests[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#owner-digests)
+# Owner digests [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#owner-digests)
 
 This page shows how an owner who asks gets a digest of only their own apps. Next: [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html).
 
 A digest is a short note in plain words: what changed in that owner's apps since the previous scan, then where each app stands. Nothing changed, no digest. Nobody gets one by default, and Rollcall never guesses an owner from commit authors.
 
-## 1. Say who answers for which apps[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
+## 1. Say who answers for which apps [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
 
 An owners file maps each scanned project to the contacts who answer for it. Point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`; leaving the key out means no.
 
@@ -39,7 +39,7 @@ No owner on file for 1 of 14 apps in this scan, so no digest covers it. Add it t
 
 and `--format=json` lists it under `no_owner_on_file`. An owner who has not opted in still counts as its owner. Reports never read the owners file, so the report stays free of owners.
 
-### Confirm owners on a schedule[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#confirm-owners-on-a-schedule)
+### Confirm owners on a schedule [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#confirm-owners-on-a-schedule)
 
 An owner on file is only as good as the last time somebody said it is still true. Give each entry a `"confirmed"` date, the day the contact last confirmed it answers for those apps:
 
@@ -59,7 +59,7 @@ Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-
 
 It exits 1 while any owner is unknown, so the weekly scan job, which runs it after `scan`, goes red until someone asks the contact and writes the new date. `--format=json` gives the same answer to a script (`contract/owners-check.schema.json`). Rollcall never fills the gap by guessing an owner from commit authors.
 
-## 2. Print them[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
+## 2. Print them [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
 
 After a scan:
 
@@ -79,7 +79,7 @@ What counts as a change, app by app:
 
 The first scan has no "before", so the first digest is a first roll call: every app and where it stands. The states and flags are the report's own (`rollcall report --internal`), so a digest and the report never disagree.
 
-## 3. Mail them (only if you want Rollcall to)[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#3-mail-them-only-if-you-want-rollcall-to)
+## 3. Mail them (only if you want Rollcall to) [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#3-mail-them-only-if-you-want-rollcall-to)
 
 Sending is a second, separate switch, and every part of it must be there:
 

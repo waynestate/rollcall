@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Metrics[#](https://rollcall.apps.wayne.edu/docs/guides/metrics.html#metrics)
+# Metrics [#](https://rollcall.apps.wayne.edu/docs/guides/metrics.html#metrics)
 
 This page turns on and protects the Prometheus endpoint. Next: [Laravel](https://rollcall.apps.wayne.edu/docs/guides/laravel.html) for the dashboard.
 

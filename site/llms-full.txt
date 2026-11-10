@@ -1009,7 +1009,7 @@ These are the parts of the Wayne State application stack, and what each one has 
 
 Source: https://rollcall.apps.wayne.edu/docs/architecture.html
 
-## How it is built[#](https://rollcall.apps.wayne.edu/docs/architecture.html#how-it-is-built)
+## How it is built [#](https://rollcall.apps.wayne.edu/docs/architecture.html#how-it-is-built)
 
 This page shows the moving parts. Next: [security notes](https://rollcall.apps.wayne.edu/docs/security.html).
 
@@ -1033,7 +1033,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports (the default); or, with `ROLLCALL_PROCTOR_SOURCE=gitlab`, each project's proctor job artifact in GitLab CI |
 
-#### Where PROCTOR results come from[#](https://rollcall.apps.wayne.edu/docs/architecture.html#where-proctor-results-come-from)
+#### Where PROCTOR results come from [#](https://rollcall.apps.wayne.edu/docs/architecture.html#where-proctor-results-come-from)
 
 Rollcall never runs PROCTOR. It reads the JSON report PROCTOR already wrote (`proctor check --format=json`), from one of two places, chosen by `ROLLCALL_PROCTOR_SOURCE`:
 
@@ -1054,7 +1054,7 @@ The decisions behind this shape (saved files over live calls, counts in public, 
 
 Source: https://rollcall.apps.wayne.edu/docs/checks.html
 
-## Run the checks[#](https://rollcall.apps.wayne.edu/docs/checks.html#run-the-checks)
+## Run the checks [#](https://rollcall.apps.wayne.edu/docs/checks.html#run-the-checks)
 
 This page shows how the project is built, tested and released, and where changes land.
 
@@ -1074,7 +1074,7 @@ The GitLab pipeline (`.gitlab-ci.yml`) and the GitHub workflow (`.github/workflo
 
 The front page has its own accessibility gate (axe-core in Playwright, run in Docker): `scripts/a11y.sh` on Linux and macOS, `scripts/a11y.ps1` on Windows; [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md) says when to run it.
 
-### Contributing[#](https://rollcall.apps.wayne.edu/docs/checks.html#contributing)
+### Contributing [#](https://rollcall.apps.wayne.edu/docs/checks.html#contributing)
 
 The canonical repository is [enterprise-apps/rollcall](https://git.wayne.edu/enterprise-apps/rollcall) on git.wayne.edu; changes land there first, and Wayne State developers open issues and merge requests on that project. GitHub ([waynestate/rollcall](https://github.com/waynestate/rollcall)) is a read-only push mirror of git.wayne.edu: nobody pushes to it, and Packagist reads from it.
 
@@ -1084,7 +1084,7 @@ License: MIT, Copyright Wayne State University.
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/advisor.html
 
-## Use Rollcall from your coding agent (ADVISOR)[#](https://rollcall.apps.wayne.edu/docs/guides/advisor.html#use-rollcall-from-your-coding-agent-advisor)
+## Use Rollcall from your coding agent (ADVISOR) [#](https://rollcall.apps.wayne.edu/docs/guides/advisor.html#use-rollcall-from-your-coding-agent-advisor)
 
 This page installs the ADVISOR module and names the three tools. Next: [run the checks](https://rollcall.apps.wayne.edu/docs/checks.html).
 
@@ -1120,17 +1120,17 @@ The tools take no path, command or URL, make no network call, and answer public 
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/citadel.html
 
-## Citadel's registrations export[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#citadel-s-registrations-export)
+## Citadel's registrations export [#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#citadel-s-registrations-export)
 
 This page shows how Rollcall reads the runtime image of each app, and any forced upgrade date, from a file Citadel produces. Next: [run the collector in Docker](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html).
 
 Citadel is one source among others. On OpenShift, Coolify or plain Docker, keep using the image list (`ROLLCALL_IMAGES_FILE`), which any platform can produce. Nothing in Rollcall needs Citadel.
 
-### 1. Rollcall never calls Citadel[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#1-rollcall-never-calls-citadel)
+### 1. Rollcall never calls Citadel [#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#1-rollcall-never-calls-citadel)
 
 Rollcall reads a saved file. It holds no Citadel account, opens no connection to Citadel, and sends nothing back. A person or a scheduled job saves the export, and `rollcall scan` reads it, the same way it reads PROCTOR's reports and the endoflife.date page. If Citadel offers a read-only endpoint that answers with this JSON, save its answer to the file: the shape is the same.
 
-### 2. The shape[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#2-the-shape)
+### 2. The shape [#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#2-the-shape)
 
 The export uses Citadel's own field names, so the people who keep Citadel can produce it without a mapping table. The schema is `contract/citadel-export.schema.json`; extra fields are ignored, so an export may carry more.
 
@@ -1158,7 +1158,7 @@ Two fields are optional: `applications[].php_version` (the PHP version in the ru
 
 Entries Rollcall cannot trust are skipped, never guessed: an application with no repository, an upgrade with no real date (`"soon"`, `2026-02-30`) or without `"completed": false`. An app registered on Citadel but not in the scan is not invented either: the census starts from the repositories.
 
-### 3. Point Rollcall at it[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#3-point-rollcall-at-it)
+### 3. Point Rollcall at it [#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#3-point-rollcall-at-it)
 
 macOS and Linux
 
@@ -1178,7 +1178,7 @@ php bin/rollcall report
 
 Set `ROLLCALL_CITADEL_EXPORT` or `ROLLCALL_IMAGES_FILE`, not both: each is a complete image source, and the scan stops with a plain message if both are set. In Laravel, the setting is `rollcall.citadel_export`.
 
-### 4. What the report gains[#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#4-what-the-report-gains)
+### 4. What the report gains [#](https://rollcall.apps.wayne.edu/docs/guides/citadel.html#4-what-the-report-gains)
 
 - **Forced image upgrades**: the text report prints `Forced image upgrades pending: 2 (1 due today or earlier), next due 2026-12-15.` and the JSON report carries `forced_upgrades` with `pending`, `overdue` (due today or earlier) and `next_due` (the next future date, or `null`). Counts only, so it is public. With the image list, or no image source, all three are zero.
 - **Metrics and ADVISOR**: the same counts reach `/metrics` as `rollcall_forced_upgrades_pending_apps`, `rollcall_forced_upgrades_overdue_apps` and `rollcall_forced_upgrades_next_due_timestamp_seconds` (see [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html)), and ADVISOR's `rollcall_fleet_summary` tool answers with `forced_upgrades` (see [ADVISOR](https://rollcall.apps.wayne.edu/docs/guides/advisor.html)).
@@ -1191,7 +1191,7 @@ The export names applications, so keep it where you keep the snapshots: on the h
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html
 
-## Run the collector in Docker[#](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html#run-the-collector-in-docker)
+## Run the collector in Docker [#](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html#run-the-collector-in-docker)
 
 This page builds the collector image and runs a scan in Docker. Next: [WSU values (Playbook)](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html) for where the GitLab URL comes from.
 
@@ -1215,13 +1215,13 @@ Next: after a good scan, `var/snapshots/<today>.json` holds the day's attendance
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/digest.html
 
-## Owner digests[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#owner-digests)
+## Owner digests [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#owner-digests)
 
 This page shows how an owner who asks gets a digest of only their own apps. Next: [metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html).
 
 A digest is a short note in plain words: what changed in that owner's apps since the previous scan, then where each app stands. Nothing changed, no digest. Nobody gets one by default, and Rollcall never guesses an owner from commit authors.
 
-### 1. Say who answers for which apps[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
+### 1. Say who answers for which apps [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#1-say-who-answers-for-which-apps)
 
 An owners file maps each scanned project to the contacts who answer for it. Point `ROLLCALL_OWNERS_FILE` at it. An owner opts in with `"digest": true`; leaving the key out means no.
 
@@ -1248,7 +1248,7 @@ No owner on file for 1 of 14 apps in this scan, so no digest covers it. Add it t
 
 and `--format=json` lists it under `no_owner_on_file`. An owner who has not opted in still counts as its owner. Reports never read the owners file, so the report stays free of owners.
 
-#### Confirm owners on a schedule[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#confirm-owners-on-a-schedule)
+#### Confirm owners on a schedule [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#confirm-owners-on-a-schedule)
 
 An owner on file is only as good as the last time somebody said it is still true. Give each entry a `"confirmed"` date, the day the contact last confirmed it answers for those apps:
 
@@ -1268,7 +1268,7 @@ Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-
 
 It exits 1 while any owner is unknown, so the weekly scan job, which runs it after `scan`, goes red until someone asks the contact and writes the new date. `--format=json` gives the same answer to a script (`contract/owners-check.schema.json`). Rollcall never fills the gap by guessing an owner from commit authors.
 
-### 2. Print them[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
+### 2. Print them [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#2-print-them)
 
 After a scan:
 
@@ -1288,7 +1288,7 @@ What counts as a change, app by app:
 
 The first scan has no "before", so the first digest is a first roll call: every app and where it stands. The states and flags are the report's own (`rollcall report --internal`), so a digest and the report never disagree.
 
-### 3. Mail them (only if you want Rollcall to)[#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#3-mail-them-only-if-you-want-rollcall-to)
+### 3. Mail them (only if you want Rollcall to) [#](https://rollcall.apps.wayne.edu/docs/guides/digest.html#3-mail-them-only-if-you-want-rollcall-to)
 
 Sending is a second, separate switch, and every part of it must be there:
 
@@ -1306,13 +1306,13 @@ Schedule it right after `rollcall scan`: weekly suits the burn-down, and a quiet
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/laravel.html
 
-## Laravel[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
+## Laravel [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#laravel)
 
 This page wires Rollcall into a Laravel app, and shows the same dashboard as a Vue page in an Inertia app and in a raw PHP app. Next: [use it from your coding agent (ADVISOR)](https://rollcall.apps.wayne.edu/docs/guides/advisor.html).
 
 The package registers itself (`extra.laravel.providers`). Publish the config with `php artisan vendor:publish --tag=rollcall-config`, set the variables in [the configuration reference](https://rollcall.apps.wayne.edu/docs/reference/configuration.html), and schedule `rollcall:scan`. The dashboard shows counts and progress; the per-app page is a second route that stays off until you enable it, and it runs behind `rollcall.dashboard.internal_middleware` (default `web` and `auth.sesame`), so an app with no such middleware fails closed. The page uses WayneUI's class names and takes its stylesheet from `ROLLCALL_WAYNEUI_CSS`. In an Inertia app it can be one of your own Vue pages instead (below). The page also carries a status line (a `role="status"` paragraph) that names the apps shown and the scan date, so assistive technology hears what the page displays. The `/metrics` route is registered on its own path; if your app already serves `/metrics` (HELMET does), run Rollcall's on a separate app or leave metrics off.
 
-### The dashboard in an Inertia app (Vue)[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-an-inertia-app-vue)
+### The dashboard in an Inertia app (Vue) [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-an-inertia-app-vue)
 
 In a Laravel + Inertia + Vue app (WELD's shape) the dashboard can be one of the app's own pages, inside its own layout. Same routes, same switches, same report: with `ROLLCALL_DASHBOARD_INERTIA=true` the controller hands what `DashboardPage::report()` built to an Inertia page as props (`report`, `internal`, `scanCommand`) instead of printing the Blade view. From a WELD app:
 
@@ -1345,7 +1345,7 @@ Why this shape: the page is published because the layout is the app's, and the c
 
 The component renders what the Blade page shows inside `<main>`: the same WayneUI classes, the `role="status"` line, the captions and headers, and the per-app table only on the internal page (`<path>/apps`, still behind `rollcall.dashboard.internal_middleware` and `ROLLCALL_INTERNAL_ENABLED`). It has no style block, no style attribute and no script of its own, so it works under HELMET's CSP, and it takes its look from the app's WayneUI stylesheet. Every Inertia answer carries `X-Robots-Tag: noindex`. CI holds the rooms together: `dashboard-vue` server-renders the component with the props the route sends and fails on any difference from the Blade page (elements, attributes and text; only whitespace, attribute order and Vue's hydration comments are normalized), and `dashboard-a11y` checks the three Vue pages with the other six.
 
-### The dashboard in a raw PHP app[#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
+### The dashboard in a raw PHP app [#](https://rollcall.apps.wayne.edu/docs/guides/laravel.html#the-dashboard-in-a-raw-php-app)
 
 The same page, no framework. `rollcall_dashboard()` prints the renderer the Laravel page prints, from the same report, so the two answer the roll in the same words. Drop one file into the folder your web server serves:
 
@@ -1368,7 +1368,7 @@ All three go through the same accessibility gate: `DashboardRenderTest` writes t
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/metrics.html
 
-## Metrics[#](https://rollcall.apps.wayne.edu/docs/guides/metrics.html#metrics)
+## Metrics [#](https://rollcall.apps.wayne.edu/docs/guides/metrics.html#metrics)
 
 This page turns on and protects the Prometheus endpoint. Next: [Laravel](https://rollcall.apps.wayne.edu/docs/guides/laravel.html) for the dashboard.
 
@@ -1386,7 +1386,7 @@ The same line Grafana draws from `/metrics`. Made-up apps, real arithmetic.
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/quick-start.html
 
-## Quick start[#](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html#quick-start)
+## Quick start [#](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html#quick-start)
 
 This page takes you from a fresh clone to a first report, on the fixtures in the repo. Next: read [what the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html).
 
@@ -1422,7 +1422,7 @@ php bin/rollcall report
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html
 
-## What the report says[#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
+## What the report says [#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
 
 This page explains each part of the report. Next: [Citadel's registrations export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) if your apps run on Citadel.
 
@@ -1445,7 +1445,7 @@ State is never decided in code: it is derived from the dates in `policy.json` by
 
 Source: https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html
 
-## WSU values (Playbook)[#](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html#wsu-values-playbook)
+## WSU values (Playbook) [#](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html#wsu-values-playbook)
 
 This page says which setting may come from Playbook, and how to get Playbook into your app. Next: [Metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html).
 
@@ -1497,7 +1497,7 @@ Playbook is private on git.wayne.edu. If you get a 404, ask the Enterprise Appli
 
 Source: https://rollcall.apps.wayne.edu/docs/
 
-## Rollcall[#](https://rollcall.apps.wayne.edu/docs/#rollcall)
+## Rollcall [#](https://rollcall.apps.wayne.edu/docs/#rollcall)
 
 This page says what Rollcall is and where it sits in the stack. Next: [install it](https://rollcall.apps.wayne.edu/docs/install.html), then run the [quick start](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html).
 
@@ -1512,7 +1512,7 @@ Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys 
 ![A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.](https://rollcall.apps.wayne.edu/docs/readme/register.svg)
 One page of the roll book, called name by name. Sample data: the apps are fictional, and a real scan's per-app list stays internal.
 
-### Where it sits in the stack[#](https://rollcall.apps.wayne.edu/docs/#where-it-sits-in-the-stack)
+### Where it sits in the stack [#](https://rollcall.apps.wayne.edu/docs/#where-it-sits-in-the-stack)
 
 The parts of the Wayne State application stack, and their jobs. WELD is the Laravel starter app that has most of them installed:
 
@@ -1545,7 +1545,7 @@ Images are regenerated from the front page by [`scripts/readme-art`](https://git
 
 ![Rollcall's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.](https://rollcall.apps.wayne.edu/docs/readme/board.jpg)
 
-### Install[#](https://rollcall.apps.wayne.edu/docs/#install)
+### Install [#](https://rollcall.apps.wayne.edu/docs/#install)
 
 One line:
 
@@ -1559,7 +1559,7 @@ The first command is `php bin/rollcall scan`; the [quick start](https://rollcall
 
 Source: https://rollcall.apps.wayne.edu/docs/install.html
 
-## Install[#](https://rollcall.apps.wayne.edu/docs/install.html#install)
+## Install [#](https://rollcall.apps.wayne.edu/docs/install.html#install)
 
 This page is the install. Next: run the [quick start](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html).
 
@@ -1571,7 +1571,7 @@ Rollcall is on Packagist, so no extra repository is needed. Requires PHP `^8.3`.
 
 Optional: `composer require symfony/mailer` only if Rollcall should mail the [owner digests](https://rollcall.apps.wayne.edu/docs/guides/digest.html) itself (`rollcall digest --send`). Printing them, or writing them to files, needs nothing extra.
 
-### Versions[#](https://rollcall.apps.wayne.edu/docs/install.html#versions)
+### Versions [#](https://rollcall.apps.wayne.edu/docs/install.html#versions)
 
 1.1.1 is the current release, and Composer's `^1.0` takes every 1.x. From 1.0 Rollcall follows SemVer against its [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html): inside 1.x the report, the stored snapshot and the image list may gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
 
@@ -1579,7 +1579,7 @@ Optional: `composer require symfony/mailer` only if Rollcall should mail the [ow
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/commands.html
 
-## Commands[#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#commands)
+## Commands [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#commands)
 
 This page lists the commands (generated from the CLI) and what each one prints, plus the exit codes.
 
@@ -1683,7 +1683,7 @@ Usage: `rollcall scan [--today TODAY] [--prune [PRUNE]]`
 | `--prune=VALUE` | After saving, delete snapshots older than this many days (default: ROLLCALL_RETENTION_DAYS, 90; 0 keeps everything). |  |
 | `--silent` | Do not output any message |  |
 
-#### Options every command accepts[#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#options-every-command-accepts)
+#### Options every command accepts [#](https://rollcall.apps.wayne.edu/docs/reference/commands.html#options-every-command-accepts)
 
 | Option | Meaning | Default |
 | --- | --- | --- |
@@ -1707,7 +1707,7 @@ Exit codes: `0` ok, `1` owner unknown (`rollcall owners` only), `2` tool error (
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/configuration.html
 
-## Configuration[#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#configuration)
+## Configuration [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#configuration)
 
 This page covers how Rollcall is configured, all through environment variables. Next: [run the collector in Docker](https://rollcall.apps.wayne.edu/docs/guides/collector-docker.html) with them.
 
@@ -1746,7 +1746,7 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_STORE_DIR | Snapshot directory, the only place Rollcall writes | `var/snapshots` | config/rollcall.php |
 | ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 
-#### Auth packages[#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#auth-packages)
+#### Auth packages [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#auth-packages)
 
 `ROLLCALL_AUTH_PACKAGES` is checked in list order, and the first entry that matches an app wins. An entry with a slash matches that package exactly; an entry without a slash is a bare package name and matches that package under any vendor, so `wayne-cas` matches `anyvendor/wayne-cas`. The report carries the real locked package name, vendor included. The built-in list is `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas` and `simplecas`; the exact `waynestate/wayne-cas` entry comes first, so it still wins over the bare `wayne-cas` entry.
 
@@ -1758,7 +1758,7 @@ With `ROLLCALL_PROCTOR_SOURCE=gitlab` the same token reads each project's `proct
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/contract.html
 
-## Contract[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#contract)
+## Contract [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#contract)
 
 This page covers the shapes Rollcall promises to anyone who reads its output. Next: the [Proof](https://rollcall.apps.wayne.edu/docs/reference/proof.html) of a real run.
 
@@ -1774,7 +1774,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 | `digest.schema.json` | `rollcall digest --format=json` (internal: it names apps) | Rollcall |
 | `owners-check.schema.json` | `rollcall owners --format=json`, the latest scan checked against the owners file (internal: it names apps) | Rollcall |
 
-### What the suite checks[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
+### What the suite checks [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#what-the-suite-checks)
 
 - The public and internal JSON reports, after one scan and after two, match `report.schema.json`.
 - `GET /report.json` from the raw-PHP endpoint matches the same schema.
@@ -1786,7 +1786,7 @@ The contract lives in [`contract/`](https://github.com/waynestate/rollcall/tree/
 
 It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with `vendor/bin/phpunit tests/ContractTest.php`; `composer ci` runs it with everything else.
 
-### Rules[#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#rules)
+### Rules [#](https://rollcall.apps.wayne.edu/docs/reference/contract.html#rules)
 
 - **Closed objects.** Rollcall's own output uses `additionalProperties: false` throughout, so a new field is a contract change made in the same commit as the code. Inputs stay open: a producer may add fields of its own, and Rollcall ignores them.
 - **Public means counts.** The public report may never carry `apps` or `scan_errors`, and no field holds an owner, a rank or a score.
@@ -1796,13 +1796,13 @@ It reads fixtures only and never calls GitLab, Citadel or any other host. Run it
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/proof.html
 
-## Proof[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#proof)
+## Proof [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#proof)
 
 This page says how Rollcall was proven on real repositories: what ran, what held, what the runs caught in Rollcall itself, and what they do not prove yet. Next, see [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html) for how to read the output quoted here.
 
 A register is only worth something on a day with real students in the room. Rollcall had two such days on 2026-11-06.
 
-### Last run[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#last-run)
+### Last run [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#last-run)
 
 | Check | Date | Commit | Result | Duration |
 | --- | --- | --- | --- | --- |
@@ -1819,7 +1819,7 @@ A register is only worth something on a day with real students in the room. Roll
 
 The rollcall rows ran against the fixtures bundled under `tests/fixtures/` in one `composer:2.10.3` container, with no credentials; the PROCTOR row installed the deploy layer's committed lock first. To refresh this table, re-run `composer ci` and the commands above and rewrite the rows with the new date, commit and durations. The two runs the page describes, the scheduled GitLab CI scan and the 58-repository corpus rerun, need a live service account and the stack's proof corpus, so they are not repeated here; their results stand as recorded below.
 
-### What ran[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-ran)
+### What ran [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-ran)
 
 **1. The scheduled scan on GitLab CI.** The weekly `rollcall-scan` job (see [Configuration](https://rollcall.apps.wayne.edu/docs/reference/configuration.html)) ran on its schedule for the first time, on the canonical GitLab, against the 13 stack projects. It used a read-only service account that can see those 13 projects and nothing else, with a `read_api` token held in a masked CI variable. Rollcall 0.1.9 from `main`, `composer:2.10.3`, no image export and no PROCTOR reports configured.
 
@@ -1834,7 +1834,7 @@ The 13 stack projects were scanned the same way from their committed files, as a
 
 A run **passes** when every command exits 0 and every repository with a `composer.json` gets a row. A **tool error** is Rollcall breaking: a crash, an exit 2, a repository silently missing from the snapshot, or a number that disagrees with the files.
 
-### Results[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#results)
+### Results [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#results)
 
 | Run | Read | Rows | Tool errors | Time |
 | --- | --- | --- | --- | --- |
@@ -1851,7 +1851,7 @@ The CI job's 23 seconds include installing Rollcall; the scan itself, 26 file re
 - **Prune** found nothing to prune, as it should with one fresh snapshot.
 - The fleet tallies themselves (how many apps sit on which version) stay with the stack team, the same way Rollcall keeps its own per-app list internal.
 
-### The warning on the scheduled pipeline[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#the-warning-on-the-scheduled-pipeline)
+### The warning on the scheduled pipeline [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#the-warning-on-the-scheduled-pipeline)
 
 The pipeline that ran the scan finished green with one warning. It was not the scan: it was the allowed-to-fail PROCTOR job that checks the front page's own deploy layer (`deploy/`). Run again locally it says:
 
@@ -1861,7 +1861,7 @@ The pipeline that ran the scan finished green with one warning. It was not the s
 
 So the one warning on Rollcall's first real attendance day was Rollcall's own homework, found by PROCTOR, which is the system working.
 
-### What it caught in Rollcall[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-it-caught-in-rollcall)
+### What it caught in Rollcall [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-it-caught-in-rollcall)
 
 A run that only finds praise was not looking hard enough. Every finding here is about Rollcall, not the apps:
 
@@ -1869,7 +1869,7 @@ A run that only finds praise was not looking hard enough. Every finding here is 
 - **Fixed: "scan problems" that were not problems.** The text report's first line said `scan problems: 2` on every run that had no image export and no PROCTOR reports. The 2026-11-03 run took those for two unexplained scan errors and logged them for a look. They are the two notes `scan` prints when a source is not configured. The line now says `scan notes`, and [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html) explains the count. The JSON key and the metric keep their names, so nothing that reads them breaks.
 - **Documented: the burn-down needs the image export.** The EOL burn-down counts apps by the PHP image they run. With no image export every app is `unknown` in it, even while the declared-floor table already shows end-of-life versions. That is the design (a floor is a promise, an image is a fact), and the guide now says so.
 
-### What this does not prove[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-this-does-not-prove)
+### What this does not prove [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-this-does-not-prove)
 
 - **No PHP image column yet.** No export of the runtime image per app exists yet, so the image table, the image drift kinds and the burn-down were all `unknown`. Rollcall's image source is tested on fixtures only.
 - **No PROCTOR column yet.** No PROCTOR reports were fed in, so every app shows `none`. The report source is tested on fixtures only.
@@ -1877,7 +1877,7 @@ A run that only finds praise was not looking hard enough. Every finding here is 
 - **One week, one snapshot.** Drift between scans, upgrade credit and pruning only show over weeks of scheduled runs. They are covered by tests, not yet by a real history.
 - **The advisory and endoflife.date feeds were saved on 2026-11-06.** Their answers are only as fresh as the file a person saved.
 
-### Run it on your own repositories[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#run-it-on-your-own-repositories)
+### Run it on your own repositories [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#run-it-on-your-own-repositories)
 
 On a folder of repositories laid out as `<group>/<project>/composer.{json,lock}`:
 
@@ -1901,7 +1901,7 @@ php bin/rollcall report
 
 To scan your GitLab on a schedule instead, follow [Configuration](https://rollcall.apps.wayne.edu/docs/reference/configuration.html) and the scheduled scan section of the README. Keep `report --internal` output inside your team.
 
-### Related[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#related)
+### Related [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#related)
 
 - [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html)
 - [Commands](https://rollcall.apps.wayne.edu/docs/reference/commands.html)
@@ -1912,13 +1912,13 @@ To scan your GitLab on a schedule instead, follow [Configuration](https://rollca
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/scripts.html
 
-## Scripts on every OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#scripts-on-every-os)
+## Scripts on every OS [#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#scripts-on-every-os)
 
 This page lists every script Rollcall ships and how each OS runs it. Next: the [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html) its output keeps.
 
 Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is one PHP command and nothing to pair. Where a script drives Docker, it ships twice: a `.ps1` for Windows (PowerShell 5.1 and 7, never bash or WSL) and a `.sh` for Linux and macOS (written for macOS's bash 3.2 and BSD tools). `tests/ScriptPairsTest.php` fails if a script ships without its twin, if a `.sh` uses a bash 4 feature or a GNU-only flag, or if a `.ps1` calls a Unix shell on the host.
 
-### One PHP command, every OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#one-php-command-every-os)
+### One PHP command, every OS [#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#one-php-command-every-os)
 
 | Command | What it does |
 | --- | --- |
@@ -1930,7 +1930,7 @@ Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is
 | `composer site:versions-check` | Fails when the front page versions table or the quick-start printout's policy values are stale; runs in `composer ci` |
 | `php tools/creed-copy-check.php` (`composer creed-copy:check`) | Proves the CREED copy has not drifted |
 
-### A pair per OS[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#a-pair-per-os)
+### A pair per OS [#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#a-pair-per-os)
 
 | Windows (PowerShell) | Linux and macOS (bash) | What they do |
 | --- | --- | --- |
@@ -1940,7 +1940,7 @@ Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is
 
 `scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.
 
-### Inside Citadel's container only[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-citadel-s-container-only)
+### Inside Citadel's container only [#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-citadel-s-container-only)
 
 These run on Citadel's Linux container, never on a developer machine, so they have no Windows twin. Squire writes and owns them (`deploy/.squire.json`):
 
@@ -1951,7 +1951,7 @@ These run on Citadel's Linux container, never on a developer machine, so they ha
 | `deploy/.squire/portable/squire-entrypoint.sh` | Each time the portable image starts (OpenShift, Coolify, raw Docker), as the container entrypoint |
 | `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
 
-### Inside GitLab CI only[#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-gitlab-ci-only)
+### Inside GitLab CI only [#](https://rollcall.apps.wayne.edu/docs/reference/scripts.html#inside-gitlab-ci-only)
 
 This runs in a GitLab CI job on the Linux composer image, never on a developer machine, so it has no Windows twin. It still keeps to POSIX sh and macOS-safe tools, like every `.sh` here.
 
@@ -1965,7 +1965,7 @@ Before a release, a maintainer runs the smoke test on all three OSes; the checkl
 
 Source: https://rollcall.apps.wayne.edu/docs/security.html
 
-## Security notes[#](https://rollcall.apps.wayne.edu/docs/security.html#security-notes)
+## Security notes [#](https://rollcall.apps.wayne.edu/docs/security.html#security-notes)
 
 This page lists how Rollcall keeps itself and the fleet safe, and exactly what its GitLab token needs. Next: [run the checks](https://rollcall.apps.wayne.edu/docs/checks.html).
 
@@ -1974,11 +1974,11 @@ This page lists how Rollcall keeps itself and the fleet safe, and exactly what i
 - Composer files are parsed as data. No `composer install`, script or plugin from a scanned repository ever runs.
 - PROCTOR reports, image tags and app ids are outside input: shapes are validated, text is bounded, and terminal output strips control characters.
 
-### The GitLab token, exactly[#](https://rollcall.apps.wayne.edu/docs/security.html#the-gitlab-token-exactly)
+### The GitLab token, exactly [#](https://rollcall.apps.wayne.edu/docs/security.html#the-gitlab-token-exactly)
 
 Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it scans. Nothing else. GitLab describes `read_api` as read access to the API for the token's scope, and every call Rollcall makes is a read through the REST API.
 
-#### Every call Rollcall makes[#](https://rollcall.apps.wayne.edu/docs/security.html#every-call-rollcall-makes)
+#### Every call Rollcall makes [#](https://rollcall.apps.wayne.edu/docs/security.html#every-call-rollcall-makes)
 
 | Call | When | Why | Covered by |
 | --- | --- | --- | --- |
@@ -1993,7 +1993,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 
 `tests/TokenScopeDocsTest.php` fails if the GitLab adapter calls an API path this table does not list.
 
-#### Scopes it must not have[#](https://rollcall.apps.wayne.edu/docs/security.html#scopes-it-must-not-have)
+#### Scopes it must not have [#](https://rollcall.apps.wayne.edu/docs/security.html#scopes-it-must-not-have)
 
 | Scope | Why not |
 | --- | --- |
@@ -2005,7 +2005,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 | `self_rotate` | Lets the token rotate itself. The stack maintainer rotates the token, never Rollcall |
 | `create_runner`, `manage_runner`, `k8s_proxy`, `ai_features` and any admin scope | Nothing Rollcall does |
 
-#### Role, membership and expiry[#](https://rollcall.apps.wayne.edu/docs/security.html#role-membership-and-expiry)
+#### Role, membership and expiry [#](https://rollcall.apps.wayne.edu/docs/security.html#role-membership-and-expiry)
 
 - **Reporter, on each project to scan, and nothing more.** Reporter is the lowest role that can read a private project's files; Guest cannot. Developer and above add powers Rollcall never uses.
 - **Membership is the real fence.** `ROLLCALL_GITLAB_PROJECTS` limits what Rollcall asks for, not what the token can read. A group token reads every project in its group. For the tightest fence, the token's user is a member of just the projects to scan: a service account, or a bot on a small group made for the purpose. The stack's own token takes the wider road on purpose (below), and the scan job's project list keeps the asking narrow.
@@ -2014,7 +2014,7 @@ Rollcall needs one scope, `read_api`, and one role, Reporter, on each project it
 - **Who rotates it.** A role, not a person: the stack maintainer creates the replacement, updates the variable and revokes the old token before the expiry date. Rollcall only reminds.
 - **A refused token stops the scan.** A `401` or `403` ends the scan loudly with exit `2`, so a dead token never produces a flattering partial roll. One `403` is not the token: with `ROLLCALL_PROCTOR_SOURCE=gitlab`, a `403` on a project's pipeline list means CI/CD is off for that project (the same token has just read its files), so that app has no PROCTOR report and the scan carries on.
 
-### The scanner token and how to rotate it[#](https://rollcall.apps.wayne.edu/docs/security.html#the-scanner-token-and-how-to-rotate-it)
+### The scanner token and how to rotate it [#](https://rollcall.apps.wayne.edu/docs/security.html#the-scanner-token-and-how-to-rotate-it)
 
 The stack's weekly scan on git.wayne.edu reads with one token. Everything about it except its value is here.
 

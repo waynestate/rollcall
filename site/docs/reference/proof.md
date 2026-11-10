@@ -6,13 +6,13 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Proof[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#proof)
+# Proof [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#proof)
 
 This page says how Rollcall was proven on real repositories: what ran, what held, what the runs caught in Rollcall itself, and what they do not prove yet. Next, see [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html) for how to read the output quoted here.
 
 A register is only worth something on a day with real students in the room. Rollcall had two such days on 2026-11-06.
 
-## Last run[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#last-run)
+## Last run [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#last-run)
 
 | Check | Date | Commit | Result | Duration |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ A register is only worth something on a day with real students in the room. Roll
 
 The rollcall rows ran against the fixtures bundled under `tests/fixtures/` in one `composer:2.10.3` container, with no credentials; the PROCTOR row installed the deploy layer's committed lock first. To refresh this table, re-run `composer ci` and the commands above and rewrite the rows with the new date, commit and durations. The two runs the page describes, the scheduled GitLab CI scan and the 58-repository corpus rerun, need a live service account and the stack's proof corpus, so they are not repeated here; their results stand as recorded below.
 
-## What ran[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-ran)
+## What ran [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-ran)
 
 **1. The scheduled scan on GitLab CI.** The weekly `rollcall-scan` job (see [Configuration](https://rollcall.apps.wayne.edu/docs/reference/configuration.html)) ran on its schedule for the first time, on the canonical GitLab, against the 13 stack projects. It used a read-only service account that can see those 13 projects and nothing else, with a `read_api` token held in a masked CI variable. Rollcall 0.1.9 from `main`, `composer:2.10.3`, no image export and no PROCTOR reports configured.
 
@@ -44,7 +44,7 @@ The 13 stack projects were scanned the same way from their committed files, as a
 
 A run **passes** when every command exits 0 and every repository with a `composer.json` gets a row. A **tool error** is Rollcall breaking: a crash, an exit 2, a repository silently missing from the snapshot, or a number that disagrees with the files.
 
-## Results[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#results)
+## Results [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#results)
 
 | Run | Read | Rows | Tool errors | Time |
 | --- | --- | --- | --- | --- |
@@ -61,7 +61,7 @@ The CI job's 23 seconds include installing Rollcall; the scan itself, 26 file re
 - **Prune** found nothing to prune, as it should with one fresh snapshot.
 - The fleet tallies themselves (how many apps sit on which version) stay with the stack team, the same way Rollcall keeps its own per-app list internal.
 
-## The warning on the scheduled pipeline[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#the-warning-on-the-scheduled-pipeline)
+## The warning on the scheduled pipeline [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#the-warning-on-the-scheduled-pipeline)
 
 The pipeline that ran the scan finished green with one warning. It was not the scan: it was the allowed-to-fail PROCTOR job that checks the front page's own deploy layer (`deploy/`). Run again locally it says:
 
@@ -71,7 +71,7 @@ The pipeline that ran the scan finished green with one warning. It was not the s
 
 So the one warning on Rollcall's first real attendance day was Rollcall's own homework, found by PROCTOR, which is the system working.
 
-## What it caught in Rollcall[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-it-caught-in-rollcall)
+## What it caught in Rollcall [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-it-caught-in-rollcall)
 
 A run that only finds praise was not looking hard enough. Every finding here is about Rollcall, not the apps:
 
@@ -79,7 +79,7 @@ A run that only finds praise was not looking hard enough. Every finding here is 
 - **Fixed: "scan problems" that were not problems.** The text report's first line said `scan problems: 2` on every run that had no image export and no PROCTOR reports. The 2026-11-03 run took those for two unexplained scan errors and logged them for a look. They are the two notes `scan` prints when a source is not configured. The line now says `scan notes`, and [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html) explains the count. The JSON key and the metric keep their names, so nothing that reads them breaks.
 - **Documented: the burn-down needs the image export.** The EOL burn-down counts apps by the PHP image they run. With no image export every app is `unknown` in it, even while the declared-floor table already shows end-of-life versions. That is the design (a floor is a promise, an image is a fact), and the guide now says so.
 
-## What this does not prove[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-this-does-not-prove)
+## What this does not prove [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#what-this-does-not-prove)
 
 - **No PHP image column yet.** No export of the runtime image per app exists yet, so the image table, the image drift kinds and the burn-down were all `unknown`. Rollcall's image source is tested on fixtures only.
 - **No PROCTOR column yet.** No PROCTOR reports were fed in, so every app shows `none`. The report source is tested on fixtures only.
@@ -87,7 +87,7 @@ A run that only finds praise was not looking hard enough. Every finding here is 
 - **One week, one snapshot.** Drift between scans, upgrade credit and pruning only show over weeks of scheduled runs. They are covered by tests, not yet by a real history.
 - **The advisory and endoflife.date feeds were saved on 2026-11-06.** Their answers are only as fresh as the file a person saved.
 
-## Run it on your own repositories[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#run-it-on-your-own-repositories)
+## Run it on your own repositories [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#run-it-on-your-own-repositories)
 
 On a folder of repositories laid out as `<group>/<project>/composer.{json,lock}`:
 
@@ -111,7 +111,7 @@ php bin/rollcall report
 
 To scan your GitLab on a schedule instead, follow [Configuration](https://rollcall.apps.wayne.edu/docs/reference/configuration.html) and the scheduled scan section of the README. Keep `report --internal` output inside your team.
 
-## Related[#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#related)
+## Related [#](https://rollcall.apps.wayne.edu/docs/reference/proof.html#related)
 
 - [What the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html)
 - [Commands](https://rollcall.apps.wayne.edu/docs/reference/commands.html)

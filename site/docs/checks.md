@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Run the checks[#](https://rollcall.apps.wayne.edu/docs/checks.html#run-the-checks)
+# Run the checks [#](https://rollcall.apps.wayne.edu/docs/checks.html#run-the-checks)
 
 This page shows how the project is built, tested and released, and where changes land.
 
@@ -26,7 +26,7 @@ The GitLab pipeline (`.gitlab-ci.yml`) and the GitHub workflow (`.github/workflo
 
 The front page has its own accessibility gate (axe-core in Playwright, run in Docker): `scripts/a11y.sh` on Linux and macOS, `scripts/a11y.ps1` on Windows; [MAINTAINING.md](https://github.com/waynestate/rollcall/blob/main/MAINTAINING.md) says when to run it.
 
-## Contributing[#](https://rollcall.apps.wayne.edu/docs/checks.html#contributing)
+## Contributing [#](https://rollcall.apps.wayne.edu/docs/checks.html#contributing)
 
 The canonical repository is [enterprise-apps/rollcall](https://git.wayne.edu/enterprise-apps/rollcall) on git.wayne.edu; changes land there first, and Wayne State developers open issues and merge requests on that project. GitHub ([waynestate/rollcall](https://github.com/waynestate/rollcall)) is a read-only push mirror of git.wayne.edu: nobody pushes to it, and Packagist reads from it.
 

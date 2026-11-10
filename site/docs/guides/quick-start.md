@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Quick start[#](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html#quick-start)
+# Quick start [#](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html#quick-start)
 
 This page takes you from a fresh clone to a first report, on the fixtures in the repo. Next: read [what the report says](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html).
 

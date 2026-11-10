@@ -38,7 +38,7 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../docs/index.html">Overview</a></li><li><a href="../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../docs/guides/quick-start.html">Quick start</a></li><li><a href="../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../docs/guides/digest.html">Owner digests</a></li><li><a href="../docs/guides/metrics.html">Metrics</a></li><li><a href="../docs/guides/laravel.html">Laravel</a></li><li><a href="../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../docs/reference/commands.html">Commands</a></li><li><a href="../docs/reference/configuration.html">Configuration</a></li><li><a href="../docs/reference/scripts.html">Scripts on every OS</a></li><li><a href="../docs/reference/contract.html">Contract</a></li><li><a href="../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../docs/architecture.html" aria-current="page">Architecture</a></li><li><a href="../docs/security.html">Security</a></li><li><a href="../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="how-it-is-built">How it is built<a class="docs-heading-link" aria-label="Link to this section" href="#how-it-is-built">#</a></h1>
+      <article class="docs-article"><h1 id="how-it-is-built">How it is <span class="docs-heading-tail"><span>built</span><a class="docs-heading-link" aria-label="Link to this section" href="#how-it-is-built">#</a></span></h1>
 <p>This page shows the moving parts. Next: <a href="security.html">security notes</a>.</p>
 <p>A framework-free core (<code>src/</code>) plus thin entry points that hold no rules:</p>
 <ul>
@@ -85,7 +85,7 @@ and <code>composer ci</code>, and pushes to main only when both pass. A red run 
 </tr>
 </tbody>
 </table></div>
-<h3 id="where-proctor-results-come-from">Where PROCTOR results come from<a class="docs-heading-link" aria-label="Link to this section" href="#where-proctor-results-come-from">#</a></h3>
+<h3 id="where-proctor-results-come-from">Where PROCTOR results come <span class="docs-heading-tail"><span>from</span><a class="docs-heading-link" aria-label="Link to this section" href="#where-proctor-results-come-from">#</a></span></h3>
 <p>Rollcall never runs PROCTOR. It reads the JSON report PROCTOR already wrote (<code>proctor check --format=json</code>), from
 one of two places, chosen by <code>ROLLCALL_PROCTOR_SOURCE</code>:</p>
 <ul>

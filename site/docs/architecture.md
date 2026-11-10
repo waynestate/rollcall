@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# How it is built[#](https://rollcall.apps.wayne.edu/docs/architecture.html#how-it-is-built)
+# How it is built [#](https://rollcall.apps.wayne.edu/docs/architecture.html#how-it-is-built)
 
 This page shows the moving parts. Next: [security notes](https://rollcall.apps.wayne.edu/docs/security.html).
 
@@ -30,7 +30,7 @@ Data comes in through three interfaces. Each has a fixture adapter, so you can t
 | Runtime image per app | `ImageSource` | a JSON export of the app list from any platform, or Citadel's own registrations export (which adds forced upgrade dates) |
 | PROCTOR result | `ProctorReportSource` | a directory of PROCTOR `--format=json` reports (the default); or, with `ROLLCALL_PROCTOR_SOURCE=gitlab`, each project's proctor job artifact in GitLab CI |
 
-### Where PROCTOR results come from[#](https://rollcall.apps.wayne.edu/docs/architecture.html#where-proctor-results-come-from)
+### Where PROCTOR results come from [#](https://rollcall.apps.wayne.edu/docs/architecture.html#where-proctor-results-come-from)
 
 Rollcall never runs PROCTOR. It reads the JSON report PROCTOR already wrote (`proctor check --format=json`), from one of two places, chosen by `ROLLCALL_PROCTOR_SOURCE`:
 

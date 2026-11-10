@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Rollcall[#](https://rollcall.apps.wayne.edu/docs/#rollcall)
+# Rollcall [#](https://rollcall.apps.wayne.edu/docs/#rollcall)
 
 This page says what Rollcall is and where it sits in the stack. Next: [install it](https://rollcall.apps.wayne.edu/docs/install.html), then run the [quick start](https://rollcall.apps.wayne.edu/docs/guides/quick-start.html).
 
@@ -21,7 +21,7 @@ Rollcall enforces nothing. It never opens an issue, leaves a comment or deploys 
 ![A page of Rollcall's roll book: seventeen sample apps called down the register one at a time, each answered with a stamp: seven present, five late, four back row and one inaudible.](https://rollcall.apps.wayne.edu/docs/readme/register.svg)
 One page of the roll book, called name by name. Sample data: the apps are fictional, and a real scan's per-app list stays internal.
 
-## Where it sits in the stack[#](https://rollcall.apps.wayne.edu/docs/#where-it-sits-in-the-stack)
+## Where it sits in the stack [#](https://rollcall.apps.wayne.edu/docs/#where-it-sits-in-the-stack)
 
 The parts of the Wayne State application stack, and their jobs. WELD is the Laravel starter app that has most of them installed:
 
@@ -54,7 +54,7 @@ Images are regenerated from the front page by [`scripts/readme-art`](https://git
 
 ![Rollcall's brand board: the open roll-book mark with a gold tick on a green tile, lockups, the green, gold and cream palette, type, favicons, and do and don't panels.](https://rollcall.apps.wayne.edu/docs/readme/board.jpg)
 
-## Install[#](https://rollcall.apps.wayne.edu/docs/#install)
+## Install [#](https://rollcall.apps.wayne.edu/docs/#install)
 
 One line:
 

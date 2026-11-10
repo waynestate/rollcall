@@ -38,7 +38,7 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/quick-start.html">Quick start</a></li><li><a href="../../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../../docs/guides/digest.html">Owner digests</a></li><li><a href="../../docs/guides/metrics.html">Metrics</a></li><li><a href="../../docs/guides/laravel.html">Laravel</a></li><li><a href="../../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/configuration.html">Configuration</a></li><li><a href="../../docs/reference/scripts.html">Scripts on every OS</a></li><li><a href="../../docs/reference/contract.html" aria-current="page">Contract</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/architecture.html">Architecture</a></li><li><a href="../../docs/security.html">Security</a></li><li><a href="../../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="contract">Contract<a class="docs-heading-link" aria-label="Link to this section" href="#contract">#</a></h1>
+      <article class="docs-article"><h1 id="contract"><span class="docs-heading-tail"><span>Contract</span><a class="docs-heading-link" aria-label="Link to this section" href="#contract">#</a></span></h1>
 <p>This page covers the shapes Rollcall promises to anyone who reads its output. Next: the <a href="proof.html">Proof</a> of a real run.</p>
 <p>The contract lives in <a rel="noopener" href="https://github.com/waynestate/rollcall/tree/main/contract"><code>contract/</code></a> as JSON Schema
 (draft 2020-12). <code>tests/ContractTest.php</code> runs the real commands on the fixtures, then validates what they print and
@@ -90,7 +90,7 @@ or a script should read Rollcall against these schemas, not against an example i
 </tr>
 </tbody>
 </table></div>
-<h2 id="what-the-suite-checks">What the suite checks<a class="docs-heading-link" aria-label="Link to this section" href="#what-the-suite-checks">#</a></h2>
+<h2 id="what-the-suite-checks">What the suite <span class="docs-heading-tail"><span>checks</span><a class="docs-heading-link" aria-label="Link to this section" href="#what-the-suite-checks">#</a></span></h2>
 <ul>
 <li>The public and internal JSON reports, after one scan and after two, match <code>report.schema.json</code>.</li>
 <li><code>GET /report.json</code> from the raw-PHP endpoint matches the same schema.</li>
@@ -109,7 +109,7 @@ suite fails, so a new schema cannot land unchecked.</li>
 </ul>
 <p>It reads fixtures only and never calls GitLab, Citadel or any other host. Run it alone with
 <code>vendor/bin/phpunit tests/ContractTest.php</code>; <code>composer ci</code> runs it with everything else.</p>
-<h2 id="rules">Rules<a class="docs-heading-link" aria-label="Link to this section" href="#rules">#</a></h2>
+<h2 id="rules"><span class="docs-heading-tail"><span>Rules</span><a class="docs-heading-link" aria-label="Link to this section" href="#rules">#</a></span></h2>
 <ul>
 <li><strong>Closed objects.</strong> Rollcall's own output uses <code>additionalProperties: false</code> throughout, so a new field is a
 contract change made in the same commit as the code. Inputs stay open: a producer may add fields of its own, and

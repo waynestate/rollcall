@@ -38,7 +38,7 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/quick-start.html">Quick start</a></li><li><a href="../../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../../docs/guides/digest.html">Owner digests</a></li><li><a href="../../docs/guides/metrics.html">Metrics</a></li><li><a href="../../docs/guides/laravel.html">Laravel</a></li><li><a href="../../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html" aria-current="page">Commands</a></li><li><a href="../../docs/reference/configuration.html">Configuration</a></li><li><a href="../../docs/reference/scripts.html">Scripts on every OS</a></li><li><a href="../../docs/reference/contract.html">Contract</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/architecture.html">Architecture</a></li><li><a href="../../docs/security.html">Security</a></li><li><a href="../../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="commands">Commands<a class="docs-heading-link" aria-label="Link to this section" href="#commands">#</a></h1>
+      <article class="docs-article"><h1 id="commands"><span class="docs-heading-tail"><span>Commands</span><a class="docs-heading-link" aria-label="Link to this section" href="#commands">#</a></span></h1>
 <p>This page lists the commands (generated from the CLI) and what each one prints, plus the exit codes.</p>
 <!-- generated:commands -->
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -79,7 +79,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-advisories"><code>rollcall advisories</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-advisories">#</a></h3>
+<h3 id="rollcall-advisories"><span class="docs-heading-tail"><code>rollcall advisories</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-advisories">#</a></span></h3>
 <p>Check locked package versions against a saved Packagist security-advisories response.</p>
 <p>Usage: <code>rollcall advisories [--today TODAY] [--feed FEED]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -108,7 +108,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-digest"><code>rollcall digest</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-digest">#</a></h3>
+<h3 id="rollcall-digest"><span class="docs-heading-tail"><code>rollcall digest</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-digest">#</a></span></h3>
 <p>Print (or write, or send) each opted-in owner's digest of what changed in their apps.</p>
 <p>Usage: <code>rollcall digest [--today TODAY] [--owner OWNER] [--format FORMAT] [--out OUT] [--send]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -152,7 +152,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-drift"><code>rollcall drift</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-drift">#</a></h3>
+<h3 id="rollcall-drift"><span class="docs-heading-tail"><code>rollcall drift</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-drift">#</a></span></h3>
 <p>Compare policy.json with a saved endoflife.date v1 product file.</p>
 <p>Usage: <code>rollcall drift [--today TODAY] [--feed FEED] [--component COMPONENT]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -186,7 +186,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-owners"><code>rollcall owners</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-owners">#</a></h3>
+<h3 id="rollcall-owners"><span class="docs-heading-tail"><code>rollcall owners</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-owners">#</a></span></h3>
 <p>List the scanned apps whose owner is unknown (no owners-file entry, or none confirmed within ROLLCALL_OWNERS_CONFIRM_DAYS); exit 1 when there is one.</p>
 <p>Usage: <code>rollcall owners [--today TODAY] [--format FORMAT]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -215,7 +215,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-prune"><code>rollcall prune</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-prune">#</a></h3>
+<h3 id="rollcall-prune"><span class="docs-heading-tail"><code>rollcall prune</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-prune">#</a></span></h3>
 <p>Delete snapshots older than the retention window; the newest is never deleted.</p>
 <p>Usage: <code>rollcall prune [--today TODAY] [--days DAYS] [--dry-run]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -249,7 +249,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-report"><code>rollcall report</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-report">#</a></h3>
+<h3 id="rollcall-report"><span class="docs-heading-tail"><code>rollcall report</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-report">#</a></span></h3>
 <p>Print the fleet report from the stored snapshots.</p>
 <p>Usage: <code>rollcall report [--today TODAY] [--format FORMAT] [--internal]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -283,7 +283,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="rollcall-scan"><code>rollcall scan</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-scan">#</a></h3>
+<h3 id="rollcall-scan"><span class="docs-heading-tail"><code>rollcall scan</code><a class="docs-heading-link" aria-label="Link to this section" href="#rollcall-scan">#</a></span></h3>
 <p>Scan the fleet read-only and store a snapshot.</p>
 <p>Usage: <code>rollcall scan [--today TODAY] [--prune [PRUNE]]</code></p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -312,7 +312,7 @@
 </tr>
 </tbody>
 </table></div>
-<h3 id="options-every-command-accepts">Options every command accepts<a class="docs-heading-link" aria-label="Link to this section" href="#options-every-command-accepts">#</a></h3>
+<h3 id="options-every-command-accepts">Options every command <span class="docs-heading-tail"><span>accepts</span><a class="docs-heading-link" aria-label="Link to this section" href="#options-every-command-accepts">#</a></span></h3>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>

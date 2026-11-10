@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# What the report says[#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
+# What the report says [#](https://rollcall.apps.wayne.edu/docs/guides/what-the-report-says.html#what-the-report-says)
 
 This page explains each part of the report. Next: [Citadel's registrations export](https://rollcall.apps.wayne.edu/docs/guides/citadel.html) if your apps run on Citadel.
 

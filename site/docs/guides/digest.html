@@ -38,12 +38,12 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/quick-start.html">Quick start</a></li><li><a href="../../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../../docs/guides/digest.html" aria-current="page">Owner digests</a></li><li><a href="../../docs/guides/metrics.html">Metrics</a></li><li><a href="../../docs/guides/laravel.html">Laravel</a></li><li><a href="../../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/configuration.html">Configuration</a></li><li><a href="../../docs/reference/scripts.html">Scripts on every OS</a></li><li><a href="../../docs/reference/contract.html">Contract</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/architecture.html">Architecture</a></li><li><a href="../../docs/security.html">Security</a></li><li><a href="../../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="owner-digests">Owner digests<a class="docs-heading-link" aria-label="Link to this section" href="#owner-digests">#</a></h1>
+      <article class="docs-article"><h1 id="owner-digests">Owner <span class="docs-heading-tail"><span>digests</span><a class="docs-heading-link" aria-label="Link to this section" href="#owner-digests">#</a></span></h1>
 <p>This page shows how an owner who asks gets a digest of only their own apps. Next: <a href="metrics.html">metrics</a>.</p>
 <p>A digest is a short note in plain words: what changed in that owner's apps since the previous scan, then where each
 app stands. Nothing changed, no digest. Nobody gets one by default, and Rollcall never guesses an owner from
 commit authors.</p>
-<h2 id="1-say-who-answers-for-which-apps">1. Say who answers for which apps<a class="docs-heading-link" aria-label="Link to this section" href="#1-say-who-answers-for-which-apps">#</a></h2>
+<h2 id="1-say-who-answers-for-which-apps">1. Say who answers for which <span class="docs-heading-tail"><span>apps</span><a class="docs-heading-link" aria-label="Link to this section" href="#1-say-who-answers-for-which-apps">#</a></span></h2>
 <p>An owners file maps each scanned project to the contacts who answer for it. Point <code>ROLLCALL_OWNERS_FILE</code> at it. An
 owner opts in with <code>&quot;digest&quot;: true</code>; leaving the key out means no.</p>
 <pre tabindex="0"><code class="language-json">{
@@ -67,7 +67,7 @@ fleet, keep that fleet's file next to its snapshots, outside a public repo, and 
 </code></pre>
 <p>and <code>--format=json</code> lists it under <code>no_owner_on_file</code>. An owner who has not opted in still counts as its owner.
 Reports never read the owners file, so the report stays free of owners.</p>
-<h3 id="confirm-owners-on-a-schedule">Confirm owners on a schedule<a class="docs-heading-link" aria-label="Link to this section" href="#confirm-owners-on-a-schedule">#</a></h3>
+<h3 id="confirm-owners-on-a-schedule">Confirm owners on a <span class="docs-heading-tail"><span>schedule</span><a class="docs-heading-link" aria-label="Link to this section" href="#confirm-owners-on-a-schedule">#</a></span></h3>
 <p>An owner on file is only as good as the last time somebody said it is still true. Give each entry a
 <code>&quot;confirmed&quot;</code> date, the day the contact last confirmed it answers for those apps:</p>
 <pre tabindex="0"><code class="language-json">{&quot;contact&quot;: &quot;team@example.test&quot;, &quot;digest&quot;: true, &quot;confirmed&quot;: &quot;2026-11-01&quot;, &quot;projects&quot;: [&quot;group/project&quot;]}
@@ -85,7 +85,7 @@ Owner unknown for 1 of 14 scanned apps. Ask who answers for it, then list or re-
 <p>It exits 1 while any owner is unknown, so the weekly scan job, which runs it after <code>scan</code>, goes red until someone
 asks the contact and writes the new date. <code>--format=json</code> gives the same answer to a script
 (<code>contract/owners-check.schema.json</code>). Rollcall never fills the gap by guessing an owner from commit authors.</p>
-<h2 id="2-print-them">2. Print them<a class="docs-heading-link" aria-label="Link to this section" href="#2-print-them">#</a></h2>
+<h2 id="2-print-them">2. Print <span class="docs-heading-tail"><span>them</span><a class="docs-heading-link" aria-label="Link to this section" href="#2-print-them">#</a></span></h2>
 <p>After a scan:</p>
 <pre tabindex="0"><code>rollcall digest
 </code></pre>
@@ -105,7 +105,7 @@ including one that appears because a date in CREED's policy passed;</li>
 </ul>
 <p>The first scan has no &quot;before&quot;, so the first digest is a first roll call: every app and where it stands. The states
 and flags are the report's own (<code>rollcall report --internal</code>), so a digest and the report never disagree.</p>
-<h2 id="3-mail-them-only-if-you-want-rollcall-to">3. Mail them (only if you want Rollcall to)<a class="docs-heading-link" aria-label="Link to this section" href="#3-mail-them-only-if-you-want-rollcall-to">#</a></h2>
+<h2 id="3-mail-them-only-if-you-want-rollcall-to">3. Mail them (only if you want Rollcall <span class="docs-heading-tail"><span>to)</span><a class="docs-heading-link" aria-label="Link to this section" href="#3-mail-them-only-if-you-want-rollcall-to">#</a></span></h2>
 <p>Sending is a second, separate switch, and every part of it must be there:</p>
 <ol>
 <li><code>composer require symfony/mailer</code> (Rollcall only suggests it).</li>

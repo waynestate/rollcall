@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# Use Rollcall from your coding agent (ADVISOR)[#](https://rollcall.apps.wayne.edu/docs/guides/advisor.html#use-rollcall-from-your-coding-agent-advisor)
+# Use Rollcall from your coding agent (ADVISOR) [#](https://rollcall.apps.wayne.edu/docs/guides/advisor.html#use-rollcall-from-your-coding-agent-advisor)
 
 This page installs the ADVISOR module and names the three tools. Next: [run the checks](https://rollcall.apps.wayne.edu/docs/checks.html).
 

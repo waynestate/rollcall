@@ -6,7 +6,7 @@ llms: https://rollcall.apps.wayne.edu/llms.txt
 generator: Squire agent-ready
 ---
 
-# WSU values (Playbook)[#](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html#wsu-values-playbook)
+# WSU values (Playbook) [#](https://rollcall.apps.wayne.edu/docs/guides/wsu-values.html#wsu-values-playbook)
 
 This page says which setting may come from Playbook, and how to get Playbook into your app. Next: [Metrics](https://rollcall.apps.wayne.edu/docs/guides/metrics.html).
 

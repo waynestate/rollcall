@@ -38,14 +38,14 @@
   <nav class="docs-nav docs-nav--sidebar" aria-label="Documentation"><ul class="docs-nav__list"><li><a href="../../docs/index.html">Overview</a></li><li><a href="../../docs/install.html">Install</a></li><li class="docs-nav__group"><span class="docs-nav__label">Guides</span><ul><li><a href="../../docs/guides/quick-start.html">Quick start</a></li><li><a href="../../docs/guides/what-the-report-says.html">What the report says</a></li><li><a href="../../docs/guides/citadel.html">Citadel&#039;s registrations export</a></li><li><a href="../../docs/guides/collector-docker.html">Run the collector in Docker</a></li><li><a href="../../docs/guides/wsu-values.html">WSU values (Playbook)</a></li><li><a href="../../docs/guides/digest.html">Owner digests</a></li><li><a href="../../docs/guides/metrics.html">Metrics</a></li><li><a href="../../docs/guides/laravel.html">Laravel</a></li><li><a href="../../docs/guides/advisor.html">Use Rollcall from your coding agent (ADVISOR)</a></li></ul></li><li class="docs-nav__group"><span class="docs-nav__label">Reference</span><ul><li><a href="../../docs/reference/commands.html">Commands</a></li><li><a href="../../docs/reference/configuration.html">Configuration</a></li><li><a href="../../docs/reference/scripts.html" aria-current="page">Scripts on every OS</a></li><li><a href="../../docs/reference/contract.html">Contract</a></li><li><a href="../../docs/reference/proof.html">Proof</a></li></ul></li><li><a href="../../docs/architecture.html">Architecture</a></li><li><a href="../../docs/security.html">Security</a></li><li><a href="../../docs/checks.html">Checks</a></li></ul></nav>
   <div class="docs-content">
     <main id="main">
-      <article class="docs-article"><h1 id="scripts-on-every-os">Scripts on every OS<a class="docs-heading-link" aria-label="Link to this section" href="#scripts-on-every-os">#</a></h1>
+      <article class="docs-article"><h1 id="scripts-on-every-os">Scripts on every <span class="docs-heading-tail"><span>OS</span><a class="docs-heading-link" aria-label="Link to this section" href="#scripts-on-every-os">#</a></span></h1>
 <p>This page lists every script Rollcall ships and how each OS runs it. Next: the <a href="contract.html">contract</a> its output keeps.</p>
 <p>Every developer tool works on Windows, macOS and Linux. Where PHP fits, there is one PHP command and nothing to
 pair. Where a script drives Docker, it ships twice: a <code>.ps1</code> for Windows (PowerShell 5.1 and 7, never bash or WSL)
 and a <code>.sh</code> for Linux and macOS (written for macOS's bash 3.2 and BSD tools). <code>tests/ScriptPairsTest.php</code> fails if
 a script ships without its twin, if a <code>.sh</code> uses a bash 4 feature or a GNU-only flag, or if a <code>.ps1</code> calls a Unix
 shell on the host.</p>
-<h2 id="one-php-command-every-os">One PHP command, every OS<a class="docs-heading-link" aria-label="Link to this section" href="#one-php-command-every-os">#</a></h2>
+<h2 id="one-php-command-every-os">One PHP command, every <span class="docs-heading-tail"><span>OS</span><a class="docs-heading-link" aria-label="Link to this section" href="#one-php-command-every-os">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -84,7 +84,7 @@ shell on the host.</p>
 </tr>
 </tbody>
 </table></div>
-<h2 id="a-pair-per-os">A pair per OS<a class="docs-heading-link" aria-label="Link to this section" href="#a-pair-per-os">#</a></h2>
+<h2 id="a-pair-per-os">A pair per <span class="docs-heading-tail"><span>OS</span><a class="docs-heading-link" aria-label="Link to this section" href="#a-pair-per-os">#</a></span></h2>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
 <thead>
 <tr>
@@ -112,7 +112,7 @@ shell on the host.</p>
 </tbody>
 </table></div>
 <p><code>scripts/readme-art</code> is a Node tool (<code>npm run build</code>), the same on every OS.</p>
-<h2 id="inside-citadel-s-container-only">Inside Citadel's container only<a class="docs-heading-link" aria-label="Link to this section" href="#inside-citadel-s-container-only">#</a></h2>
+<h2 id="inside-citadel-s-container-only">Inside Citadel's container <span class="docs-heading-tail"><span>only</span><a class="docs-heading-link" aria-label="Link to this section" href="#inside-citadel-s-container-only">#</a></span></h2>
 <p>These run on Citadel's Linux container, never on a developer machine, so they have no Windows twin. Squire writes
 and owns them (<code>deploy/.squire.json</code>):</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
@@ -141,7 +141,7 @@ and owns them (<code>deploy/.squire.json</code>):</p>
 </tr>
 </tbody>
 </table></div>
-<h2 id="inside-gitlab-ci-only">Inside GitLab CI only<a class="docs-heading-link" aria-label="Link to this section" href="#inside-gitlab-ci-only">#</a></h2>
+<h2 id="inside-gitlab-ci-only">Inside GitLab CI <span class="docs-heading-tail"><span>only</span><a class="docs-heading-link" aria-label="Link to this section" href="#inside-gitlab-ci-only">#</a></span></h2>
 <p>This runs in a GitLab CI job on the Linux composer image, never on a developer machine, so it has no Windows twin.
 It still keeps to POSIX sh and macOS-safe tools, like every <code>.sh</code> here.</p>
 <div class="docs-table" role="region" aria-label="Table" tabindex="0"><table>
