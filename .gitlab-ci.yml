@@ -1,25 +1,25 @@
 # composer ci is the contract: the checks are defined there, and this pipeline wraps them.
 # It also carries rollcall-scan, a read-only scan of the 13 stack projects on a schedule or by hand.
 # Rollcall's pipeline, built from the Preflight components on this GitLab.
-# Pinned to Preflight 0.5.0. Never use ~latest.
+# Pinned to Preflight 0.8.0. Never use ~latest.
 # Rollcall requires PHP ^8.3, so the test matrix starts at 8.3.
 # Docker Hub images go through the GitLab Dependency Proxy to avoid the anonymous pull limit.
 include:
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/php-test@0.8.0
     inputs:
       php_versions: ["8.3", "8.4", "8.5"]
       image: "php:${PHP_VERSION}-cli-trixie"
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/composer-audit@0.8.0
   # The front page deploy layer (ADR-0017): PROCTOR checks deploy/ against CREED's policy.
   # It blocks (the component's default): a failing check fails the pipeline. Warnings never fail it.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/proctor@0.8.0
     inputs:
       working_dir: deploy
       proctor_command: vendor/bin/proctor check --format=codequality
       image: "php:8.4-cli-trixie@sha256:9cf851bc2c1b37c3e59dfd677a3c3e56d485af5a47c93f629424bb039eafcb69"
   # Accessibility: axe-core in Playwright (Preflight's a11y component), WCAG 2.2 AA.
   # The front page and its docs, served from site/.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.8.0
     inputs:
       job_name: a11y-site
       site_dir: site
@@ -27,7 +27,7 @@ include:
       wcag_tags: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
   # The dashboard pages, rendered by the dashboard-render job below: Laravel (index, apps, empty) and raw PHP (raw-*),
   # plus the Vue page (vue-*), server-rendered by dashboard-vue once it matches the PHP page.
-  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.5.0
+  - component: $CI_SERVER_FQDN/enterprise-apps/preflight/a11y@0.8.0
     inputs:
       job_name: dashboard-a11y
       site_dir: build/dashboard-a11y

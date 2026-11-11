@@ -53,7 +53,7 @@ page check (versions table and quick-start printout), PHPStan and `composer audi
 
 ## CI
 
-- **GitLab:** Preflight 0.5.0's `php-test` (PHP 8.3, 8.4, 8.5), `composer-audit`, `proctor` (on `deploy/`) and
+- **GitLab:** Preflight 0.8.0's `php-test` (PHP 8.3, 8.4, 8.5), `composer-audit`, `proctor` (on `deploy/`) and
   `a11y` components (`a11y-site` and `dashboard-a11y`), plus the `composer-ci`, `wayneui-copies`,
   `dashboard-render` and `dashboard-vue` jobs. `rollcall-scan` and `creed-copy-refresh` run only on their
   schedules or by hand.

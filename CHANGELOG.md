@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- CI pins Preflight 0.8.0.
 - Docs: OPEN_QUESTIONS question 1 no longer calls Preflight 0.5.0 "landing": it shipped on 2026-11-09 and keeps `proctor.json` for the CI reader when the app runs PROCTOR 0.11.0 or later. What remains is the live trial.
 - Added: the dashboard shows Citadel's forced image upgrades under the totals (apps with an upgrade pending, due today or earlier, the next date ahead; the due count wears a badge while any date has come), and the internal table gains an "Upgrade due" column beside the image state, badged "date has come" once the report's day reaches it. Counts only on the public page. The Blade, raw-PHP and Vue pages print the same markup; the parity and axe fixtures now scan through Citadel's export, so they cover the badges.
 - Added: the dashboard shows the MySQL 5.6 CI job counts (held, missing, not applicable, unknown) under the totals, and the internal table has the per-app state (D-079).
