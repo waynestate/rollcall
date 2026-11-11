@@ -167,10 +167,9 @@ clean clone.
    It should print the counts and progress, with no per-app owner, rank or score. If any of those words appear,
    stop and fix the report before the release.
 
-6. **Run the parity stack.** `deploy/scripts/parity.sh up` on Linux and macOS, or `deploy/scripts/parity.ps1 up` on
-   Windows, as each script's header says (add `--fallback` or `-Fallback` when the real Citadel image is not on the
-   machine). Expect the app to come up on the printed address. If it does not, read the logs the script points at,
-   then bring the stack down with `down`.
+6. **Run the parity stack.** Run the app with Parity: `parity init --from-squire` once (it reads the Squire kit and
+   writes `parity.json`), then `parity up`. Expect the app to come up on the printed address. `parity check` and
+   `parity test` are the gates; `parity down` stops the stack. If it does not come up, read the logs (`parity logs`).
 
 7. **Run the accessibility gates.** `scripts/a11y.sh` (front page) and `scripts/dashboard-a11y.sh` (dashboard)
    on Linux and macOS, or `scripts/a11y.ps1` and `scripts/dashboard-a11y.ps1` on Windows. Expect zero axe

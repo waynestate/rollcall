@@ -27,8 +27,8 @@ final class DocsChecklistTest extends TestCase
         $maintaining = $this->touchedFiles()['MAINTAINING.md'];
 
         $this->assertStringContainsString('Smoke test on every OS', $maintaining);
-        $this->assertStringContainsString('parity.sh', $maintaining);
-        $this->assertStringContainsString('parity.ps1', $maintaining);
+        $this->assertStringContainsString('parity init --from-squire', $maintaining);
+        $this->assertStringContainsString('parity up', $maintaining);
         $this->assertStringContainsString('a11y.sh', $maintaining);
         $this->assertStringContainsString('a11y.ps1', $maintaining);
         $this->assertStringContainsString('docker build -t rollcall-collector', $maintaining);
