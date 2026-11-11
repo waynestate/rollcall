@@ -293,6 +293,28 @@ final class ReportTest extends TestCase
         $this->assertStringNotContainsString('Upgrade scheduled', $text);
     }
 
+    /**
+     * A panel that queries a metric /metrics never serves draws "No data" forever, so every
+     * query on the Grafana board has to name a series the renderer writes for the fixture fleet.
+     */
+    public function test_every_grafana_panel_queries_a_metric_the_endpoint_serves(): void
+    {
+        $text = (new PrometheusRenderer())->render($this->report());
+        $dash = json_decode((string) file_get_contents(__DIR__ . '/../grafana/rollcall-burn-down.json'), true, 32, JSON_THROW_ON_ERROR);
+
+        $queried = [];
+        foreach ($dash['panels'] as $panel) {
+            foreach ($panel['targets'] as $target) {
+                $this->assertSame(1, preg_match('/^rollcall_[a-z0-9_]+/', $target['expr'], $name), $panel['title']);
+                $queried[] = $name[0];
+                $this->assertMatchesRegularExpression('/^' . $name[0] . '[ {]/m', $text, $panel['title'] . ' queries a metric /metrics does not serve');
+            }
+        }
+
+        $this->assertContains('rollcall_mysql56_ci_apps', $queried, 'the MySQL 5.6 CI job has a panel');
+        $this->assertContains('rollcall_booster_apps', $queried, 'the Booster hop results have a panel');
+    }
+
     public function test_prometheus_carries_the_forced_upgrades_as_counts(): void
     {
         $snapshot = Fleet::snapshot(self::TODAY);

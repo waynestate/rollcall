@@ -53,9 +53,12 @@ rest: <code>rollcall_forced_upgrades_pending_apps</code> (apps with one pending,
 one). With any other image source the two counts are 0 and the date is absent. The dashboard shows pending and
 overdue as two stat panels.</p>
 <p>PROCTOR's MySQL 5.6 CI job check comes through as one gauge, <code>rollcall_mysql56_ci_apps</code>, counted per state (<code>held</code>,
-<code>missing</code>, <code>not_applicable</code>, <code>unknown</code>); all four series always exist, zero when no app is in a state.</p>
+<code>missing</code>, <code>not_applicable</code>, <code>unknown</code>); all four series always exist, zero when no app is in a state. The
+dashboard shows the four as a bar gauge.</p>
 <p>Booster's hop records come through the same way, as <code>rollcall_booster_apps</code>, counted per result (<code>pass</code>, <code>fail</code>,
-<code>none</code>); all three series always exist.</p>
+<code>none</code>); all three series always exist. The dashboard shows the three as a pie chart beside the MySQL 5.6 one.</p>
+<p>Every query on the dashboard names a metric this endpoint serves; <code>composer ci</code> renders the fixture fleet's metrics
+and fails when a panel asks for one that is not there, so a renamed gauge never leaves a panel on &quot;No data&quot;.</p>
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
 <br>

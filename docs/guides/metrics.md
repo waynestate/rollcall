@@ -22,10 +22,14 @@ one). With any other image source the two counts are 0 and the date is absent. T
 overdue as two stat panels.
 
 PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`,
-`missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
+`missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state. The
+dashboard shows the four as a bar gauge.
 
 Booster's hop records come through the same way, as `rollcall_booster_apps`, counted per result (`pass`, `fail`,
-`none`); all three series always exist.
+`none`); all three series always exist. The dashboard shows the three as a pie chart beside the MySQL 5.6 one.
+
+Every query on the dashboard names a metric this endpoint serves; `composer ci` renders the fixture fleet's metrics
+and fails when a panel asks for one that is not there, so a renamed gauge never leaves a panel on "No data".
 
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
