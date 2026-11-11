@@ -37,6 +37,12 @@ final class DashboardPage
     /** The one state that needs a person: an app with migrations and no MySQL 5.6 job. */
     private const MYSQL56_BAD = 'missing';
 
+    /** Booster's hop results, in page order: report key => label. */
+    private const BOOSTER_RESULTS = ['pass' => 'pass', 'fail' => 'fail', 'none' => 'no record'];
+
+    /** The one result that needs a person: the app's last upgrade run did not land. */
+    private const BOOSTER_BAD = 'fail';
+
     /** What a row's Citadel date says once it is the report's day or earlier: Citadel may move the app any time now. */
     private const DUE_COME = 'date has come';
 
@@ -176,6 +182,21 @@ final class DashboardPage
         }
         $h[] = '    </section>';
 
+        // Booster's hop records, counted: three panels, and "fail" wears a badge while any app's last hop failed.
+        $booster = self::arr($report['booster'] ?? []);
+        $h[] = '';
+        $h[] = '    <section aria-labelledby="h-booster">';
+        $h[] = '        <h2 id="h-booster">Booster hop record</h2>';
+        $h[] = '        <p>Booster writes booster-hop.json when an upgrade run finishes; an app that commits it shows how its last hop'
+            . ' ended. No record means the app has none, or one that could not be read.</p>';
+        foreach (self::BOOSTER_RESULTS as $key => $label) {
+            $count = $booster[$key] ?? '';
+            $h[] = '        <div class="wsu-stat"><span class="wsu-stat__label">'
+                . ($key === self::BOOSTER_BAD && is_int($count) && $count > 0 ? self::badge($label) : self::e($label)) . '</span>'
+                . '<span class="wsu-stat__value">' . self::e($count) . '</span></div>';
+        }
+        $h[] = '    </section>';
+
         foreach (self::VERSION_TABLES as $key => $title) {
             $rows = [];
             foreach (self::arr($report[$key] ?? []) as $row) {
@@ -242,14 +263,15 @@ final class DashboardPage
                     . '<td>' . self::e($auth) . '</td>'
                     . '<td>' . self::e(self::text($app['proctor'] ?? null, 'no report')) . '</td>'
                     . '<td>' . self::mysql56State($app['mysql56_ci'] ?? null) . '</td>'
+                    . '<td>' . self::boosterResult($app['booster'] ?? null) . '</td>'
                     . '<td>' . self::e($drift === [] ? 'none' : implode(', ', $drift)) . '</td></tr>';
             }
             array_push($h, ...self::table(
                 'h-apps',
                 'Apps',
                 'cap-apps',
-                "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift",
-                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
+                "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job, Booster hop and drift",
+                ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Booster', 'Drift'],
                 $rows,
             ));
         }
@@ -303,6 +325,14 @@ final class DashboardPage
         $words = self::words(self::text($state, 'unknown'));
 
         return $words === self::MYSQL56_BAD ? self::badge($words) : self::e($words);
+    }
+
+    /** An app's Booster hop result, escaped: "no record" without one, and "fail" in its badge. */
+    private static function boosterResult(mixed $result): string
+    {
+        $words = self::text($result, self::BOOSTER_RESULTS['none']);
+
+        return $words === self::BOOSTER_BAD ? self::badge($words) : self::e($words);
     }
 
     /**

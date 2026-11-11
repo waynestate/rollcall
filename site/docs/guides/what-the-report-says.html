@@ -70,7 +70,10 @@ the word in it while any app is missing the job, and the internal page's table h
 writes at the repository root after a real upgrade run: <code>pass</code>, <code>fail</code> (a hop's gate or checks failed), and <code>none</code>
 for an app with no record or one that could not be read (that one also gets a scan note). In the internal view
 each app carries its <code>booster</code> result, the <code>booster_version</code> that wrote the record and <code>booster_at</code>, when the run
-finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image.</p>
+finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image. The
+dashboard shows the three counts as panels after the MySQL 5.6 ones (pass, fail, no record); <code>fail</code> wears a red
+badge with the word in it while any app's last hop failed, and the internal page's table has each app's result in
+a &quot;Booster&quot; column before Drift.</p>
 </li>
 <li>
 <p><strong>Drift</strong>, counted per kind: <code>image_eol</code>, <code>image_unknown</code>, <code>image_below_floor</code>, <code>floor_allows_eol</code>,

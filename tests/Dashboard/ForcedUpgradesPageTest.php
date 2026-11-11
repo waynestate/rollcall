@@ -36,7 +36,7 @@ final class ForcedUpgradesPageTest extends TestCase
 
         $internal = (new DashboardPage())->render($builder->build($snapshot, [$snapshot], $today, true), true);
         $this->assertStringContainsString('<th scope="col">Image state</th><th scope="col">Upgrade due</th><th scope="col">PHP floor</th>', $internal);
-        $this->assertStringContainsString('Each app&#039;s versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift', $internal);
+        $this->assertStringContainsString('Each app&#039;s versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job, Booster hop and drift', $internal);
         // demo/broken's date passed on Nov 1; demo/atlas has Dec 15 ahead; demo/ledger has none.
         $this->assertSame('<span class="wsu-badge wsu-badge--danger">2026-11-01, date has come</span>', $this->dueCell($internal, 'demo/broken'));
         $this->assertSame('2026-12-15', $this->dueCell($internal, 'demo/atlas'));

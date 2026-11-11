@@ -64,8 +64,8 @@ final class DashboardPageTest extends TestCase
     {
         $body = $this->page(true);
 
-        $this->assertStringContainsString('Each app&#039;s versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift', $body);
-        $this->assertStringContainsString('<th scope="col">PROCTOR</th><th scope="col">MySQL 5.6 CI</th><th scope="col">Drift</th>', $body);
+        $this->assertStringContainsString('Each app&#039;s versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job, Booster hop and drift', $body);
+        $this->assertStringContainsString('<th scope="col">PROCTOR</th><th scope="col">MySQL 5.6 CI</th><th scope="col">Booster</th><th scope="col">Drift</th>', $body);
         $this->assertMatchesRegularExpression('#<th scope="row">demo/atlas</th>(?:<td>[^<]*</td>){9}<td>held</td>#', $body);
         $this->assertMatchesRegularExpression('#<th scope="row">demo/ledger</th>(?:<td>[^<]*</td>){9}<td>' . preg_quote(self::BADGE, '#') . '</td>#', $body);
         $this->assertSame(2, substr_count($body, self::BADGE), 'the panel and the ledger row, nothing else');

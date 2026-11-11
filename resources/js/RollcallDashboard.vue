@@ -61,6 +61,16 @@ const MYSQL56_STATES: [string, string][] = [
 /** The one state that needs a person: an app with migrations and no MySQL 5.6 job (DashboardPage::MYSQL56_BAD). */
 const MYSQL56_BAD = 'missing';
 
+/** Booster's hop results, in page order: report key => label (DashboardPage::BOOSTER_RESULTS). */
+const BOOSTER_RESULTS: [string, string][] = [
+    ['pass', 'pass'],
+    ['fail', 'fail'],
+    ['none', 'no record'],
+];
+
+/** The one result that needs a person: the app's last upgrade run did not land (DashboardPage::BOOSTER_BAD). */
+const BOOSTER_BAD = 'fail';
+
 /** What a row's Citadel date says once it is the report's day or earlier (DashboardPage::DUE_COME). */
 const DUE_COME = 'date has come';
 
@@ -118,6 +128,13 @@ function mysql56State(value: unknown): Cell {
     return state === MYSQL56_BAD ? { badge: state } : state;
 }
 
+/** An app's Booster hop result: "no record" without one, and "fail" in its badge (DashboardPage::boosterResult()). */
+function boosterResult(value: unknown): Cell {
+    const result = text(value, 'no record');
+
+    return result === BOOSTER_BAD ? { badge: result } : result;
+}
+
 /**
  * An app's forced upgrade date: "none" without one, and in its badge once the report's
  * day has reached it, the rule behind the report's overdue count (DashboardPage::upgradeDue()).
@@ -171,6 +188,17 @@ const mysql56 = computed((): [string, string, boolean][] => {
     });
 });
 
+/** Booster's hop records, counted: [label, count, wears the badge]. "fail" does while any app's last hop failed. */
+const booster = computed((): [string, string, boolean][] => {
+    const counts = obj(props.report?.booster);
+
+    return BOOSTER_RESULTS.map(([key, label]) => {
+        const count = counts[key];
+
+        return [label, e(count), key === BOOSTER_BAD && typeof count === 'number' && Number.isInteger(count) && count > 0];
+    });
+});
+
 const tables = computed((): Table[] => {
     const report = props.report ?? {};
     const out: Table[] = VERSION_TABLES.map(([key, title]) => ({
@@ -215,8 +243,8 @@ const tables = computed((): Table[] => {
         out.push({
             key: 'apps',
             title: 'Apps',
-            caption: "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job and drift",
-            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Drift'],
+            caption: "Each app's versions, Citadel upgrade date, PROCTOR result, MySQL 5.6 CI job, Booster hop and drift",
+            columns: ['App', 'PHP image', 'PHP (running)', 'httpd (running)', 'Image state', 'Upgrade due', 'PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI', 'Booster', 'Drift'],
             rows: list(report.apps).map((item) => {
                 const app = obj(item);
                 const drift = list(app.drift).map(words);
@@ -236,6 +264,7 @@ const tables = computed((): Table[] => {
                     auth,
                     text(app.proctor, 'no report'),
                     mysql56State(app.mysql56_ci),
+                    boosterResult(app.booster),
                     drift.length === 0 ? 'none' : drift.join(', '),
                 ];
             }),
@@ -288,6 +317,20 @@ const tables = computed((): Table[] => {
                 which apps hold the job. Unknown means no PROCTOR report, or one older than 0.15.1.
             </p>
             <div v-for="[label, value, warn] in mysql56" :key="label" class="wsu-stat">
+                <span class="wsu-stat__label"
+                    ><span v-if="warn" class="wsu-badge wsu-badge--danger">{{ label }}</span
+                    ><template v-else>{{ label }}</template></span
+                ><span class="wsu-stat__value">{{ value }}</span>
+            </div>
+        </section>
+
+        <section aria-labelledby="h-booster">
+            <h2 id="h-booster">Booster hop record</h2>
+            <p>
+                Booster writes booster-hop.json when an upgrade run finishes; an app that commits it shows how its last hop
+                ended. No record means the app has none, or one that could not be read.
+            </p>
+            <div v-for="[label, value, warn] in booster" :key="label" class="wsu-stat">
                 <span class="wsu-stat__label"
                     ><span v-if="warn" class="wsu-badge wsu-badge--danger">{{ label }}</span
                     ><template v-else>{{ label }}</template></span

@@ -27,7 +27,10 @@ This page explains each part of the report. Next: [Citadel's registrations expor
   writes at the repository root after a real upgrade run: `pass`, `fail` (a hop's gate or checks failed), and `none`
   for an app with no record or one that could not be read (that one also gets a scan note). In the internal view
   each app carries its `booster` result, the `booster_version` that wrote the record and `booster_at`, when the run
-  finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image.
+  finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image. The
+  dashboard shows the three counts as panels after the MySQL 5.6 ones (pass, fail, no record); `fail` wears a red
+  badge with the word in it while any app's last hop failed, and the internal page's table has each app's result in
+  a "Booster" column before Drift.
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`,
   `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`,
   `proctor_failing`, `override_expired`.

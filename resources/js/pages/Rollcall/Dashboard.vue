@@ -58,20 +58,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 }
 
 /*
- * The totals, the forced upgrade counts and the MySQL 5.6 CI job counts sit
- * side by side when there is room, one per row on a phone. Their heading and
- * note span the row.
+ * The totals, the forced upgrade counts, the MySQL 5.6 CI job counts and the
+ * Booster hop counts sit side by side when there is room, one per row on a
+ * phone. Their heading and note span the row.
  */
 .rollcall-page :deep(section[aria-labelledby='totals']),
 .rollcall-page :deep(section[aria-labelledby='h-forced']),
-.rollcall-page :deep(section[aria-labelledby='h-mysql56']) {
+.rollcall-page :deep(section[aria-labelledby='h-mysql56']),
+.rollcall-page :deep(section[aria-labelledby='h-booster']) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
 }
 
 .rollcall-page :deep(section[aria-labelledby='totals'] > h2),
 .rollcall-page :deep(section[aria-labelledby='h-forced'] > :is(h2, p)),
-.rollcall-page :deep(section[aria-labelledby='h-mysql56'] > :is(h2, p)) {
+.rollcall-page :deep(section[aria-labelledby='h-mysql56'] > :is(h2, p)),
+.rollcall-page :deep(section[aria-labelledby='h-booster'] > :is(h2, p)) {
     grid-column: 1 / -1;
 }
 </style>
