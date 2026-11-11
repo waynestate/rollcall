@@ -4,6 +4,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-11
+
 - Added: the Grafana board (`grafana/rollcall-burn-down.json`) gains a "MySQL 5.6 CI job" bar gauge and a "Booster hop results" pie chart, from gauges `/metrics` already served. A new test renders the fixture fleet's metrics and fails when any panel queries a metric the endpoint does not serve.
 - Added: the dashboard shows the Booster hop counts after the MySQL 5.6 panels (pass, fail, no record; "fail" wears a badge with the word in it while any app's last hop failed), and the internal table gains a "Booster" column before Drift. Counts only on the public page. The Blade, raw-PHP and Vue pages print the same markup (`dashboard-vue` parity and `dashboard-a11y`, nine pages, 0 violations); `BoosterPanelsTest` holds the panels, the badge rule and the column.
 - Added: the report counts apps by their Booster hop record (`booster`: pass, fail, none), and the internal view gives each app its `booster` result, `booster_version` and `booster_at`. The scan has kept Booster's `booster-hop.json` in every snapshot since 0.1.10 (BOOSTER-24), but no report, metric or tool showed it until now; snapshots already stored count at once, with no rescan. New gauge `rollcall_booster_apps{result}`, the same field in ADVISOR's fleet summary, and a "Booster hop record" line in the text report. A stored result other than pass or fail reads as none. The contract adds the fields (a minor change under ADR-0008), and its suite refuses an undeclared result.
