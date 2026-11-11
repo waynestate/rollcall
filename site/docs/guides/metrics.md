@@ -16,6 +16,8 @@ Forced image upgrades from a Citadel export come through as three gauges, counts
 
 PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`, `missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
 
+Booster's hop records come through the same way, as `rollcall_booster_apps`, counted per result (`pass`, `fail`, `none`); all three series always exist.
+
 **Watch the back row empty (the burn-down, sample data)**
 
 ![Rollcall's sample burn-down: hatched bars of apps on an end-of-life PHP image falling from 19 on August 12 to 4 on October 28, with a red line over the top and the last bar filled green.](https://rollcall.apps.wayne.edu/docs/readme/burn-down.jpg)

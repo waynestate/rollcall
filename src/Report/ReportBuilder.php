@@ -79,6 +79,7 @@ final class ReportBuilder
         $states = $this->emptyStates();
         $proctor = ['pass' => 0, 'fail' => 0, 'none' => 0];
         $mysql56 = ['held' => 0, 'missing' => 0, 'not_applicable' => 0, 'unknown' => 0];
+        $booster = ['pass' => 0, 'fail' => 0, 'none' => 0];
         $auth = [];
         $perApp = [];
         $upgradedOn = $internal ? $this->upgradeDates($history) : [];
@@ -96,6 +97,9 @@ final class ReportBuilder
                 $mysql56State = 'unknown';
             }
             $mysql56[$mysql56State]++;
+            // Booster's hop record: how the app's last committed upgrade run ended, "none" with no readable record.
+            $boosterResult = self::boosterResult($app);
+            $booster[$boosterResult ?? 'none']++;
             $authKey = $app->authPackage ?? 'none';
             $auth[$authKey] = ($auth[$authKey] ?? 0) + 1;
 
@@ -114,6 +118,9 @@ final class ReportBuilder
                     'auth_version' => $app->authVersion,
                     'proctor' => $app->proctorResult,
                     'mysql56_ci' => $app->mysql56 ?? 'unknown',
+                    'booster' => $boosterResult,
+                    'booster_version' => $boosterResult === null ? null : $app->boosterVersion,
+                    'booster_at' => $boosterResult === null ? null : $app->boosterAt,
                     'overrides' => array_map(static fn($o): array => $o->toArray(), $app->overrides),
                     'drift' => $flags,
                     'upgraded_on' => $upgradedOn[$app->id] ?? null,
@@ -138,6 +145,7 @@ final class ReportBuilder
             'auth_package' => $auth,
             'proctor' => $proctor,
             'mysql56_ci' => $mysql56,
+            'booster' => $booster,
             'drift' => $drift,
             'progress' => $this->progress($current, $previous, $today),
             'forced_upgrades' => $this->forcedUpgrades($apps, $today),
@@ -149,6 +157,16 @@ final class ReportBuilder
         }
 
         return $report;
+    }
+
+    /**
+     * The app's Booster hop result, pass or fail, or null when it has no
+     * readable booster-hop.json. A stored value outside those two is read as
+     * null, so an old or hand-edited snapshot never invents a third result.
+     */
+    private static function boosterResult(AppFacts $app): ?string
+    {
+        return $app->boosterResult === 'pass' || $app->boosterResult === 'fail' ? $app->boosterResult : null;
     }
 
     /**

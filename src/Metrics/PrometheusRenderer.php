@@ -59,6 +59,7 @@ final class PrometheusRenderer
         $this->gauge($registry, 'auth_package_apps', 'Apps by auth package.', ['package'], $this->pairs($report['auth_package'] ?? [], self::package(...)));
         $this->gauge($registry, 'proctor_apps', 'Apps by PROCTOR result.', ['result'], $this->pairs($report['proctor'] ?? [], self::result(...)));
         $this->gauge($registry, 'mysql56_ci_apps', 'Apps by MySQL 5.6 CI job state (held, missing, not applicable, unknown).', ['state'], $this->pairs($report['mysql56_ci'] ?? [], self::mysql56State(...)));
+        $this->gauge($registry, 'booster_apps', 'Apps by the result of their committed Booster hop record (pass, fail, none).', ['result'], $this->pairs($report['booster'] ?? [], self::result(...)));
         $this->gauge($registry, 'drift_apps', 'Apps showing each kind of drift.', ['kind'], $this->pairs($report['drift'] ?? [], self::kind(...)));
 
         $progress = self::arr($report['progress'] ?? []);

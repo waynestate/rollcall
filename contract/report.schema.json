@@ -4,7 +4,7 @@
     "title": "Rollcall report",
     "description": "What `rollcall report --format=json` prints and `GET /report.json` serves. The public view is counts and progress only; the internal view (`--internal`) adds the per-app list and the scan notes. Every object is closed (additionalProperties false), so a new field is a contract change made in the same commit.",
     "type": "object",
-    "required": ["tool", "version", "scan_date", "as_of", "visibility", "totals", "image_states", "php_image", "php_floor", "laravel", "auth_package", "proctor", "mysql56_ci", "drift", "progress", "forced_upgrades", "burn_down"],
+    "required": ["tool", "version", "scan_date", "as_of", "visibility", "totals", "image_states", "php_image", "php_floor", "laravel", "auth_package", "proctor", "mysql56_ci", "booster", "drift", "progress", "forced_upgrades", "burn_down"],
     "additionalProperties": false,
     "properties": {
         "tool": {"const": "rollcall"},
@@ -51,6 +51,17 @@
                 "missing": {"$ref": "#/$defs/count"},
                 "not_applicable": {"$ref": "#/$defs/count"},
                 "unknown": {"$ref": "#/$defs/count"}
+            }
+        },
+        "booster": {
+            "description": "Apps by the result of the Booster hop record each one commits as booster-hop.json: pass, fail, or none when an app has no record or one that could not be read. Every result is always present, zeros included.",
+            "type": "object",
+            "required": ["pass", "fail", "none"],
+            "additionalProperties": false,
+            "properties": {
+                "pass": {"$ref": "#/$defs/count"},
+                "fail": {"$ref": "#/$defs/count"},
+                "none": {"$ref": "#/$defs/count"}
             }
         },
         "drift": {
@@ -183,7 +194,7 @@
         "app": {
             "description": "One app in the internal view. The id is the repository path; it never appears in the public view.",
             "type": "object",
-            "required": ["id", "php_image", "runtime_php", "runtime_httpd", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "mysql56_ci", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
+            "required": ["id", "php_image", "runtime_php", "runtime_httpd", "image_state", "php_floor", "floor_state", "laravel", "laravel_state", "auth_package", "auth_version", "proctor", "mysql56_ci", "booster", "booster_version", "booster_at", "overrides", "drift", "upgraded_on", "upgrade_due", "notes"],
             "additionalProperties": false,
             "properties": {
                 "id": {"type": "string", "minLength": 1},
@@ -209,6 +220,20 @@
                 "mysql56_ci": {
                     "description": "The state of the app's MySQL 5.6 CI job from PROCTOR's mysql56-ci findings, counted as unknown when the report cannot say.",
                     "enum": ["held", "missing", "not_applicable", "unknown"]
+                },
+                "booster": {
+                    "description": "How the app's last committed Booster run ended, from its booster-hop.json, or null when it has no readable record.",
+                    "enum": ["pass", "fail", null]
+                },
+                "booster_version": {
+                    "description": "The Booster release that wrote the hop record, or null (no record, or a record without a version).",
+                    "type": ["string", "null"],
+                    "maxLength": 40
+                },
+                "booster_at": {
+                    "description": "When Booster finished that run, as the record says (an ISO 8601 time), or null with no record.",
+                    "type": ["string", "null"],
+                    "maxLength": 40
                 },
                 "overrides": {"type": "array", "items": {"$ref": "#/$defs/override"}},
                 "drift": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/driftKind"}},

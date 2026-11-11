@@ -52,6 +52,13 @@ final class TextRenderer
             self::cell($mysql56['not_applicable'] ?? 0),
             self::cell($mysql56['unknown'] ?? 0),
         );
+        $booster = self::arr($report['booster'] ?? []);
+        $out[] = sprintf(
+            'Booster hop record: %s pass, %s fail, %s none',
+            self::cell($booster['pass'] ?? 0),
+            self::cell($booster['fail'] ?? 0),
+            self::cell($booster['none'] ?? 0),
+        );
         $out[] = '';
         $out[] = 'Drift';
         $out[] = self::table(['KIND', 'APPS'], self::pairs($report['drift'] ?? []));

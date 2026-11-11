@@ -4,6 +4,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+- Added: the report counts apps by their Booster hop record (`booster`: pass, fail, none), and the internal view gives each app its `booster` result, `booster_version` and `booster_at`. The scan has kept Booster's `booster-hop.json` in every snapshot since 0.1.10 (BOOSTER-24), but no report, metric or tool showed it until now; snapshots already stored count at once, with no rescan. New gauge `rollcall_booster_apps{result}`, the same field in ADVISOR's fleet summary, and a "Booster hop record" line in the text report. A stored result other than pass or fail reads as none. The contract adds the fields (a minor change under ADR-0008), and its suite refuses an undeclared result.
 - Changed: the deploy kit is Squire 0.10.8 (was 0.10.7): 0.10.8 moves no template and no kit file (the last template move was the 0.10.7 `.gitattributes`, the last docs and agent-ready tool change was 0.10.6), so `deploy/.squire.json` records the new version and every kit file stays as it is.
 - CI pins Preflight 0.8.0.
 - Docs: OPEN_QUESTIONS question 1 no longer calls Preflight 0.5.0 "landing": it shipped on 2026-11-09 and keeps `proctor.json` for the CI reader when the app runs PROCTOR 0.11.0 or later. What remains is the live trial.

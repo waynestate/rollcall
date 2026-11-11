@@ -32,7 +32,7 @@ and point `ADVISOR_MODULES_FILE` at that file. The tools read the snapshot store
 
 | Tool | What it answers |
 | --- | --- |
-| `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package and PROCTOR result, drift per kind, progress since the previous scan, forced image upgrades (`forced_upgrades`: pending, overdue, next due), and the snapshot date |
+| `rollcall_fleet_summary` | Counts from the latest snapshot: apps by PHP image, declared floor, Laravel line, auth package, PROCTOR result, MySQL 5.6 CI job state and Booster hop result, drift per kind, progress since the previous scan, forced image upgrades (`forced_upgrades`: pending, overdue, next due), and the snapshot date |
 | `rollcall_burn_down` | The dated EOL series, one point per scan day, each with its counts per support state, PHP minor and Laravel major; optional `days` (an integer, 1 to 365) keeps only the most recent days |
 | `rollcall_supported_versions` | Every version in CREED's policy, grouped by what it says today: active, security only, or end of life |
 

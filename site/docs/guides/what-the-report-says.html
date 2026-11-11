@@ -66,6 +66,13 @@ the word in it while any app is missing the job, and the internal page's table h
 &quot;MySQL 5.6 CI&quot; column beside PROCTOR's.</p>
 </li>
 <li>
+<p><strong>Booster hop record</strong>: apps by how their last committed Booster run ended, from the <code>booster-hop.json</code> Booster
+writes at the repository root after a real upgrade run: <code>pass</code>, <code>fail</code> (a hop's gate or checks failed), and <code>none</code>
+for an app with no record or one that could not be read (that one also gets a scan note). In the internal view
+each app carries its <code>booster</code> result, the <code>booster_version</code> that wrote the record and <code>booster_at</code>, when the run
+finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image.</p>
+</li>
+<li>
 <p><strong>Drift</strong>, counted per kind: <code>image_eol</code>, <code>image_unknown</code>, <code>image_below_floor</code>, <code>floor_allows_eol</code>,
 <code>floor_unbounded</code>, <code>eol_past_grace</code> (past the policy's grace days), <code>laravel_eol</code>, <code>proctor_missing</code>,
 <code>proctor_failing</code>, <code>override_expired</code>.</p>

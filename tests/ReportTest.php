@@ -50,6 +50,29 @@ final class ReportTest extends TestCase
         $this->assertSame(['apereo/phpcas' => 1, 'none' => 2, 'waynestate/sesame' => 1], $report['auth_package']);
         $this->assertSame(['pass' => 1, 'fail' => 1, 'none' => 2], $report['proctor']);
         $this->assertSame(['held' => 1, 'missing' => 1, 'not_applicable' => 0, 'unknown' => 2], $report['mysql56_ci']);
+        // ledger's hop passed, atlas's failed its gate, relic has no record and broken's could not be read.
+        $this->assertSame(['pass' => 1, 'fail' => 1, 'none' => 2], $report['booster']);
+    }
+
+    public function test_the_booster_counts_take_only_pass_and_fail_from_a_stored_snapshot(): void
+    {
+        $snapshot = new Snapshot(new DateTimeImmutable(self::TODAY), [
+            new AppFacts('g/passed', boosterResult: 'pass', boosterVersion: '1.10.0', boosterAt: '2026-10-20T09:00:00+00:00'),
+            new AppFacts('g/edited', boosterResult: 'skipped', boosterVersion: '1.10.0', boosterAt: '2026-10-20T09:00:00+00:00'),
+            new AppFacts('g/never'),
+        ]);
+        $report = $this->builder()->build($snapshot, [$snapshot], new DateTimeImmutable(self::TODAY), true);
+        $apps = array_column($report['apps'], null, 'id');
+
+        $this->assertSame(['pass' => 1, 'fail' => 0, 'none' => 2], $report['booster']);
+        $this->assertSame('pass', $apps['g/passed']['booster']);
+        $this->assertSame('1.10.0', $apps['g/passed']['booster_version']);
+        $this->assertSame('2026-10-20T09:00:00+00:00', $apps['g/passed']['booster_at']);
+        // A value Booster never writes is no record at all, and drags no version or time along with it.
+        $this->assertNull($apps['g/edited']['booster']);
+        $this->assertNull($apps['g/edited']['booster_version']);
+        $this->assertNull($apps['g/edited']['booster_at']);
+        $this->assertNull($apps['g/never']['booster']);
     }
 
     public function test_a_version_ahead_of_the_policy_is_shown_as_treated_as_current(): void
@@ -104,6 +127,13 @@ final class ReportTest extends TestCase
         $this->assertSame('missing', $apps['demo/ledger']['mysql56_ci']);
         $this->assertSame('unknown', $apps['demo/relic']['mysql56_ci'], 'no report at all is unknown');
         $this->assertSame('unknown', $apps['demo/broken']['mysql56_ci'], 'an unreadable report is unknown too');
+        $this->assertSame('pass', $apps['demo/ledger']['booster']);
+        $this->assertSame('1.10.0', $apps['demo/ledger']['booster_version']);
+        $this->assertSame('2026-11-08T14:07:41+00:00', $apps['demo/ledger']['booster_at']);
+        $this->assertSame('fail', $apps['demo/atlas']['booster']);
+        $this->assertNull($apps['demo/relic']['booster'], 'no hop record');
+        $this->assertNull($apps['demo/broken']['booster'], 'an unreadable hop record counts as none');
+        $this->assertNull($apps['demo/broken']['booster_at']);
     }
 
     public function test_progress_and_the_upgrade_credit_across_two_scans(): void
@@ -223,7 +253,7 @@ final class ReportTest extends TestCase
     public function test_text_output_has_the_public_sections(): void
     {
         $text = (new TextRenderer())->render($this->report());
-        foreach (['PHP image', 'Declared PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI job', 'Drift', 'EOL burn-down'] as $heading) {
+        foreach (['PHP image', 'Declared PHP floor', 'Laravel', 'Auth package', 'PROCTOR', 'MySQL 5.6 CI job', 'Booster hop record: 1 pass, 1 fail, 2 none', 'Drift', 'EOL burn-down'] as $heading) {
             $this->assertStringContainsString($heading, $text);
         }
         $this->assertStringNotContainsString('demo/', $text);
@@ -256,6 +286,9 @@ final class ReportTest extends TestCase
         $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="missing"} 1', $text);
         $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="not_applicable"} 0', $text);
         $this->assertStringContainsString('rollcall_mysql56_ci_apps{state="unknown"} 2', $text);
+        $this->assertStringContainsString('rollcall_booster_apps{result="pass"} 1', $text);
+        $this->assertStringContainsString('rollcall_booster_apps{result="fail"} 1', $text);
+        $this->assertStringContainsString('rollcall_booster_apps{result="none"} 2', $text);
         $this->assertStringNotContainsString('demo/', $text);
         $this->assertStringNotContainsString('Upgrade scheduled', $text);
     }

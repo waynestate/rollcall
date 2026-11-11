@@ -220,6 +220,13 @@ final class ContractTest extends TestCase
         $made = $public;
         $made['drift']['made_up'] = 1;
         $this->assertBreaksContract('report.schema.json', (string) json_encode($made));
+        // A Booster result nobody declared, in the counts or on an app, breaks it as well.
+        $hopped = $public;
+        $hopped['booster']['skipped'] = 1;
+        $this->assertBreaksContract('report.schema.json', (string) json_encode($hopped));
+        $hoppedApp = $internal;
+        $hoppedApp['apps'][0]['booster'] = 'maybe';
+        $this->assertBreaksContract('report.schema.json', (string) json_encode($hoppedApp));
     }
 
     public function test_the_json_owners_check_matches_the_contract(): void

@@ -23,6 +23,11 @@ This page explains each part of the report. Next: [Citadel's registrations expor
   counts as panels under "Apps present" (held, missing, not applicable, unknown); `missing` wears a red badge with
   the word in it while any app is missing the job, and the internal page's table has each app's state in a
   "MySQL 5.6 CI" column beside PROCTOR's.
+- **Booster hop record**: apps by how their last committed Booster run ended, from the `booster-hop.json` Booster
+  writes at the repository root after a real upgrade run: `pass`, `fail` (a hop's gate or checks failed), and `none`
+  for an app with no record or one that could not be read (that one also gets a scan note). In the internal view
+  each app carries its `booster` result, the `booster_version` that wrote the record and `booster_at`, when the run
+  finished. A pass says the app's last hop landed, not that the app is current: read it beside the PHP image.
 - **Drift**, counted per kind: `image_eol`, `image_unknown`, `image_below_floor`, `floor_allows_eol`,
   `floor_unbounded`, `eol_past_grace` (past the policy's grace days), `laravel_eol`, `proctor_missing`,
   `proctor_failing`, `override_expired`.

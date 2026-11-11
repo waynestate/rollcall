@@ -24,6 +24,9 @@ overdue as two stat panels.
 PROCTOR's MySQL 5.6 CI job check comes through as one gauge, `rollcall_mysql56_ci_apps`, counted per state (`held`,
 `missing`, `not_applicable`, `unknown`); all four series always exist, zero when no app is in a state.
 
+Booster's hop records come through the same way, as `rollcall_booster_apps`, counted per result (`pass`, `fail`,
+`none`); all three series always exist.
+
 <details>
 <summary>Watch the back row empty (the burn-down, sample data)</summary>
 
