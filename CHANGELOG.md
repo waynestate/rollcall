@@ -4,6 +4,10 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Changed
+
+- CI pins Preflight 0.9.0 (components and the a11y checker copy).
+
 ## [1.2.0] - 2026-11-11
 
 - Added: the Grafana board (`grafana/rollcall-burn-down.json`) gains a "MySQL 5.6 CI job" bar gauge and a "Booster hop results" pie chart, from gauges `/metrics` already served. A new test renders the fixture fleet's metrics and fails when any panel queries a metric the endpoint does not serve.
