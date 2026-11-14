@@ -53,7 +53,7 @@ page check (versions table and quick-start printout), PHPStan and `composer audi
 
 ## CI
 
-- **GitLab:** Preflight 0.8.0's `php-test` (PHP 8.3, 8.4, 8.5), `composer-audit`, `proctor` (on `deploy/`) and
+- **GitLab:** Preflight 0.9.0's `php-test` (PHP 8.3, 8.4, 8.5), `composer-audit`, `proctor` (on `deploy/`) and
   `a11y` components (`a11y-site` and `dashboard-a11y`), plus the `composer-ci`, `wayneui-copies`,
   `dashboard-render` and `dashboard-vue` jobs. `rollcall-scan` and `creed-copy-refresh` run only on their
   schedules or by hand.
@@ -210,7 +210,7 @@ so the committed `site/index.md` carries the table without markers; the check ac
 ### Accessibility gate
 
 The front page and the dashboard must pass an accessibility gate: Preflight's own a11y checker, vendored byte
-for byte into `tools/a11y/check.mjs` from Preflight 0.4.0 and pinned by `tests/A11yCheckerPinTest.php`, run in
+for byte into `tools/a11y/check.mjs` from Preflight 0.9.0 and pinned by `tests/A11yCheckerPinTest.php`, run in
 Docker with the same digest-pinned Playwright image, WCAG 2.2 AA tag set (`wcag2a`, `wcag2aa`, `wcag21a`,
 `wcag21aa`, `wcag22aa`), color schemes (light and dark) and widths (320 px and 1280 px) as the CI jobs, so a
 page that passes locally passes CI. No host browser is needed:
