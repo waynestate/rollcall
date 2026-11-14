@@ -12,6 +12,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - CI: the GitHub workflow calls Preflight 0.9.0's reusable workflow (commit fb73b53), the release the GitLab pipeline pins.
 - Docs: the README says Rollcall 1.2.0 is on Packagist (it said 1.1.1). Content only.
+- Docs: the install guide says 1.2.0 is the current release (it said 1.1.1). Content only.
 
 ## [1.2.0] - 2026-11-11
 
