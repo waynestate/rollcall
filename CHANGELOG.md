@@ -7,6 +7,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ### Changed
 
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
+- CI: the GitHub workflow calls Preflight 0.9.0's reusable workflow (commit fb73b53), the release the GitLab pipeline pins.
 
 ## [1.2.0] - 2026-11-11
 
