@@ -6,6 +6,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ### Changed
 
+- Changed: `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
+- Changed: the dev dependency Pinstripe is `^0.4` (was `^0.3`, which does not allow 0.4.0); 0.4.0 adds two opt-in Rector presets and changes no rule this repo uses.
 - Changed: the deploy kit is Squire 0.11.1 (was 0.10.8): the release script fetches PROCTOR when `--no-dev` left it out and installs the frontend from a `yarn.lock`, the HAProxy pin is current, the fallback base follows the app's PHP line, and the parity scripts carry the deprecation note.
 - CI pins Preflight 0.9.0 (components and the a11y checker copy).
 - CI: the GitHub workflow calls Preflight 0.9.0's reusable workflow (commit fb73b53), the release the GitLab pipeline pins.
