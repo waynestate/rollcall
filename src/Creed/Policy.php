@@ -21,7 +21,7 @@ final class Policy
     /** @var array<string, array{versions: array<string, array<string, mixed>>}> */
     private array $components;
 
-    /** @var array<string, array<string, string>> */
+    /** @var array<string, array<string, mixed>> */
     private array $tools;
 
     /** @var array<string, mixed> */
@@ -448,6 +448,37 @@ final class Policy
         return $value;
     }
 
+    /** The advisory severities composer audit reports, most severe first. */
+    public const SEVERITIES = ['critical', 'high', 'medium', 'low'];
+
+    /**
+     * How many days an app has to ship a fix once composer audit reports an
+     * advisory of this severity, from rules.fix_within_days.
+     *
+     * Null when the policy states no window for the severity (or has no
+     * fix_within_days block at all): the stack has not chosen one, and the
+     * reader does not guess.
+     *
+     * @throws InvalidArgumentException when $severity is not one of critical,
+     *                                  high, medium or low, or when the
+     *                                  recorded value is not a positive integer
+     */
+    public function fixWithinDays(string $severity): ?int
+    {
+        if (!in_array($severity, self::SEVERITIES, true)) {
+            throw new InvalidArgumentException('Unknown advisory severity ' . var_export($severity, true) . '; expected one of critical, high, medium, low.');
+        }
+        $windows = $this->rules['fix_within_days'] ?? null;
+        if (!is_array($windows) || !array_key_exists($severity, $windows)) {
+            return null;
+        }
+        $value = $windows[$severity];
+        if (!is_int($value) || $value < 1) {
+            throw new InvalidArgumentException('Policy rules carry an invalid "fix_within_days.' . $severity . '" value: ' . var_export($value, true) . '; expected a positive integer.');
+        }
+        return $value;
+    }
+
     /** The three deploy-gate stages, weakest first (ADR-0006 item 4). */
     public const GATE_STAGES = ['report', 'warn', 'block'];
 
@@ -498,6 +529,50 @@ final class Policy
     {
         $minimum = $this->tools[$tool]['minimum'] ?? null;
         return is_string($minimum) ? $minimum : null;
+    }
+
+    /**
+     * The release cooldown period of a developer tool (for example "3 days"),
+     * from tools.<tool>.cooldown.period.
+     *
+     * Null when the tool or its cooldown is not listed, or the period is not a string.
+     */
+    public function toolCooldownPeriod(string $tool): ?string
+    {
+        $cooldown = $this->tools[$tool]['cooldown'] ?? null;
+        if (!is_array($cooldown)) {
+            return null;
+        }
+        $period = $cooldown['period'] ?? null;
+        return is_string($period) ? $period : null;
+    }
+
+    /**
+     * The package patterns that skip a developer tool's release cooldown,
+     * from tools.<tool>.cooldown.ignore, in file order.
+     *
+     * Empty when the tool, its cooldown or the ignore list is not listed. Entries
+     * that are not non-empty strings are dropped.
+     *
+     * @return list<string>
+     */
+    public function toolCooldownIgnore(string $tool): array
+    {
+        $cooldown = $this->tools[$tool]['cooldown'] ?? null;
+        if (!is_array($cooldown)) {
+            return [];
+        }
+        $ignore = $cooldown['ignore'] ?? null;
+        if (!is_array($ignore)) {
+            return [];
+        }
+        $patterns = [];
+        foreach ($ignore as $pattern) {
+            if (is_string($pattern) && $pattern !== '') {
+                $patterns[] = $pattern;
+            }
+        }
+        return $patterns;
     }
 
     /**
