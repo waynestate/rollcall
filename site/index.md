@@ -24,6 +24,12 @@ Promoted to **1.2.0**, on Packagist. Inside 1.x the report, the snapshot and the
 
 [Quick start](https://rollcall.apps.wayne.edu/#start-title) [Take the roll](https://rollcall.apps.wayne.edu/#roll-title)
 
+Teacher's copy
+
+[Fleet dashboard](https://rollcall.apps.wayne.edu/dashboard)
+
+For C&IT staff. Sign in with your Wayne State account.
+
 Today's roll sample data
 
 1. kiln-bookingPHP 8.5present
