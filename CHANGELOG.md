@@ -4,6 +4,10 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ## [Unreleased]
 
+### Added
+
+- Site: the front page has a door to the fleet dashboard (D-050). Above today's sample sheet, a "Teacher's copy" ribbon links "Fleet dashboard" to `https://rollcall.apps.wayne.edu/dashboard`, with the line "For C&IT staff. Sign in with your Wayne State account." It shows words only, never counts. `stack-env.js` points it at the pre-production host on appstest; `rollcall.js` points it at `/dashboard` when the dashboard app serves the page on a laptop, and turns it into plain text when the page is opened from the `site/` folder, where no app is behind it. It rises in after the sheet when motion is allowed and is simply there under reduced motion.
+
 ### Changed
 
 - Changed: `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).

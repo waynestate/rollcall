@@ -85,6 +85,34 @@
     });
   }
 
+  // The teacher's copy: the door to the fleet dashboard. The committed href is
+  // production and stack-env.js has already pointed it at appstest on the
+  // pre-production host. In development (stack-env.js sets data-stack-env
+  // before this deferred script runs) two cases remain: the dashboard app
+  // serving this page at / on a laptop, where /dashboard is right next door,
+  // and the plain site/ folder (a static server or file://), where no app is
+  // behind the door, so the name stays as text and the note says where it is.
+  var door = document.querySelector("[data-staffdoor]");
+  var doorLink = door ? door.querySelector("a.staffdoor__link") : null;
+  if (doorLink) {
+    var stackEnv = root.getAttribute("data-stack-env");
+    var fromFolder = location.protocol === "file:" ||
+      (stackEnv === "dev" && /\/site\//.test(location.pathname));
+    if (fromFolder) {
+      var plain = document.createElement("span");
+      plain.className = doorLink.className;
+      while (doorLink.firstChild) { plain.appendChild(doorLink.firstChild); }
+      doorLink.parentNode.replaceChild(plain, doorLink);
+      door.classList.add("is-folder");
+      var who = door.querySelector("[data-staffdoor-who]");
+      if (who) {
+        who.textContent = "For C&IT staff, on the deployed site. This folder copy has no app behind it.";
+      }
+    } else if (stackEnv === "dev") {
+      doorLink.href = "/dashboard";
+    }
+  }
+
   /* ----------------------------------------------------------- 3. the roll */
 
   var register = document.querySelector("[data-roll]");

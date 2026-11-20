@@ -20,6 +20,16 @@ type: Libre Caslon Display (display) and Courier Prime (typewriter); body text i
     from Rollcall 1.1.1 against the bundled fixtures.
 - Screenshots: `screenshots/` (desktop 1440, mobile 390, reduced motion, motion GIF).
 
+## The door to the fleet dashboard
+
+The title page's "Teacher's copy" ribbon links to the fleet dashboard, which the dashboard app serves at `/dashboard`
+behind a Wayne State sign-in on the same host as this page (D-050). Words only: no counts appear on this page. The
+committed href is production (`https://rollcall.apps.wayne.edu/dashboard`); `stack-env.js` moves it to the
+pre-production host like every other part link. In development `rollcall.js` decides: served from a path with
+`/site/` in it (the side-by-side stack server) or from `file://`, there is no app behind the door, so the name stays
+as plain text and the note says it lives on the deployed site; served from anywhere else on a dev host (the dashboard
+app on a laptop), the link becomes `/dashboard`.
+
 ## Links between the stack sites
 
 Links to the other parts are committed as production URLs (`https://<project>.apps.wayne.edu/`), so crawlers and

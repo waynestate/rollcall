@@ -106,6 +106,20 @@
         </nav>
       </div>
 
+      <div class="titlepage__side">
+
+      <!-- The teacher's copy: the door to the fleet dashboard (D-050), which the
+           dashboard app serves at /dashboard behind a Wayne State sign-in. Words
+           only; no counts ever show here. stack-env.js points the link at the
+           pre-production host on appstest, and rollcall.js turns it into plain
+           text when this page is opened from the site/ folder, where no app is
+           behind it. Even a substitute knows not to grade the papers. -->
+      <div class="staffdoor" role="group" aria-labelledby="staffdoor-label" data-staffdoor>
+        <p class="staffdoor__label" id="staffdoor-label">Teacher's copy</p>
+        <p class="staffdoor__door"><a class="staffdoor__link" href="https://rollcall.apps.wayne.edu/dashboard"><span class="staffdoor__name">Fleet dashboard</span><span class="staffdoor__arrow" aria-hidden="true">→</span></a></p>
+        <p class="staffdoor__who" data-staffdoor-who>For C&amp;IT staff. Sign in with your Wayne State account.</p>
+      </div>
+
       <!-- Today's sheet: the mark's two pages (lines on the left, ticks on the
            right) become a register being taken, one name at a time. -->
       <figure class="sheet" aria-labelledby="sheet-cap">
@@ -119,6 +133,8 @@
         </ol>
         <p class="sheet__total"><span>Answered</span> <span>5 of 5</span></p>
       </figure>
+
+      </div>
 
     </div>
   </section>

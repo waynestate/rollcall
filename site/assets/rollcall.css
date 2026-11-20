@@ -549,6 +549,91 @@ h1, h2, h3 {
   margin: 1.75rem 0 0;
 }
 
+/* The right-hand page: the teacher's copy above today's sheet. */
+.titlepage__side {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  min-width: 0;
+}
+
+/* The teacher's copy: a green ribbon bookmark in the register, marking the
+   page staff turn to. Words only, never counts (D-050). */
+.staffdoor {
+  max-width: 26rem;
+  margin: 0;
+  padding: 0.1rem 0 0.15rem 0.95rem;
+  border-left: 3px solid var(--green);
+}
+
+.staffdoor :where(p) {
+  margin: 0;
+}
+
+.staffdoor__label {
+  font-family: var(--f-type);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.staffdoor__door {
+  margin-top: 0.2rem;
+  line-height: 1.2;
+}
+
+.staffdoor__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--f-display);
+  font-size: clamp(1.3rem, 2vw, 1.5rem);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* The underline is under the name only; the arrow stands clear of it. */
+.staffdoor__name {
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+a.staffdoor__link:hover {
+  color: var(--red);
+}
+
+.staffdoor__arrow {
+  font-family: var(--f-type);
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.staffdoor__who {
+  margin-top: 0.5rem;
+  font-family: var(--f-type);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* Opened from the site/ folder: no app behind the door, so the name stays as
+   plain type and the note says where the dashboard lives (rollcall.js). */
+.staffdoor.is-folder .staffdoor__link {
+  color: var(--muted);
+}
+
+.staffdoor.is-folder .staffdoor__name {
+  text-decoration: none;
+}
+
+.staffdoor.is-folder .staffdoor__arrow {
+  display: none;
+}
+
 /* Today's sheet: a second page, lying a little crooked on the first. */
 .sheet {
   --sheet-margin: clamp(1.75rem, 2.8vw, 2.35rem);
@@ -1838,6 +1923,22 @@ html:not(.motion) .caller {
 
   .motion .sheet {
     animation: sheet-in 0.8s var(--ease-out) 0.3s both;
+  }
+
+  /* The ribbon slips in once the sheet has landed; on hover the arrow leans
+     toward the door. */
+  .motion .staffdoor {
+    animation: rise 0.6s var(--ease-out) 0.9s both;
+  }
+
+  .motion .staffdoor__arrow {
+    display: inline-block;
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .motion a.staffdoor__link:hover .staffdoor__arrow,
+  .motion a.staffdoor__link:focus-visible .staffdoor__arrow {
+    transform: translateX(4px);
   }
 
   /* Today's sheet: each name is written in, then marked. */
