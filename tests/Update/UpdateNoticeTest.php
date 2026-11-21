@@ -281,6 +281,41 @@ final class UpdateNoticeTest extends TestCase
         $this->assertSame([], $this->lines);
     }
 
+    public function testRealBinaryPrintsTheNotice(): void
+    {
+        // Inside a Docker image the notice is silent by design (/.dockerenv),
+        // so this proof only runs where it can fire.
+        if (is_file('/.dockerenv')) {
+            $this->markTestSkipped('Inside a Docker image, the update notice is silent by design.');
+        }
+
+        $bin = dirname(__DIR__, 2) . '/bin/rollcall';
+        $this->assertFileExists($bin);
+
+        $xdg = Fleet::tempDir();
+        $cacheDir = $xdg . '/waynestate/rollcall';
+        mkdir($cacheDir, 0o775, true);
+        // A fresh cache with a newest release well above the running one: the
+        // notice prints from cache and never touches Packagist.
+        file_put_contents($cacheDir . '/update-check.json', (string) json_encode(['checked_at' => time(), 'latest' => '9.9.9']));
+
+        try {
+            [$outWith, $errWith] = $this->runBinary($bin, ['CI' => '', 'WAYNE_NO_UPDATE_CHECK' => ''], $xdg);
+            [$outWithout, $errWithout] = $this->runBinary($bin, ['CI' => '', 'WAYNE_NO_UPDATE_CHECK' => '1'], $xdg);
+        } finally {
+            Fleet::remove($xdg);
+        }
+
+        $lines = array_values(array_filter(explode("\n", $errWith), static fn(string $line): bool => trim($line) !== ''));
+        $this->assertCount(1, $lines, $errWith);
+        $this->assertStringContainsString('out of date', $lines[0]);
+        $this->assertStringContainsString('9.9.9', $lines[0]);
+
+        // The opt-out run prints the same command output and no notice line.
+        $this->assertSame($outWith, $outWithout);
+        $this->assertStringNotContainsString('out of date', $errWithout);
+    }
+
     /**
      * @param  array<string, string|false|null>  $env
      * @param  list<string>                      $argv
@@ -364,5 +399,28 @@ final class UpdateNoticeTest extends TestCase
     private function makeDir(string $path): void
     {
         mkdir($path, 0o775, true);
+    }
+
+    /**
+     * One real run of bin/rollcall. The `list` command is cheap and read-only,
+     * and unlike --version it goes through doRunCommand, where the notice is
+     * wired. The child env is the inherited env with the pins applied.
+     *
+     * @param  array<string, string>  $pins
+     * @return array{0: string, 1: string}  stdout and stderr
+     */
+    private function runBinary(string $bin, array $pins, string $xdg): array
+    {
+        $env = array_merge(getenv(), $pins, ['XDG_CACHE_HOME' => $xdg]);
+        $process = proc_open([PHP_BINARY, $bin, 'list'], [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null, $env);
+        $this->assertIsResource($process);
+        fclose($pipes[0]);
+        $stdout = (string) stream_get_contents($pipes[1]);
+        $stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        $this->assertSame(0, proc_close($process));
+
+        return [$stdout, $stderr];
     }
 }
