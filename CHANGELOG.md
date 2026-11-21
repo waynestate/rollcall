@@ -18,6 +18,10 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 - Docs: the README says Rollcall 1.2.0 is on Packagist (it said 1.1.1). Content only.
 - Docs: the install guide says 1.2.0 is the current release (it said 1.1.1). Content only.
 
+### Removed
+
+- Removed: Squire's parity kit files (D-095). Parity runs the app locally: `parity up` in `deploy/`; `deploy/parity.json` is committed.
+
 ## [1.2.0] - 2026-11-11
 
 - Added: the Grafana board (`grafana/rollcall-burn-down.json`) gains a "MySQL 5.6 CI job" bar gauge and a "Booster hop results" pie chart, from gauges `/metrics` already served. A new test renders the fixture fleet's metrics and fails when any panel queries a metric the endpoint does not serve.

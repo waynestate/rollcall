@@ -31,7 +31,7 @@ shell on the host.
 |---|---|---|
 | `scripts/a11y.ps1` | `scripts/a11y.sh` | The front page accessibility gate: Preflight's a11y checker (vendored in `tools/a11y/check.mjs`, pinned by `tests/A11yCheckerPinTest.php`) in Docker, the same image and inputs as the `a11y-site` CI job |
 | `scripts/dashboard-a11y.ps1` | `scripts/dashboard-a11y.sh` | The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), server-renders the Vue page and fails unless it matches the Laravel page (`tools/vue-dashboard/parity.mjs`), then runs the same axe-core check on all nine, in Docker |
-| `deploy/scripts/parity.ps1` | `deploy/scripts/parity.sh` | The kit's parity script, replaced by Parity (`parity up`); kept only until Parity lands everywhere |
+To run the app locally, use Parity: `parity init --from-squire` once (it writes `deploy/parity.json`, already committed here), then `parity up`, `parity test`, `parity down`. Parity's site is https://git.wayne.edu/enterprise-apps/parity.
 
 `scripts/readme-art` is a Node tool (`npm run build`), the same on every OS.
 
@@ -44,7 +44,6 @@ and owns them (`deploy/.squire.json`):
 |---|---|
 | `deploy/build.sh` | At image build time, as root, with `/bin/sh` |
 | `deploy/deployments/001-first-release.sh` | Once, when the first release starts |
-| `deploy/.squire/portable/squire-entrypoint.sh` | Each time the portable image starts (OpenShift, Coolify, raw Docker), as the container entrypoint |
 | `deploy/scripts/release.sh` | After every Quick Update (the post-script), and from the first-release hook |
 
 ## Inside GitLab CI only

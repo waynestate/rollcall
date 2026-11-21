@@ -26,7 +26,6 @@ final class ScriptPairsTest extends TestCase
         'deploy/build.sh',
         'deploy/scripts/release.sh',
         'deploy/deployments/001-first-release.sh',
-        'deploy/.squire/portable/squire-entrypoint.sh',
     ];
 
     /**
