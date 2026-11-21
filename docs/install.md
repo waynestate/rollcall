@@ -22,3 +22,10 @@ itself (`rollcall digest --send`). Printing them, or writing them to files, need
 against its [contract](reference/contract.md): inside 1.x the report, the stored snapshot and the image list may
 gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each
 release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
+
+## Update notice
+
+Rollcall notices a newer release at most once a day and says so on stderr after a command, with the update command
+for how your copy was installed (`git pull` for a checkout, `composer update waynestate/rollcall` for a project
+dependency, `composer global update waynestate/rollcall` otherwise). It never touches stdout and never changes an
+exit code. Set `WAYNE_NO_UPDATE_CHECK=1` to turn it off; it stays off in CI and with `--quiet`.

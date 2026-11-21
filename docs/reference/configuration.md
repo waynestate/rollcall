@@ -44,6 +44,12 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 <!-- /generated -->
 
+### Update notice
+
+One shared stack variable sits outside the generated table because it is not a Rollcall setting:
+`WAYNE_NO_UPDATE_CHECK=1` turns off the once-a-day update notice Rollcall prints on stderr when a newer release is
+on Packagist. The notice never touches stdout and never changes an exit code; it is off in CI and with `--quiet`.
+
 ### Auth packages
 
 `ROLLCALL_AUTH_PACKAGES` is checked in list order, and the first entry that matches an app wins. An entry with a
