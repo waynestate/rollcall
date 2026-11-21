@@ -17,7 +17,7 @@ final class DashboardVueGateTest extends TestCase
 {
     private const ROOT = __DIR__ . '/..';
 
-    private const IMAGE = 'mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d';
+    private const IMAGE = 'mcr.microsoft.com/playwright:v1.65.0-noble@sha256:9beb546099e11f52d62e505537914870e01a67e0e6b00ae41da4775324e73dbe';
 
     private const VUE_PAGES = ['vue.html', 'vue-apps.html', 'vue-empty.html'];
 
