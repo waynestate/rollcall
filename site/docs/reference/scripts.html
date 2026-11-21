@@ -104,13 +104,9 @@ shell on the host.</p>
 <td><code>scripts/dashboard-a11y.sh</code></td>
 <td>The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), server-renders the Vue page and fails unless it matches the Laravel page (<code>tools/vue-dashboard/parity.mjs</code>), then runs the same axe-core check on all nine, in Docker</td>
 </tr>
-<tr>
-<td><code>deploy/scripts/parity.ps1</code></td>
-<td><code>deploy/scripts/parity.sh</code></td>
-<td>The kit's parity script, replaced by Parity (<code>parity up</code>); kept only until Parity lands everywhere</td>
-</tr>
 </tbody>
 </table></div>
+<p>To run the app locally, use Parity: <code>parity init --from-squire</code> once (it writes <code>deploy/parity.json</code>, already committed here), then <code>parity up</code>, <code>parity test</code>, <code>parity down</code>. Parity: <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/parity">https://git.wayne.edu/enterprise-apps/parity</a>.</p>
 <p><code>scripts/readme-art</code> is a Node tool (<code>npm run build</code>), the same on every OS.</p>
 <h2 id="inside-citadel-s-container-only">Inside Citadel's container <span class="docs-heading-tail"><span>only</span><a class="docs-heading-link" aria-label="Link to this section" href="#inside-citadel-s-container-only">#</a></span></h2>
 <p>These run on Citadel's Linux container, never on a developer machine, so they have no Windows twin. Squire writes
