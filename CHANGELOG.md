@@ -7,6 +7,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 ### Added
 
 - Site: the front page has a door to the fleet dashboard (D-050). Above today's sample sheet, a "Teacher's copy" ribbon links "Fleet dashboard" to `https://rollcall.apps.wayne.edu/dashboard`, with the line "For C&IT staff. Sign in with your Wayne State account." It shows words only, never counts. `stack-env.js` points it at the pre-production host on appstest; `rollcall.js` points it at `/dashboard` when the dashboard app serves the page on a laptop, and turns it into plain text when the page is opened from the `site/` folder, where no app is behind it. It rises in after the sheet when motion is allowed and is simply there under reduced motion.
+- The CLI tells you on stderr when a newer release is on Packagist, with the update command for how your copy was installed (`git pull` for a source checkout, `composer update waynestate/rollcall` for a project dependency, `composer global update waynestate/rollcall` otherwise). It checks at most once a day, caches the answer in the user cache dir, never touches stdout, never changes an exit code, and stays silent in CI, under `--quiet`, in a Docker image and for a dev version. A major bump adds a link to the changelog. `WAYNE_NO_UPDATE_CHECK=1` turns it off.
 
 ### Changed
 

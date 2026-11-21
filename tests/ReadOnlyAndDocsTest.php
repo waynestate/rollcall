@@ -42,7 +42,7 @@ final class ReadOnlyAndDocsTest extends TestCase
     public function test_only_the_snapshot_store_and_the_digest_writer_write_files(): void
     {
         foreach ($this->phpFiles('src') as $file) {
-            if (str_ends_with($file, 'JsonFileSnapshotStore.php') || str_ends_with($file, 'DigestFileWriter.php')) {
+            if (str_ends_with($file, 'JsonFileSnapshotStore.php') || str_ends_with($file, 'DigestFileWriter.php') || str_ends_with($file, 'UpdateCache.php')) {
                 continue;
             }
             $this->assertDoesNotMatchRegularExpression('/file_put_contents|fopen\(|\bunlink\(|\brename\(|\bmkdir\(/', (string) file_get_contents($file), $file . ' writes to disk');

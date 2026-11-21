@@ -107,6 +107,13 @@ From 1.0 Rollcall follows SemVer against its contract ([`contract/`](contract/RE
 the stored snapshot and the image list may gain a field (a minor release) but never lose or retype one. Promoted
 to 1.0 with perfect attendance.
 
+## Update notice
+
+After a command, Rollcall tells you on stderr when a newer release is on Packagist, with the command that updates
+this copy: `git pull` for a checkout, `composer update waynestate/rollcall` for a project dependency,
+`composer global update waynestate/rollcall` otherwise. It checks at most once a day, never touches stdout, and
+never changes an exit code. Set `WAYNE_NO_UPDATE_CHECK=1` to turn it off; it stays off in CI and with `--quiet`.
+
 ## Quick start
 
 This runs on the fixtures in the repo, so you need no network and no token. Run `composer install` once
