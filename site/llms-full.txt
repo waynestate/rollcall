@@ -103,6 +103,13 @@ From 1.0 Rollcall follows SemVer against its contract ([`contract/`](https://git
 the stored snapshot and the image list may gain a field (a minor release) but never lose or retype one. Promoted
 to 1.0 with perfect attendance.
 
+### Update notice
+
+After a command, Rollcall tells you on stderr when a newer release is on Packagist, with the command that updates
+this copy: `git pull` for a checkout, `composer update waynestate/rollcall` for a project dependency,
+`composer global update waynestate/rollcall` otherwise. It checks at most once a day, never touches stdout, and
+never changes an exit code. Set `WAYNE_NO_UPDATE_CHECK=1` to turn it off; it stays off in CI and with `--quiet`.
+
 ### Quick start
 
 This runs on the fixtures in the repo, so you need no network and no token. Run `composer install` once
@@ -1588,6 +1595,10 @@ Optional: `composer require symfony/mailer` only if Rollcall should mail the [ow
 
 1.2.0 is the current release, and Composer's `^1.0` takes every 1.x. From 1.0 Rollcall follows SemVer against its [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html): inside 1.x the report, the stored snapshot and the image list may gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
 
+### Update notice [#](https://rollcall.apps.wayne.edu/docs/install.html#update-notice)
+
+Rollcall notices a newer release at most once a day and says so on stderr after a command, with the update command for how your copy was installed (`git pull` for a checkout, `composer update waynestate/rollcall` for a project dependency, `composer global update waynestate/rollcall` otherwise). It never touches stdout and never changes an exit code. Set `WAYNE_NO_UPDATE_CHECK=1` to turn it off; it stays off in CI and with `--quiet`.
+
 ---
 
 Source: https://rollcall.apps.wayne.edu/docs/reference/commands.html
@@ -1758,6 +1769,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_SOURCE | directory (fixtures) or gitlab | `directory` | config/rollcall.php |
 | ROLLCALL_STORE_DIR | Snapshot directory, the only place Rollcall writes | `var/snapshots` | config/rollcall.php |
 | ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
+
+#### Update notice [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#update-notice)
+
+One shared stack variable sits outside the generated table because it is not a Rollcall setting: `WAYNE_NO_UPDATE_CHECK=1` turns off the once-a-day update notice Rollcall prints on stderr when a newer release is on Packagist. The notice never touches stdout and never changes an exit code; it is off in CI and with `--quiet`.
 
 #### Auth packages [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#auth-packages)
 

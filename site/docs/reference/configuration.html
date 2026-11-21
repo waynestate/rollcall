@@ -235,6 +235,10 @@
 </tbody>
 </table></div>
 <!-- /generated -->
+<h3 id="update-notice">Update <span class="docs-heading-tail"><span>notice</span><a class="docs-heading-link" aria-label="Link to this section" href="#update-notice">#</a></span></h3>
+<p>One shared stack variable sits outside the generated table because it is not a Rollcall setting:
+<code>WAYNE_NO_UPDATE_CHECK=1</code> turns off the once-a-day update notice Rollcall prints on stderr when a newer release is
+on Packagist. The notice never touches stdout and never changes an exit code; it is off in CI and with <code>--quiet</code>.</p>
 <h3 id="auth-packages">Auth <span class="docs-heading-tail"><span>packages</span><a class="docs-heading-link" aria-label="Link to this section" href="#auth-packages">#</a></span></h3>
 <p><code>ROLLCALL_AUTH_PACKAGES</code> is checked in list order, and the first entry that matches an app wins. An entry with a
 slash matches that package exactly; an entry without a slash is a bare package name and matches that package under
@@ -257,7 +261,7 @@ job of their own that does. See <a href="../architecture.html#where-proctor-resu
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../../docs/reference/commands.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Commands</span></a><a class="docs-pager__link docs-pager__link--next" href="../../docs/reference/scripts.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Scripts on every OS</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item docs-toc__item--sub"><a href="#auth-packages">Auth packages</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item docs-toc__item--sub"><a href="#update-notice">Update notice</a></li><li class="docs-toc__item docs-toc__item--sub"><a href="#auth-packages">Auth packages</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>1.2.0</span></span>

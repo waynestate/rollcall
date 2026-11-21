@@ -50,11 +50,16 @@ itself (<code>rollcall digest --send</code>). Printing them, or writing them to 
 against its <a href="reference/contract.html">contract</a>: inside 1.x the report, the stored snapshot and the image list may
 gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each
 release is in the <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md">changelog</a>.</p>
+<h2 id="update-notice">Update <span class="docs-heading-tail"><span>notice</span><a class="docs-heading-link" aria-label="Link to this section" href="#update-notice">#</a></span></h2>
+<p>Rollcall notices a newer release at most once a day and says so on stderr after a command, with the update command
+for how your copy was installed (<code>git pull</code> for a checkout, <code>composer update waynestate/rollcall</code> for a project
+dependency, <code>composer global update waynestate/rollcall</code> otherwise). It never touches stdout and never changes an
+exit code. Set <code>WAYNE_NO_UPDATE_CHECK=1</code> to turn it off; it stays off in CI and with <code>--quiet</code>.</p>
 </article>
     </main>
     <nav class="docs-pager" aria-label="Pages"><a class="docs-pager__link" href="../docs/index.html"><span class="docs-pager__dir">Previous</span><span class="docs-pager__title">Overview</span></a><a class="docs-pager__link docs-pager__link--next" href="../docs/guides/quick-start.html"><span class="docs-pager__dir">Next</span><span class="docs-pager__title">Quick start</span></a></nav>
   </div>
-  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#versions">Versions</a></li></ul></nav>
+  <nav class="docs-toc" aria-label="On this page"><h2 class="docs-toc__title">On this page</h2><ul class="docs-toc__list"><li class="docs-toc__item"><a href="#versions">Versions</a></li><li class="docs-toc__item"><a href="#update-notice">Update notice</a></li></ul></nav>
 </div>
 <footer class="docs-footer">
   <span>Documents Rollcall <span data-docs-version>1.2.0</span></span>

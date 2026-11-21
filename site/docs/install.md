@@ -21,3 +21,7 @@ Optional: `composer require symfony/mailer` only if Rollcall should mail the [ow
 ## Versions [#](https://rollcall.apps.wayne.edu/docs/install.html#versions)
 
 1.2.0 is the current release, and Composer's `^1.0` takes every 1.x. From 1.0 Rollcall follows SemVer against its [contract](https://rollcall.apps.wayne.edu/docs/reference/contract.html): inside 1.x the report, the stored snapshot and the image list may gain a field or an enum value (a minor release), but never lose or retype one; that takes a 2.0. What changed in each release is in the [changelog](https://git.wayne.edu/enterprise-apps/rollcall/-/blob/main/CHANGELOG.md).
+
+## Update notice [#](https://rollcall.apps.wayne.edu/docs/install.html#update-notice)
+
+Rollcall notices a newer release at most once a day and says so on stderr after a command, with the update command for how your copy was installed (`git pull` for a checkout, `composer update waynestate/rollcall` for a project dependency, `composer global update waynestate/rollcall` otherwise). It never touches stdout and never changes an exit code. Set `WAYNE_NO_UPDATE_CHECK=1` to turn it off; it stays off in CI and with `--quiet`.

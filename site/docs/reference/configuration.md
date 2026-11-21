@@ -45,6 +45,10 @@ Every setting is an environment variable. `.env.example` holds placeholders; nev
 | ROLLCALL_STORE_DIR | Snapshot directory, the only place Rollcall writes | `var/snapshots` | config/rollcall.php |
 | ROLLCALL_WAYNEUI_CSS | Laravel and raw PHP: https:// or absolute URL of WayneUI's stylesheet for the dashboard | none | config/rollcall.php |
 
+### Update notice [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#update-notice)
+
+One shared stack variable sits outside the generated table because it is not a Rollcall setting: `WAYNE_NO_UPDATE_CHECK=1` turns off the once-a-day update notice Rollcall prints on stderr when a newer release is on Packagist. The notice never touches stdout and never changes an exit code; it is off in CI and with `--quiet`.
+
 ### Auth packages [#](https://rollcall.apps.wayne.edu/docs/reference/configuration.html#auth-packages)
 
 `ROLLCALL_AUTH_PACKAGES` is checked in list order, and the first entry that matches an app wins. An entry with a slash matches that package exactly; an entry without a slash is a bare package name and matches that package under any vendor, so `wayne-cas` matches `anyvendor/wayne-cas`. The report carries the real locked package name, vendor included. The built-in list is `waynestate/sesame`, `waynestate/wayne-cas`, `apereo/phpcas`, `jasig/phpcas`, `subfission/cas`, `wayne-cas` and `simplecas`; the exact `waynestate/wayne-cas` entry comes first, so it still wins over the bare `wayne-cas` entry.
