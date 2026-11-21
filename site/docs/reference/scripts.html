@@ -105,9 +105,9 @@ shell on the host.</p>
 <td>The dashboard accessibility gate: renders the public, internal and empty-state dashboard pages with PHPUnit, from Laravel and from the raw-PHP entry point (styled with the bundled WayneUI stylesheet), server-renders the Vue page and fails unless it matches the Laravel page (<code>tools/vue-dashboard/parity.mjs</code>), then runs the same axe-core check on all nine, in Docker</td>
 </tr>
 <tr>
-<td><code>deploy/scripts/parity.ps1</code></td>
-<td><code>deploy/scripts/parity.sh</code></td>
-<td>The kit's parity script, replaced by Parity (<code>parity up</code>); kept only until Parity lands everywhere</td>
+<td>To run the app locally, use Parity: <code>parity init --from-squire</code> once (it writes <code>deploy/parity.json</code>, already committed here), then <code>parity up</code>, <code>parity test</code>, <code>parity down</code>. Parity's site is <a rel="noopener" href="https://git.wayne.edu/enterprise-apps/parity">https://git.wayne.edu/enterprise-apps/parity</a>.</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table></div>
@@ -130,10 +130,6 @@ and owns them (<code>deploy/.squire.json</code>):</p>
 <tr>
 <td><code>deploy/deployments/001-first-release.sh</code></td>
 <td>Once, when the first release starts</td>
-</tr>
-<tr>
-<td><code>deploy/.squire/portable/squire-entrypoint.sh</code></td>
-<td>Each time the portable image starts (OpenShift, Coolify, raw Docker), as the container entrypoint</td>
 </tr>
 <tr>
 <td><code>deploy/scripts/release.sh</code></td>
