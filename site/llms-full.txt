@@ -839,21 +839,17 @@ Apps present: 4 (scan notes: 0)
 
 PHP image
 VERSION  APPS  STATE          SECURITY UNTIL  DAYS TO EOL
-8.1      1     eol            2025-12-31      -320
-8.3      1     security_only  2027-12-31      410
-8.4      1     active         2028-12-31      776
+8.1      1     eol            2025-12-31      -325
+8.3      1     security_only  2027-12-31      405
+8.4      1     active         2028-12-31      771
 unknown  1     unknown        -               -
 
 EOL burn-down (state on each scan day)
 DATE        APPS  EOL  SUPPORTED  UNKNOWN
-2026-11-16  4     1    2          1
+2026-11-21  4     1    2          1
 ```
 
 **exit 0**, however the fleet looks. There is no exit 1: Rollcall takes attendance, it does not hand out detention.
-
-2026-10-28 4 1 2 1
-
-**exit 0**, however the fleet looks. Neither command exits 1: Rollcall takes attendance, it does not hand out detention.
 
 - **`rollcall scan`**: Scans once and saves `<date>.json`. A second scan on the same day replaces it.
 - **`rollcall report`**: `--format=text|json|prometheus`. `--internal` adds the per-app list; keep that inside the project.
