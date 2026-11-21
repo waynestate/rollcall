@@ -5,8 +5,15 @@ declare(strict_types=1);
 namespace Waynestate\Rollcall\Tests\Update;
 
 use Closure;
+use LogicException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use Waynestate\Rollcall\Clock\FixedClock;
+use Waynestate\Rollcall\Clock\SystemClock;
+use Waynestate\Rollcall\Console\Application;
 use Waynestate\Rollcall\Tests\Support\Fleet;
 use Waynestate\Rollcall\Update\ReleaseFetcher;
 use Waynestate\Rollcall\Update\UpdateCache;
@@ -18,6 +25,8 @@ final class UpdateNoticeTest extends TestCase
 
     private string $cacheDir;
 
+    private string $cacheHome;
+
     private int $fetches = 0;
 
     /** @var list<string> */
@@ -27,6 +36,7 @@ final class UpdateNoticeTest extends TestCase
     {
         $this->root = Fleet::tempDir();
         $this->cacheDir = $this->root . '/cache';
+        $this->cacheHome = $this->root . '/xdg';
         $this->makeDir($this->root . '/loose');
         $this->fetches = 0;
         $this->lines = [];
@@ -282,6 +292,63 @@ final class UpdateNoticeTest extends TestCase
     }
 
     /**
+     * bin/rollcall wiring is covered by reading (bin/rollcall:21 constructs the
+     * Application and run() dispatches doRunCommand, which calls the notice
+     * before any exit); the Application path is covered by this test.
+     */
+    public function testApplicationPrintsTheNotice(): void
+    {
+        $notice = $this->applicationNotice();
+
+        [$code, $outWith, $errWith] = $this->runList($notice, ['XDG_CACHE_HOME' => $this->cacheHome]);
+        $this->assertSame(0, $code);
+
+        $lines = array_values(array_filter(explode("\n", $errWith), static fn(string $line): bool => trim($line) !== ''));
+        $this->assertCount(1, $lines, $errWith);
+        $this->assertStringContainsString('out of date', $lines[0]);
+        $this->assertStringContainsString('99.0.0', $lines[0]);
+
+        // The opt-out run prints the same command output and no notice line.
+        [$code, $outWithout, $errWithout] = $this->runList($notice, ['XDG_CACHE_HOME' => $this->cacheHome, 'WAYNE_NO_UPDATE_CHECK' => '1']);
+        $this->assertSame(0, $code);
+        $this->assertNotEmpty($outWith);
+        $this->assertSame($outWith, $outWithout);
+        $this->assertStringNotContainsString('out of date', $errWithout);
+
+        // The fresh cache answered, so the network was never asked.
+        $this->assertSame(0, $this->fetches);
+    }
+
+    /**
+     * bin/rollcall wiring is covered by reading (bin/rollcall:21 constructs the
+     * Application and run() dispatches doRunCommand, which calls the notice
+     * before any exit); the Application path is covered by this test.
+     */
+    public function testSilentInsideDockerWithDefaultPath(): void
+    {
+        // The rule can only be shown where /.dockerenv really exists.
+        if (! is_file('/.dockerenv')) {
+            $this->markTestSkipped('No /.dockerenv here, so the Docker silence rule cannot be shown.');
+        }
+
+        $this->seedCacheHome();
+        $notice = new UpdateNotice(
+            $this->fetcher(null),
+            new SystemClock(),
+            new UpdateCache($this->cacheHome . '/waynestate/rollcall'),
+            $this->root . '/loose',
+            // the default dockerEnvPath: /.dockerenv
+        );
+
+        [$code, , $err] = $this->runList($notice, ['XDG_CACHE_HOME' => $this->cacheHome]);
+        $this->assertSame(0, $code);
+
+        $lines = array_values(array_filter(explode("\n", $err), static fn(string $line): bool => trim($line) !== ''));
+        $this->assertSame([], $lines, $err);
+        $this->assertSame(0, $this->fetches);
+    }
+
+    /**
      * @param  array<string, string|false|null>  $env
      * @param  list<string>                      $argv
      * @param  list<string>                      $versions
@@ -364,5 +431,122 @@ final class UpdateNoticeTest extends TestCase
     private function makeDir(string $path): void
     {
         mkdir($path, 0o775, true);
+    }
+
+    /**
+     * The notice for the in-process proof: a once-a-day cache seeded fresh
+     * with a release far above the running one, a fetcher that fails the test
+     * if the cache misses, and a dockerEnvPath that points at nothing.
+     */
+    private function applicationNotice(): UpdateNotice
+    {
+        $this->seedCacheHome();
+
+        $count = function (): void {
+            $this->fetches++;
+        };
+        $fetcher = new class ($count) implements ReleaseFetcher {
+            public function __construct(private readonly Closure $count) {}
+
+            public function fetch(): ?array
+            {
+                ($this->count)();
+
+                throw new LogicException('the fresh cache must keep the notice off the network');
+            }
+        };
+
+        return new UpdateNotice(
+            $fetcher,
+            new SystemClock(),
+            new UpdateCache($this->cacheHome . '/waynestate/rollcall'),
+            $this->root . '/loose',
+            dockerEnvPath: $this->root . '/no-such-dockerenv',
+        );
+    }
+
+    /** Seeds the once-a-day cache where UpdateCache::fromEnv finds it for the runs below. */
+    private function seedCacheHome(): void
+    {
+        $home = $this->cacheHome . '/waynestate/rollcall';
+        $this->makeDir($home);
+        file_put_contents($home . '/update-check.json', (string) json_encode(['checked_at' => time(), 'latest' => '99.0.0']));
+    }
+
+    /**
+     * Runs the cheap, read-only `list` command in-process through the real
+     * Application. The output is a ConsoleOutputInterface with captured stdout
+     * and stderr memory streams, because the notice only fires for a
+     * ConsoleOutputInterface.
+     *
+     * @param  array<string, string|false|null>  $env
+     * @return array{0: int, 1: string, 2: string}  exit code, stdout, stderr
+     */
+    private function runList(UpdateNotice $notice, array $env): array
+    {
+        $app = new Application($env, $notice);
+        $app->setAutoExit(false);
+
+        $stdout = fopen('php://memory', 'w+');
+        $stderr = fopen('php://memory', 'w+');
+        $this->assertIsResource($stdout);
+        $this->assertIsResource($stderr);
+
+        $error = new class ($stderr) extends Output {
+            public function __construct(
+                /** @var resource */
+                private readonly mixed $stream,
+            ) {
+                parent::__construct();
+            }
+
+            protected function doWrite(string $message, bool $newline): void
+            {
+                fwrite($this->stream, $message . ($newline ? "\n" : ''));
+            }
+        };
+
+        $output = new class ($stdout, $error) extends ConsoleOutput {
+            public function __construct(
+                /** @var resource */
+                public readonly mixed $stdout,
+                private readonly OutputInterface $error,
+            ) {
+                parent::__construct();
+            }
+
+            protected function doWrite(string $message, bool $newline): void
+            {
+                fwrite($this->stdout, $message . ($newline ? "\n" : ''));
+            }
+
+            public function getErrorOutput(): OutputInterface
+            {
+                return $this->error;
+            }
+        };
+
+        // The notice spots -q/--quiet in the process argv, so stand in for
+        // `rollcall list` instead of the phpunit invocation.
+        $argv = $_SERVER['argv'] ?? null;
+        $_SERVER['argv'] = ['rollcall', 'list'];
+        try {
+            $code = $app->run(new ArrayInput([]), $output);
+        } finally {
+            if ($argv === null) {
+                unset($_SERVER['argv']);
+            } else {
+                $_SERVER['argv'] = $argv;
+            }
+        }
+
+        fseek($stdout, 0);
+        fseek($stderr, 0);
+        $out = (string) stream_get_contents($stdout);
+        $err = (string) stream_get_contents($stderr);
+        fclose($stdout);
+        fclose($stderr);
+
+        return [$code, $out, $err];
     }
 }

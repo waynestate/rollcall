@@ -21,10 +21,13 @@ final class Application extends BaseApplication
     /** @var array<string, string|false|null> */
     private readonly array $env;
 
+    private readonly ?UpdateNotice $notice;
+
     /** @param  array<string, string|false|null>  $env */
-    public function __construct(array $env = [])
+    public function __construct(array $env = [], ?UpdateNotice $updateNotice = null)
     {
         $this->env = $env;
+        $this->notice = $updateNotice;
         parent::__construct('rollcall', ReportBuilder::version());
         $this->addCommand(new ScanCommand($env));
         $this->addCommand(new ReportCommand($env));
@@ -56,7 +59,7 @@ final class Application extends BaseApplication
         if ($cache === null) {
             return;
         }
-        $notice = new UpdateNotice(
+        $notice = $this->notice ?? new UpdateNotice(
             new PackagistReleaseFetcher(),
             new SystemClock(),
             $cache,
