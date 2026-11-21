@@ -672,6 +672,8 @@ Issues and merge requests go to git.wayne.edu; see Where the code lives above.
 
 License: MIT, Copyright Wayne State University.
 
+Found a security problem? See [SECURITY.md](SECURITY.md); please do not open a public issue.
+
 <div align="center"><b>The whole class</b><br><sub>WayneUI and the stack. Everyone is here today; the ones in the back row know who they are.</sub></div>
 
 <div align="center">
