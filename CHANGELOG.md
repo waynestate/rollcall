@@ -11,6 +11,8 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ### Changed
 
+- Changed: the bundled CREED copy carries CREED 0.1.14's policy (`src/Creed/policy.json`, stamped `0.1.14` in `src/Creed/manifest.json`), so the front page versions table and the PHP lines the ADVISOR module reports (8.4, 8.5, 8.6) match CREED's current release.
+- Fixed: `composer site:versions` no longer stops with "No versions-table markers in site/index.md". The agent-ready kit strips the markers from the Markdown twin, so the tool now finds the bare table there by its caption and header and rewrites those lines. This is what turned the weekly creed-copy-refresh job red.
 - Changed: CI pins Preflight 0.12.0 (components and the a11y checker copy). The php-test component now also runs an advisory PHP 8.6 job that may fail and never gates the pipeline.
 - Changed: the dev dependency ADVISOR is `^0.4` (was `^0.3`, which does not allow 0.4.0); 0.4.0 adds the `advisor install --runner` option and changes nothing this repo uses.
 - Changed: `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
