@@ -111,6 +111,31 @@ final class VersionsTableTest extends TestCase
         $this->assertStringContainsString('Versions table is current', $out);
     }
 
+    public function test_write_replaces_the_stale_bare_table_in_the_marker_less_twin(): void
+    {
+        $this->write();
+        $path = $this->root . '/site/index.md';
+        $md = (string) file_get_contents($path);
+        $stripped = str_replace(["<!-- versions-table:start date=\"" . self::DATE . "\" -->\n", "<!-- versions-table:end -->\n"], '', $md);
+        $tampered = str_replace(
+            '| php | 8.1 | eol_grace_expired | 2025-12-31 |',
+            '| php | 8.1 | active | 2025-12-31 |',
+            $stripped,
+            $count,
+        );
+        $this->assertSame(1, $count, 'the test expects exactly one php 8.1 row to tamper with');
+        file_put_contents($path, $tampered);
+
+        [$code, $out] = $this->runTool(['--policy=' . self::FIXTURES . '/policy.json', '--date=' . self::DATE, '--root=' . $this->root]);
+
+        $this->assertSame(0, $code, $out);
+        $this->assertStringContainsString('wrote site/index.md', $out);
+        $this->assertStringContainsString('current site/index.html', $out);
+        $md = (string) file_get_contents($path);
+        $this->assertStringContainsString('| php | 8.1 | eol_grace_expired | 2025-12-31 |', $md);
+        $this->assertStringNotContainsString('versions-table:start', $md, 'the twin stays marker-less');
+    }
+
     public function test_an_older_date_moves_versions_out_of_the_back_row(): void
     {
         [$code, $out] = $this->runTool(['--policy=' . self::FIXTURES . '/policy.json', '--date=2020-01-01', '--root=' . $this->root]);

@@ -26,7 +26,8 @@ declare(strict_types=1);
  * region differs from what the generator would write, printing which file is
  * stale. The Squire agent-ready kit strips HTML comments from the Markdown
  * twin, so site/index.md normally carries the table without markers; the
- * check accepts that and compares the table bytes instead.
+ * check accepts that and compares the table bytes instead, and a write
+ * replaces those same bare lines when they are stale.
  *
  * Exit codes: 0 written or current, 1 stale, 2 the tool itself could not run.
  */
@@ -44,6 +45,8 @@ const VERSIONS_TABLE_DATE = '/<!-- versions-table:start date="(\d{4}-\d{2}-\d{2}
 const VERSIONS_TABLE_INDENT = '        ';
 
 const VERSIONS_TABLE_CAPTION = "Supported versions from CREED's policy.json: runtime or tool, version, support state and end of support";
+
+const VERSIONS_TABLE_HEADER = '| Runtime or tool | Version | Support state | End of support |';
 
 $autoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (!is_file($autoload)) {
@@ -127,11 +130,26 @@ foreach (VERSIONS_TABLE_PAGES as $page) {
     }
 
     if ($start === null) {
-        if ($page === 'site/index.md' && versions_table_contains($lines, $markdownLines)) {
+        if ($page !== 'site/index.md') {
+            versions_table_fail("No versions-table markers in {$page}. Add the markers around the table and re-run.");
+        }
+        if (versions_table_contains($lines, $markdownLines)) {
             fwrite(STDOUT, "current {$page}\n");
             continue;
         }
-        versions_table_fail("No versions-table markers in {$page}. Add the markers around the table and re-run.");
+        // The agent-ready kit strips the markers from the twin, so the table
+        // sits there bare; replace its lines by content, the way
+        // bin/quickstart-versions.php does.
+        [$bareStart, $bareEnd] = versions_table_locate($lines);
+        if ($bareStart === null) {
+            versions_table_fail("No versions-table markers in {$page}. Add the markers around the table and re-run.");
+        }
+        $newLines = array_merge(array_slice($lines, 0, $bareStart), $markdownLines, array_slice($lines, $bareEnd + 1));
+        if (file_put_contents($page, implode("\n", $newLines)) === false) {
+            versions_table_fail("Cannot write {$page}.");
+        }
+        fwrite(STDOUT, "wrote {$page}\n");
+        continue;
     }
     if ($end === null) {
         versions_table_fail("The versions-table start marker in {$page} has no end marker.");
@@ -245,7 +263,7 @@ function versions_table_markdown(array $rows): string
     $lines = [
         '**' . VERSIONS_TABLE_CAPTION . '**',
         '',
-        '| Runtime or tool | Version | Support state | End of support |',
+        VERSIONS_TABLE_HEADER,
         '| --- | --- | --- | --- |',
     ];
     foreach ($rows as [$name, $version, $state, $end]) {
@@ -285,6 +303,38 @@ function versions_table_region(array $lines): array
             $end = $i;
             break;
         }
+    }
+
+    return [$start, $end];
+}
+
+/**
+ * The line indexes [start, end] of the bare table in the marker-less twin:
+ * from the bold caption to the last table row, or nulls when the front page
+ * no longer puts them where the generator writes them.
+ *
+ * @param list<string> $lines
+ * @return array{0: int|null, 1: int|null}
+ */
+function versions_table_locate(array $lines): array
+{
+    $caption = '**' . VERSIONS_TABLE_CAPTION . '**';
+    $start = array_search($caption, $lines, true);
+    if ($start === false) {
+        return [null, null];
+    }
+    if (($lines[$start + 1] ?? '') !== '' || ($lines[$start + 2] ?? '') !== VERSIONS_TABLE_HEADER) {
+        return [null, null];
+    }
+    $end = $start + 2;
+    for ($i = $start + 3; $i < count($lines); $i++) {
+        if (! str_starts_with($lines[$i], '|')) {
+            break;
+        }
+        $end = $i;
+    }
+    if ($end === $start + 2) {
+        return [null, null];
     }
 
     return [$start, $end];
