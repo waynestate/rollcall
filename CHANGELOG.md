@@ -11,6 +11,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ### Changed
 
+- Changed: CI pins Preflight 0.12.0 (components and the a11y checker copy). The php-test component now also runs an advisory PHP 8.6 job that may fail and never gates the pipeline.
 - Changed: the dev dependency ADVISOR is `^0.4` (was `^0.3`, which does not allow 0.4.0); 0.4.0 adds the `advisor install --runner` option and changes nothing this repo uses.
 - Changed: `deploy/` requires PROCTOR `^0.16` (was `^0.15`, which does not allow 0.16), whose `ci-pipelines` check no longer asks for a GitHub workflow (D-069).
 - Changed: the dev dependency Pinstripe is `^0.4` (was `^0.3`, which does not allow 0.4.0); 0.4.0 adds two opt-in Rector presets and changes no rule this repo uses.
@@ -19,6 +20,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 - CI: the GitHub workflow calls Preflight 0.9.0's reusable workflow (commit fb73b53), the release the GitLab pipeline pins.
 - Docs: the README says Rollcall 1.2.0 is on Packagist (it said 1.1.1). Content only.
 - Docs: the install guide says 1.2.0 is the current release (it said 1.1.1). Content only.
+- Docs: SECURITY.md says how to report a vulnerability privately.
 
 ### Removed
 

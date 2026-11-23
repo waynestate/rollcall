@@ -1,5 +1,5 @@
 # Dashboard accessibility gate: Preflight's a11y checker (vendored in
-# tools/a11y/check.mjs from Preflight 0.9.0, pinned by tests/A11yCheckerPinTest.php),
+# tools/a11y/check.mjs from Preflight 0.12.0, pinned by tests/A11yCheckerPinTest.php),
 # run in Docker so no host browser is needed. Renders the public, internal
 # and empty-state dashboard pages with PHPUnit, from Laravel and from the
 # raw-PHP entry point (six pages), server-renders the Vue page component and
@@ -29,9 +29,9 @@ Set-Location -LiteralPath (Split-Path -Parent $PSScriptRoot)
 
 $composerImage = "composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0"
 # The a11y component's image default, digest included (templates/a11y/template.yml
-# of Preflight 0.9.0). Its tag sets the playwright npm version, so the package
+# of Preflight 0.12.0). Its tag sets the playwright npm version, so the package
 # and the image's browsers always match.
-$image = "mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d"
+$image = "mcr.microsoft.com/playwright:v1.65.0-noble@sha256:9beb546099e11f52d62e505537914870e01a67e0e6b00ae41da4775324e73dbe"
 $pw = ([regex]::Match($image, 'playwright:v(\d+\.\d+\.\d+)')).Groups[1].Value
 if (-not $pw) { throw "cannot read the Playwright version from the image tag $image" }
 $outDir = "build/dashboard-a11y"
