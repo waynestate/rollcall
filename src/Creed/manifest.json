@@ -1,7 +1,7 @@
 {
     "schema_version": 1,
     "source": "creed",
-    "creed_version": "unknown",
+    "creed_version": "0.1.14",
     "namespace": "Waynestate\\Rollcall\\Creed",
     "files": {
         "Policy.php": {
