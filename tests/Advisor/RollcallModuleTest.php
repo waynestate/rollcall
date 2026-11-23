@@ -203,7 +203,7 @@ final class RollcallModuleTest extends TestCase
         $this->assertSame(self::TODAY, $out['as_of']);
 
         $php = $out['components']['php'];
-        $this->assertSame(['8.4', '8.5'], array_column($php['active'], 'version'));
+        $this->assertSame(['8.4', '8.5', '8.6'], array_column($php['active'], 'version'));
         $this->assertSame(['8.2', '8.3'], array_column($php['security_only'], 'version'));
         $this->assertSame(['8.1'], array_column($php['end_of_life'], 'version'));
         $this->assertSame('eol_grace_expired', $php['end_of_life'][0]['state']);
@@ -212,6 +212,17 @@ final class RollcallModuleTest extends TestCase
         $this->assertSame(['13'], array_column($laravel['active'], 'version'));
         $this->assertSame(['12'], array_column($laravel['security_only'], 'version'));
         $this->assertSame(['10', '11'], array_column($laravel['end_of_life'], 'version'));
+
+        $cakephp = $out['components']['cakephp'];
+        $this->assertSame(['5'], array_column($cakephp['active'], 'version'));
+        $this->assertSame([], array_column($cakephp['security_only'], 'version'));
+        $this->assertSame(['4'], array_column($cakephp['end_of_life'], 'version'));
+        $this->assertSame('eol', $cakephp['end_of_life'][0]['state'], 'still inside the 90-day EOL grace on the pinned day');
+
+        $slim = $out['components']['slim'];
+        $this->assertSame(['4'], array_column($slim['active'], 'version'));
+        $this->assertSame([], array_column($slim['security_only'], 'version'));
+        $this->assertSame([], array_column($slim['end_of_life'], 'version'));
 
         foreach ($out['components'] as $component) {
             $this->assertSame(['active', 'security_only', 'end_of_life'], array_keys($component));
