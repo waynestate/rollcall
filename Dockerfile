@@ -2,7 +2,7 @@
 # Every setting arrives at run time with -e or --env-file; nothing secret is baked in.
 
 # The base is pinned here so CI can swap in its dependency-proxy path.
-ARG PHP_IMAGE=php:8.5-cli-trixie@sha256:50956f094e90a716d43bea28087d447555ad80510e386ab8c9c10d8c70d781a9
+ARG PHP_IMAGE=php:8.5-cli-trixie@sha256:fa19395008dff49909fa42c23ac4b48a7b5c2acd03c37e50a1e6402bb6cea143
 
 # Composer stage: resolve the production dependencies away from the final image.
 FROM composer:2 AS builder
