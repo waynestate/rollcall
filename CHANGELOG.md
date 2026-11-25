@@ -11,6 +11,7 @@ All notable changes to Rollcall. The format follows Keep a Changelog; versions f
 
 ### Changed
 
+- Changed: CI follows D-176 and pins Preflight 0.13.0 (axe-core 4.14.1 in both a11y checker copies). A push runs the fast tier (composer ci, the audits, PROCTOR, secret detection, the WayneUI copies check); the full tier (PHP matrix and advisory PHP, the site and dashboard a11y checks, the dashboard render and Vue build) runs nightly, on tags and on manual runs. The robot schedules run the fast tier. Branch pipelines only, so an open MR no longer doubles a push, and a new commit cancels the pipeline it replaces.
 - Changed: the bundled CREED copy carries CREED 0.1.14's policy (`src/Creed/policy.json`, stamped `0.1.14` in `src/Creed/manifest.json`), so the front page versions table and the PHP lines the ADVISOR module reports (8.4, 8.5, 8.6) match CREED's current release.
 - Fixed: `composer site:versions` no longer stops with "No versions-table markers in site/index.md". The agent-ready kit strips the markers from the Markdown twin, so the tool now finds the bare table there by its caption and header and rewrites those lines. This is what turned the weekly creed-copy-refresh job red.
 - Changed: CI pins Preflight 0.12.0 (components and the a11y checker copy). The php-test component now also runs an advisory PHP 8.6 job that may fail and never gates the pipeline.
